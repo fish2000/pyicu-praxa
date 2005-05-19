@@ -45,10 +45,14 @@
 #include <unicode/curramt.h>
 #include <unicode/timezone.h>
 #include <unicode/simpletz.h>
+#include <unicode/dtfmtsym.h>
+#include <unicode/dcfmtsym.h>
 
 
 typedef int32_t _int32_t;
 typedef const icu::Locale *LocaleArray1;
+typedef const icu::UnicodeString *UnicodeStringArray2;
+typedef const icu::UnicodeString *UnicodeStringArray3;
 typedef icu::DateFormat _DateFormat;
 typedef icu::MeasureFormat _MeasureFormat;
 typedef icu::Calendar _Calendar;

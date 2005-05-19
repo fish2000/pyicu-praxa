@@ -35,6 +35,9 @@
   g++ or Microsoft Visual C++ on Windows). In order to use GNU Make on
   Windows, you need to install the Cygwin environment first.
 
+  Edit the section in the Makefile for your operating system.
+  Run make and make install.
+
 
   Running PyICU
   -------------

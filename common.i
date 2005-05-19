@@ -307,6 +307,26 @@
     }
 }
 
+%typemap(in) UnicodeStringArray3 {
+
+    int len = PyList_Size($input);
+    UnicodeString *strings = new UnicodeString[len];
+    arg3 = len;
+    for (int i = 0; i < len; i++)
+        PyUnicode_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
+    $1 = (const UnicodeString *) strings;
+}
+
+%typemap(out) UnicodeStringArray2 {
+
+    $result = PyList_New(arg2);
+    for (int32_t i = 0; i < arg2; i++) {
+        UnicodeString *string = (UnicodeString *) $1 + i;
+        PyObject *o = SWIG_NewPointerObj(string, $descriptor(icu::UnicodeString *), 0);
+        PyList_SET_ITEM($result, i, o);
+    }
+}
+
 
 %exception
 {

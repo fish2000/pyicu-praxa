@@ -37,6 +37,51 @@
 
 namespace icu {
 
+    class DateFormatSymbols : public UObject {
+    public:
+        DateFormatSymbols(UErrorCode);
+        DateFormatSymbols(Locale &, UErrorCode);
+        DateFormatSymbols(char *, UErrorCode);
+        DateFormatSymbols(Locale &, char *, UErrorCode);
+        
+        UBool operator==(DateFormatSymbols &);
+        UBool operator!=(DateFormatSymbols &);
+
+        UnicodeStringArray2 getEras(_int32_t);
+        void setEras(UnicodeStringArray3, _int32_t);
+
+        UnicodeStringArray2 getMonths(_int32_t);
+        void setMonths(UnicodeStringArray3, _int32_t);
+        UnicodeStringArray2 getShortMonths(_int32_t);
+        void setShortMonths(UnicodeStringArray3, _int32_t);
+
+        UnicodeStringArray2 getWeekdays(_int32_t);
+        void setWeekdays(UnicodeStringArray3, _int32_t);
+        UnicodeStringArray2 getShortWeekdays(_int32_t);
+        void setShortWeekdays(UnicodeStringArray3, _int32_t);
+
+        UnicodeStringArray2 getAmPmStrings(_int32_t);
+        void setAmPmStrings(UnicodeStringArray3, _int32_t);
+
+        UnicodeString1 &getLocalPatternChars(UnicodeString &);
+        UnicodeString getLocalPatternChars(_UnicodeString);
+        void setLocalPatternChars(UnicodeString &);
+        void setLocalPatternChars(_PyString);
+
+        %extend {
+            const Locale getLocale(ULocDataLocaleType type=ULOC_VALID_LOCALE)
+            {
+                UErrorCode status = U_ZERO_ERROR;
+                Locale locale = self->getLocale(type, status);
+
+                if (U_FAILURE(status))
+                    throw ICUException(status);
+
+                return locale;
+            }
+        }
+    };
+
     class DateFormat : public Format {
     public:
         enum EStyle {
@@ -140,8 +185,10 @@ namespace icu {
         SimpleDateFormat(UErrorCode);
         SimpleDateFormat(UnicodeString &, UErrorCode);
         SimpleDateFormat(UnicodeString &, Locale &, UErrorCode);
+        SimpleDateFormat(UnicodeString &, DateFormatSymbols &, UErrorCode);
         SimpleDateFormat(_PyString, UErrorCode);
         SimpleDateFormat(_PyString, Locale &, UErrorCode);
+        SimpleDateFormat(_PyString, DateFormatSymbols &, UErrorCode);
         UnicodeString1 &toPattern(UnicodeString &);
         UnicodeString toPattern(_UnicodeString);
         UnicodeString1 &toLocalizedPattern(UnicodeString &, UErrorCode);
@@ -152,6 +199,9 @@ namespace icu {
         void applyLocalizedPattern(_PyString, UErrorCode);
         void set2DigitYearStart(UDate, UErrorCode);
         UDate get2DigitYearStart(UErrorCode);
+
+        DateFormatSymbols *getDateFormatSymbols();
+        void setDateFormatSymbols(DateFormatSymbols &);
 
         %extend {
             PyObject *__repr__()

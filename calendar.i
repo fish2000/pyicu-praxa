@@ -385,7 +385,7 @@ namespace icu {
                 Locale locale = self->getLocale(type, status);
 
                 if (U_FAILURE(status))
-                    throw ICUException(status, "error");
+                    throw ICUException(status);
 
                 return locale;
             }
@@ -396,7 +396,7 @@ namespace icu {
                 const char *localeID = self->getLocaleID(type, status);
 
                 if (U_FAILURE(status))
-                    throw ICUException(status, "error");
+                    throw ICUException(status);
 
                 return localeID;
             }

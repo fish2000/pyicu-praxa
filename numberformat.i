@@ -35,6 +35,52 @@
 
 namespace icu {
 
+    class DecimalFormatSymbols : public UObject {
+    public:
+        enum ENumberFormatSymbol {
+            kDecimalSeparatorSymbol,
+            kGroupingSeparatorSymbol,
+            kPatternSeparatorSymbol,
+            kPercentSymbol,
+            kZeroDigitSymbol,
+            kDigitSymbol,
+            kMinusSignSymbol,
+            kPlusSignSymbol,
+            kCurrencySymbol,
+            kIntlCurrencySymbol,
+            kMonetarySeparatorSymbol,
+            kExponentialSymbol,
+            kPerMillSymbol,
+            kPadEscapeSymbol,
+            kInfinitySymbol,
+            kNaNSymbol,
+            kSignificantDigitSymbol,
+        };
+
+        DecimalFormatSymbols(UErrorCode);
+        DecimalFormatSymbols(Locale &, UErrorCode);
+
+        UBool operator==(DecimalFormatSymbols &);
+        UBool operator!=(DecimalFormatSymbols &);
+
+        UnicodeString getSymbol(ENumberFormatSymbol);
+        void setSymbol(ENumberFormatSymbol, UnicodeString &);
+        void setSymbol(ENumberFormatSymbol, _PyString);
+
+        %extend {
+            const Locale getLocale(ULocDataLocaleType type=ULOC_VALID_LOCALE)
+            {
+                UErrorCode status = U_ZERO_ERROR;
+                Locale locale = self->getLocale(type, status);
+
+                if (U_FAILURE(status))
+                    throw ICUException(status);
+
+                return locale;
+            }
+        }
+    };
+
     class NumberFormat : public Format {
     public:
         enum EAlignmentFields {

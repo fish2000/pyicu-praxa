@@ -308,7 +308,7 @@ namespace icu {
                 int len = 0;
 
                 while (languages[len] != NULL) len += 1;
-                list = PyList_New(--len);
+                list = PyList_New(len);
 
                 for (int i = 0; i < len; i++) {
                     PyObject *str = PyString_FromString(languages[i]);
