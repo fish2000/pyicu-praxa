@@ -1,0 +1,150 @@
+
+
+  README file for PyICU
+  ---------------------
+
+  Contents
+  --------
+
+   - Welcome
+   - Building PyICU
+   - API Documentation
+
+
+  Welcome
+  -------
+
+  Welcome to PyICU, a Python extension wrapping IBM's International
+  Components for Unicode C++ library (ICU) generated using SWIG.
+
+  PyICU is a project maintained by the Open Source Applications Foundation.
+
+  IBM's ICU homepage is: http://www-306.ibm.com/software/globalization/icu/
+  SWIG's homepage is: http://www.swig.org/
+
+
+  Building PyICU
+  --------------
+
+  PyICU is built with GNU Make, SWIG and a C++ compiler (g++ on Unix, MinGW
+  g++ or Microsoft Visual C++ on Windows). In order to use GNU Make on
+  Windows, you need to install the Cygwin environment first.
+
+
+  API Documentation
+  -----------------
+
+  At the moment, there is no API documentation for PyICU. The API for ICU is
+  documented at http://icu.sourceforge.net/apiref/icu4c/ and the following
+  patterns can be used to translate from the C++ APIs to the corresponding
+  Python APIs.
+
+    - strings
+
+    The ICU string type, UnicodeString, is a type pointing at a mutable
+    array of UChar Unicode 16-bit wide characters. The Python unicode type
+    is an immutable string of 16-bit or 32-bit wide Unicode characters.
+    Because of these differences, UnicodeString and Python's unicode type
+    are not merged into the same type when crossing the SWIG boundary.
+    ICU APIs taking UnicodeString arguments have been overloaded to also
+    accept Python str or unicode type arguments. In the case of str objects,
+    utf-8 encoding is assumed when converting them to UnicodeString
+    objects. There are several ways ICU C++ API accept and return
+    UnicodeString arguments: by value, by pointer or by reference.
+    When an ICU C++ API is documented to accept a UnicodeString & parameter,
+    it is safe to assume that there are several corresponding PyICU python
+    APIs making it accessible in simpler ways:
+    For example, the 'UnicodeString &Locale::getDisplayName(UnicodeString &)'
+    API, documented here:
+        http://icu.sourceforge.net/apiref/icu4c/classLocale.html#a19
+    can be invoked from Python in several ways:
+
+      1. The ICU way
+
+        >>> from PyICU import UnicodeString, Locale
+        >>> locale = Locale('pt_BR')
+        >>> string = UnicodeString()
+        >>> name = locale.getDisplayName(string)
+        >>> name
+        <UnicodeString: Portuguese (Brazil)>
+        >>> name is string
+        True                  <-- string arg was returned, modified in place
+
+      2. The Python way
+
+        >>> from PyICU import UnicodeString, Locale
+        >>> locale = Locale('pt_BR')
+        >>> name = locale.getDisplayName()
+        >>> name
+        <UnicodeString: Portuguese (Brazil)>
+
+        A UnicodeString object was allocated for Python and returned.
+
+    A UnicodeString can be coerced to a Python unicode string with the
+    toUnicode() method. The usual len(), str(), comparison, [] and [:]
+    operators are all available, with the additional twist that slicing is not
+    read-only since a UnicodeString is mutable. For example:
+
+        >>> name = locale.getDisplayName()
+        <UnicodeString: Portuguese (Brazil)>
+        >>> name.toUnicode()
+        u'Portuguese (Brazil)'
+        >>> len(name)
+        19
+        >>> str(name)           <-- works when chars fit with default encoding
+        'Portuguese (Brazil)'
+        >>> name[3]
+        u't'
+        >>> name[12:18]
+        <UnicodeString: Brazil>
+        >>> name[12:18] = 'the country of Brasil'
+        >>> name
+        <UnicodeString: Portuguese (the country of Brasil)>
+
+    - error reporting
+
+    The C++ ICU library does not use C++ exceptions to report errors. ICU
+    C++ APIs return errors via a UErrorCode reference argument. All such
+    APIs are wrapped by Python APIs that omit this argument and throw an
+    ICUError Python exception instead. The same is true for ICU APIs taking
+    both a ParseError and a UErrorCode, they are both be omitted.
+
+    For example, the 'UnicodeString &DateFormat::format(const Formattable &,
+    UnicodeString &, UErrorCode &)' API, documented here
+        http://icu.sourceforge.net/apiref/icu4c/classDateFormat.html#a6
+    is invoked from Python with:
+
+        >>> from PyICU import DateFormat, Formattable
+        >>> df = DateFormat.createInstance()
+        >>> df
+        <SimpleDateFormat: M/d/yy h:mm a>
+        >>> f = Formattable(940284258.0, Formattable.kIsDate)
+        >>> df.format(f)
+        <UnicodeString: 10/18/99 3:04 PM>
+     
+    Of course, the simpler 'UnicodeString &DateFormat::format(UDate,
+    UnicodeString &)' documented here:
+        http://icu.sourceforge.net/apiref/icu4c/classDateFormat.html
+    can be used too:
+
+        >>> from PyICU import DateFormat
+        >>> df = DateFormat.createInstance()
+        >>> df
+        <SimpleDateFormat: M/d/yy h:mm a>
+        >>> df.format(940284258.0)
+        <UnicodeString: 10/18/99 3:04 PM>
+
+    - dates
+
+    In ICU, a date is represented by the UDate type, a double precision
+    floating point number reprensenting the number of milliseconds elapsed
+    since 1970-jan-01 UTC. 
+
+    In Python, the value returned by the time module's time function is the
+    number of seconds since 1970-jan-01 UTC. Because of this difference,
+    floating point values are multiplied by 1000 when passed to APIs taking
+    UDate and divided by 1000 when returned as UDate.
+
+    Python's datetime objects, with our without timezone information, can be
+    used with APIs taking UDate arguments, with or without timezone. The
+    datetime objects get converted to UDate in the SWIG layer.
