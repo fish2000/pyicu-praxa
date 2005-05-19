@@ -27,28 +27,37 @@
 #include <Python.h>
 #include <unicode/utypes.h>
 #include <unicode/unistr.h>
-#include <unicode/uobject.h>
-#include <unicode/rep.h>
-#include <unicode/fmtable.h>
-#include <unicode/datefmt.h>
-#include <unicode/measure.h>
-#include <unicode/measunit.h>
-#include <unicode/measfmt.h>
-#include <unicode/parseerr.h>
-#include <unicode/format.h>
-#include <unicode/msgfmt.h>
+#include <unicode/locid.h>
 #include <unicode/calendar.h>
 #include <unicode/gregocal.h>
+#include <unicode/format.h>
+#include <unicode/datefmt.h>
+#include <unicode/smpdtfmt.h>
+#include <unicode/measfmt.h>
+#include <unicode/msgfmt.h>
+#include <unicode/numfmt.h>
+#include <unicode/choicfmt.h>
+#include <unicode/decimfmt.h>
+#include <unicode/rbnf.h>
+#include <unicode/measure.h>
+#include <unicode/measunit.h>
+#include <unicode/currunit.h>
+#include <unicode/curramt.h>
+#include <unicode/timezone.h>
+#include <unicode/simpletz.h>
+
 
 typedef int32_t _int32_t;
 typedef const icu::Locale *LocaleArray1;
 typedef icu::DateFormat _DateFormat;
 typedef icu::MeasureFormat _MeasureFormat;
 typedef icu::Calendar _Calendar;
+typedef icu::TimeZone _TimeZone;
 typedef icu::UnicodeString _UnicodeString;
 typedef icu::UnicodeString UnicodeString0;
 typedef icu::UnicodeString UnicodeString1;
 typedef icu::UnicodeString UnicodeString2;
+typedef icu::UnicodeString UnicodeString3;
 typedef icu::UnicodeString _PyString;
 typedef const UChar *ISO3Code;
 typedef icu::Formattable Formattable2;

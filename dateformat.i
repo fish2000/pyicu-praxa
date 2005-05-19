@@ -25,8 +25,6 @@
 
 %{
 
-#include <unicode/datefmt.h>
-#include <unicode/smpdtfmt.h>
 #include "common.h"
 
 %}
@@ -36,7 +34,8 @@
 %import "string.i"
 %import "locale.i"
 %import "format.i"
-
+%import "numberformat.i"
+%import "calendar.i"
 
 namespace icu {
 
@@ -119,6 +118,13 @@ namespace icu {
         UDate parse(UnicodeString &, ParsePosition &);
         UDate parse(_PyString, UErrorCode);
         UDate parse(_PyString, ParsePosition &);
+
+        Calendar *getCalendar();
+        void setCalendar(Calendar &);
+        NumberFormat *getNumberFormat();
+        void setNumberFormat(NumberFormat &);
+        const TimeZone &getTimeZone();
+        void setTimeZone(TimeZone &);
 
         static _DateFormat *createInstance();
         static _DateFormat *createTimeInstance(EStyle=kDefault,

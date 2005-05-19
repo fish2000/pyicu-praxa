@@ -187,6 +187,11 @@
     Py_INCREF(obj2);
     $result = obj2;
 }
+%typemap(out) UnicodeString3 &
+{
+    Py_INCREF(obj3);
+    $result = obj3;
+}
 
 %typemap(out) Formattable2 &
 {
@@ -221,6 +226,22 @@
         $result = SWIG_NewPointerObj($1, $descriptor(icu::GregorianCalendar *), 1);
     else
         $result = SWIG_NewPointerObj($1, $descriptor(icu::Calendar *), 1);
+}
+
+%typemap(out) _TimeZone *
+{
+    if ($1->getDynamicClassID() == icu::SimpleTimeZone::getStaticClassID())
+        $result = SWIG_NewPointerObj($1, $descriptor(icu::SimpleTimeZone *), 1);
+    else
+        $result = SWIG_NewPointerObj($1, $descriptor(icu::TimeZone *), 1);
+}
+
+%typemap(out) const TimeZone &
+{
+    if ($1.getDynamicClassID() == icu::SimpleTimeZone::getStaticClassID())
+        $result = SWIG_NewPointerObj($1, $descriptor(icu::SimpleTimeZone *), 0);
+    else
+        $result = SWIG_NewPointerObj($1, $descriptor(icu::TimeZone *), 0);
 }
 
 %typemap(out) _MeasureFormat *

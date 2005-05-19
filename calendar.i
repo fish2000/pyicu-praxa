@@ -26,20 +26,37 @@
 %{
 
 #include "common.h"
-#include <unicode/datefmt.h>
 
-static PyObject *repr(char *name, Calendar *self)
+static PyObject *tz_repr(char *name, TimeZone *self)
+{
+    UnicodeString u; self->getID(u);
+    PyObject *string = PyUnicode_FromUnicodeString(&u);
+    PyObject *pyname = PyString_FromString(name);
+    PyObject *format = PyString_FromString("<%s: %s>");
+    PyObject *tuple = PyTuple_New(2);
+    PyObject *repr;
+
+    PyTuple_SET_ITEM(tuple, 0, pyname);
+    PyTuple_SET_ITEM(tuple, 1, string);
+    repr = PyString_Format(format, tuple);
+    Py_DECREF(format);
+    Py_DECREF(tuple);
+
+    return repr;
+}
+
+static PyObject *cal_repr(char *name, Calendar *self)
 {
     UErrorCode status = U_ZERO_ERROR;
     UDate date = self->getTime(status);
-    UnicodeString u = UnicodeString();
+    UnicodeString u;
 
     if (U_SUCCESS(status))
     {
         Locale locale = self->getLocale(ULOC_VALID_LOCALE, status);
         DateFormat *df = DateFormat::createDateTimeInstance(DateFormat::kDefault, DateFormat::kDefault, locale);
 
-        u = df->format(date, u);
+        df->format(date, u);
         delete df;
     }
 
@@ -124,6 +141,135 @@ enum UCalendarAMPMs {
 
 namespace icu {
 
+    class TimeZone : public UObject {
+    public:
+
+        enum EDisplayType {
+            SHORT = 1,
+            LONG
+        };
+
+        UBool operator==(TimeZone &);
+        UBool operator!=(TimeZone &);
+
+        int32_t getOffset(uint8_t, int32_t, int32_t, int32_t, uint8_t, int32_t, UErrorCode);
+        int32_t getOffset(uint8_t, int32_t, int32_t, int32_t, uint8_t, int32_t, int32_t, UErrorCode);
+
+        void setRawOffset(int32_t);
+        int32_t getRawOffset();
+
+        UnicodeString1 &getID(UnicodeString &);
+        UnicodeString getID(_UnicodeString);
+        void setID(UnicodeString &);
+        void setID(_PyString);
+
+        UnicodeString1 &getDisplayName(UnicodeString &);
+        UnicodeString2 &getDisplayName(Locale &, UnicodeString &);
+        UnicodeString getDisplayName(_UnicodeString);
+        UnicodeString getDisplayName(Locale &, _UnicodeString);
+        UnicodeString3 &getDisplayName(UBool, EDisplayType, UnicodeString &);
+        UnicodeString &getDisplayName(UBool, EDisplayType, _UnicodeString);
+
+        UBool useDaylightTime();
+        UBool inDaylightTime(UDate, UErrorCode);
+        UBool hasSameRules(TimeZone &);
+
+        static _TimeZone *getGMT();
+        static _TimeZone *createTimeZone(UnicodeString &);
+        static _TimeZone *createTimeZone(_PyString);
+        int32_t countEquivalentIDs(UnicodeString &);
+        int32_t countEquivalentIDs(_PyString);
+        UnicodeString getEquivalentID(UnicodeString &, int32_t);
+        UnicodeString getEquivalentID(_PyString, int32_t);
+        _TimeZone *createDefault();
+        void setDefault(TimeZone &);
+
+        %extend {
+            PyObject *__repr__()
+            {
+                return tz_repr("TimeZone", self);
+            }
+
+            PyObject *getOffset(UDate date, UBool local)
+            {
+                int32_t rawOffset, dstOffset;
+                UErrorCode status = U_ZERO_ERROR;
+
+                self->getOffset(date, local, rawOffset, dstOffset, status);
+                if (U_FAILURE(status))
+                    throw ICUException(status);
+                    
+                PyObject *tuple = PyTuple_New(2);
+                PyTuple_SET_ITEM(tuple, 0, PyInt_FromLong(rawOffset));
+                PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(dstOffset));
+
+                return tuple;
+            }
+        }
+    };
+    
+    class SimpleTimeZone : public TimeZone {
+    public:
+        enum TimeMode {
+            WALL_TIME = 0,
+            STANDARD_TIME,
+            UTC_TIME
+        };
+
+        SimpleTimeZone(int32_t, UnicodeString &);
+        SimpleTimeZone(int32_t, _PyString);
+        SimpleTimeZone(int32_t, UnicodeString &, int8_t, int8_t, int8_t, int32_t, int8_t, int8_t, int8_t, int32_t, UErrorCode);
+        SimpleTimeZone(int32_t, UnicodeString &, int8_t, int8_t, int8_t, int32_t, int8_t, int8_t, int8_t, int32_t, int32_t, UErrorCode);
+ 	SimpleTimeZone(int32_t, UnicodeString &, int8_t, int8_t, int8_t, int32_t, TimeMode, int8_t, int8_t, int8_t, int32_t, TimeMode, int32_t, UErrorCode);
+
+        void setStartYear(int32_t year);
+        void setStartRule(int32_t, int32_t, int32_t, int32_t, UErrorCode);
+        //void setStartRule(int32_t, int32_t, int32_t, int32_t, TimeMode, UErrorCode);
+        void setStartRule(int32_t, int32_t, int32_t, UErrorCode);
+        //void setStartRule(int32_t, int32_t, int32_t, TimeMode, UErrorCode);
+        void setStartRule(int32_t, int32_t, int32_t, int32_t, UBool, UErrorCode);
+        void setStartRule(int32_t, int32_t, int32_t, int32_t, TimeMode, UBool, UErrorCode);
+        void setEndRule(int32_t, int32_t, int32_t, int32_t, UErrorCode);
+        void setEndRule(int32_t, int32_t, int32_t, int32_t, TimeMode, UErrorCode);
+        void setEndRule(int32_t, int32_t, int32_t, UErrorCode);
+        //void setEndRule(int32_t, int32_t, int32_t, TimeMode, UErrorCode);
+        void setEndRule(int32_t, int32_t, int32_t, int32_t, UBool, UErrorCode);
+        void setEndRule(int32_t, int32_t, int32_t, int32_t, TimeMode, UBool, UErrorCode);
+
+        int32_t getOffset(uint8_t, int32_t, int32_t, int32_t, uint8_t, int32_t, UErrorCode);
+        int32_t getOffset(uint8_t, int32_t, int32_t, int32_t, uint8_t, int32_t, int32_t, UErrorCode);
+        int32_t getOffset(uint8_t, int32_t, int32_t, int32_t, uint8_t, int32_t, int32_t, int32_t, UErrorCode);
+
+        int32_t getRawOffset();
+        void setRawOffset(int32_t);
+
+        void setDSTSavings(int32_t, UErrorCode);
+        int32_t getDSTSavings();
+
+        %extend {
+            PyObject *__repr__()
+            {
+                return tz_repr("SimpleTimeZone", self);
+            }
+
+            PyObject *getOffset(UDate date, UBool local)
+            {
+                int32_t rawOffset, dstOffset;
+                UErrorCode status = U_ZERO_ERROR;
+
+                self->getOffset(date, local, rawOffset, dstOffset, status);
+                if (U_FAILURE(status))
+                    throw ICUException(status);
+                    
+                PyObject *tuple = PyTuple_New(2);
+                PyTuple_SET_ITEM(tuple, 0, PyInt_FromLong(rawOffset));
+                PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(dstOffset));
+
+                return tuple;
+            }
+        }
+    };
+
     class Calendar : public UObject {
     public:
         enum EDateFields {
@@ -193,6 +339,9 @@ namespace icu {
         void roll(UCalendarDateFields, int32_t, UErrorCode);
         
         int32_t fieldDifference(UDate, UCalendarDateFields, UErrorCode);
+
+        void setTimeZone(TimeZone &);
+        const TimeZone &getTimeZone();
         
         UBool inDaylightTime(UErrorCode);
 
@@ -226,6 +375,8 @@ namespace icu {
 
         static _Calendar *createInstance(UErrorCode);
         static _Calendar *createInstance(Locale &, UErrorCode);
+        static _Calendar *createInstance(TimeZone &, UErrorCode);
+        static _Calendar *createInstance(TimeZone &, Locale &, UErrorCode);
         static LocaleArray1 getAvailableLocales(_int32_t);
         static UDate getNow();
 
@@ -254,7 +405,7 @@ namespace icu {
 
             PyObject *__repr__()
             {
-                return repr("Calendar", self);
+                return cal_repr("Calendar", self);
             }
         }
     };
@@ -281,7 +432,7 @@ namespace icu {
         %extend {
             PyObject *__repr__()
             {
-                return repr("GregorianCalendar", self);
+                return cal_repr("GregorianCalendar", self);
             }
         };
     };

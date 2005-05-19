@@ -25,8 +25,6 @@
 
 %{
 
-#include <unicode/currunit.h>
-#include <unicode/curramt.h>
 #include "common.h"
 
 %}

@@ -25,10 +25,6 @@
 
 %{
 
-#include <unicode/numfmt.h>
-#include <unicode/decimfmt.h>
-#include <unicode/rbnf.h>
-#include <unicode/choicfmt.h>
 #include "common.h"
 
 %}

@@ -25,7 +25,6 @@
 
 %{
 
-#include <unicode/locid.h>
 #include "common.h"
 
 %}

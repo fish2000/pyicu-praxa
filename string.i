@@ -25,7 +25,6 @@
 
 %{
 
-#include <unicode/ucnv.h>
 #include "common.h"
 
 %}
