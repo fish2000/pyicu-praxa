@@ -283,6 +283,40 @@ namespace icu {
 
                 return repr;
             }
+
+            static PyObject *getISOCountries()
+            {
+                const char *const *countries = Locale::getISOCountries();
+                PyObject *list;
+                int len = 0;
+
+                while (countries[len] != NULL) len += 1;
+                list = PyList_New(len);
+
+                for (int i = 0; i < len; i++) {
+                    PyObject *str = PyString_FromStringAndSize(countries[i], 2);
+                    PyList_SET_ITEM(list, i, str);
+                }
+
+                return list;
+            }
+
+            static PyObject *getISOLanguages()
+            {
+                const char *const *languages = Locale::getISOLanguages();
+                PyObject *list;
+                int len = 0;
+
+                while (languages[len] != NULL) len += 1;
+                list = PyList_New(--len);
+
+                for (int i = 0; i < len; i++) {
+                    PyObject *str = PyString_FromString(languages[i]);
+                    PyList_SET_ITEM(list, i, str);
+                }
+
+                return list;
+            }
         }
     };
 
