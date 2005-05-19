@@ -31,7 +31,6 @@
 
 %include "common.i"
 %import "bases.i"
-%import "string.i"
 
 namespace icu {
 

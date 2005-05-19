@@ -53,6 +53,118 @@ namespace icu {
         UBool hasMetaData();
     };
 
+    class UnicodeString : public Replaceable {
+    public:
+        UnicodeString();
+        UnicodeString(UnicodeString &);
+        UnicodeString(_PyString);
+        UBool operator==(UnicodeString &);
+        UBool operator!=(UnicodeString &);
+        UBool operator>(UnicodeString &);
+        UBool operator<(UnicodeString &);
+        UBool operator>=(UnicodeString &);
+        UBool operator<=(UnicodeString &);
+        UBool operator==(_PyString);
+        UBool operator!=(_PyString);
+        UBool operator>(_PyString);
+        UBool operator<(_PyString);
+        UBool operator>=(_PyString);
+        UBool operator<=(_PyString);
+        UnicodeString0 &operator+=(UnicodeString &);
+        UnicodeString0 &operator+=(_PyString);
+        UnicodeString0 &append(UnicodeString &);
+        UnicodeString0 &append(UnicodeString &, int32_t, int32_t);
+        UnicodeString0 &append(_PyString);
+        UnicodeString0 &append(_PyString, int32_t, int32_t);
+        UnicodeString0 &append(UChar);
+
+        %extend {
+            _PyString *toUnicode()
+            {
+                return self;
+            }
+
+            UChar __getitem__(int32_t index)
+            {
+                if (index < 0)
+                    index += self->length();
+
+                return self->charAt(index);
+            }
+
+            int32_t __len__()
+            {
+                return self->length();
+            }
+
+            void __setitem__(int32_t index, UChar c)
+            {
+                if (index < 0)
+                    index += self->length();
+
+                self->setCharAt(index, c);
+            }
+
+            _UnicodeString *__getslice__(int32_t start, int32_t end)
+            {
+                if (start < 0)
+                    start += self->length();
+                if (end < 0)
+                    end += self->length();
+
+                UnicodeString *string = new UnicodeString();
+                self->extractBetween(start, end, *string);
+
+                return string;
+            }
+
+            void __setslice__(int32_t start, int32_t end, UnicodeString &string)
+            {
+                if (start < 0)
+                    start += self->length();
+                if (end < 0)
+                    end += self->length();
+
+                self->replaceBetween(start, end, string);
+            }
+
+            void __setslice__(int32_t start, int32_t end, _PyString string)
+            {
+                if (start < 0)
+                    start += self->length();
+                if (end < 0)
+                    end += self->length();
+
+                self->replaceBetween(start, end, string);
+            }
+
+            PyObject *__repr__()
+            {
+                PyObject *string = PyUnicode_FromUnicodeString(self);
+                PyObject *format = PyString_FromString("<UnicodeString: %s>");
+                PyObject *tuple = PyTuple_New(1);
+                PyObject *repr;
+
+                PyTuple_SET_ITEM(tuple, 0, string);
+                repr = PyString_Format(format, tuple);
+                Py_DECREF(format);
+                Py_DECREF(tuple);
+
+                return repr;
+            }
+
+            PyObject *__str__()
+            {
+                PyObject *string = PyUnicode_FromUnicodeString(self);
+                PyObject *str = PyObject_Str(string);
+
+                Py_DECREF(string);
+
+                return str;
+            }
+        }
+    };
+
     class Formattable : public UObject {
     public:
         enum ISDATE {
@@ -150,6 +262,11 @@ namespace icu {
         static Locale getCanada();
         static Locale getCanadaFrench();
         static Locale getDefault();
+
+	static Locale createFromName(char *);
+	static Locale createCanonical(char *);
+
+        static LocaleArray1 getAvailableLocales(_int32_t);
 
         %extend {
             PyObject *__repr__()

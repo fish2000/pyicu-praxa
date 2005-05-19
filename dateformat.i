@@ -31,7 +31,6 @@
 
 %include "common.i"
 %import "bases.i"
-%import "string.i"
 %import "format.i"
 %import "numberformat.i"
 %import "calendar.i"

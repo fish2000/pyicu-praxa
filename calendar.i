@@ -79,7 +79,6 @@ static PyObject *cal_repr(char *name, Calendar *self)
 
 %include "common.i"
 %import "bases.i"
-%import "string.i"
 
 enum UCalendarDateFields {
     UCAL_ERA,
