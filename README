@@ -51,8 +51,8 @@
   What's available
   ----------------
 
-  PyICU is under active developement. Currently, the string, locale, format,
-  calendar and timezone are available.
+  PyICU is under active development. Currently, the string, locale, format,
+  calendar and timezone classes are available.
 
 
   API Documentation
