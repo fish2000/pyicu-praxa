@@ -177,12 +177,12 @@ namespace icu {
         static _TimeZone *getGMT();
         static _TimeZone *createTimeZone(UnicodeString &);
         static _TimeZone *createTimeZone(_PyString);
-        int32_t countEquivalentIDs(UnicodeString &);
-        int32_t countEquivalentIDs(_PyString);
-        UnicodeString getEquivalentID(UnicodeString &, int32_t);
-        UnicodeString getEquivalentID(_PyString, int32_t);
-        _TimeZone *createDefault();
-        void setDefault(TimeZone &);
+        static int32_t countEquivalentIDs(UnicodeString &);
+        static int32_t countEquivalentIDs(_PyString);
+        static UnicodeString getEquivalentID(UnicodeString &, int32_t);
+        static UnicodeString getEquivalentID(_PyString, int32_t);
+        static _TimeZone *createDefault();
+        static void setDefault(TimeZone &);
 
         %extend {
             PyObject *__repr__()
