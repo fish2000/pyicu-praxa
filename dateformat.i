@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2005 Open Source Applications Foundation.
+ * Copyright (c) 2005 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -128,6 +128,7 @@ namespace icu {
         static _DateFormat *createDateTimeInstance(EStyle=kDefault,
                                                    EStyle=kDefault,
                                                    Locale &=Locale::getDefault());
+        static LocaleArray1 getAvailableLocales(_int32_t);
     };
 
     class SimpleDateFormat : public DateFormat {

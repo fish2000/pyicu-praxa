@@ -77,7 +77,8 @@ endif
 
 SWIG_OPT=-DSWIG_COBJECT_TYPES -DSWIG_COBJECT_PYTHON -DPYICU_VER="'$(VERSION)'" -DICU_VER="'$(ICU_VER)'"
 
-MODULES=errors bases string locale format dateformat currency numberformat
+MODULES=errors bases string locale format dateformat currency numberformat \
+        calendar
 
 ifeq ($(OS),Darwin)
 PYTHON_SITE=$(PREFIX_PYTHON)/lib/python$(PYTHON_VER)/site-packages
@@ -152,15 +153,6 @@ endif
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
-
-PyICU_wrap.cxx: $(MODULES:%=%.i) common.i
-bases_wrap.cxx: common.i
-string_wrap.cxx: common.i bases.i
-locale_wrap.cxx: common.i bases.i string.i
-format_wrap.cxx: common.i bases.i string.i locale.i
-dateformat_wrap.cxx: common.i bases.i string.i locale.i format.i
-currency_wrap.cxx: common.i bases.i string.i locale.i format.i
-numberformat_wrap.cxx: common.i bases.i string.i locale.i format.i
 
 %_wrap.cxx: %.i
 	$(SWIG) $(SWIG_OPT) -I$(ICU_INC) -c++ -nodefault -python -modern $<

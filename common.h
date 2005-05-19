@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2005 Open Source Applications Foundation.
+ * Copyright (c) 2005 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -37,9 +37,14 @@
 #include <unicode/parseerr.h>
 #include <unicode/format.h>
 #include <unicode/msgfmt.h>
+#include <unicode/calendar.h>
+#include <unicode/gregocal.h>
 
+typedef int32_t _int32_t;
+typedef const icu::Locale *LocaleArray1;
 typedef icu::DateFormat _DateFormat;
 typedef icu::MeasureFormat _MeasureFormat;
+typedef icu::Calendar _Calendar;
 typedef icu::UnicodeString _UnicodeString;
 typedef icu::UnicodeString UnicodeString0;
 typedef icu::UnicodeString UnicodeString1;

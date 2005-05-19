@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2005 Open Source Applications Foundation.
+ * Copyright (c) 2005 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -36,4 +36,5 @@
     from PyICU_dateformat import *
     from PyICU_currency import *
     from PyICU_numberformat import *
+    from PyICU_calendar import *
 }

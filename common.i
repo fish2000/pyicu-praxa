@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2005 Open Source Applications Foundation.
+ * Copyright (c) 2005 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -98,6 +98,19 @@
     $1 = PyInt_CheckExact($input);
 }
 
+%typemap(in) uint8_t
+{
+    $1 = (uint8_t) PyInt_AsLong($input);
+}
+%typemap(out) uint8_t
+{
+    $result = PyInt_FromLong((long) $1);
+}
+%typecheck(SWIG_TYPECHECK_UINT8) uint8_t
+{
+    $1 = PyInt_CheckExact($input);
+}
+
 %typemap(in) int32_t
 {
     $1 = (int32_t) PyInt_AsLong($input);
@@ -155,6 +168,10 @@
 {
 }
 
+%typemap(in, numinputs=0) _int32_t
+{
+}
+
 %typemap(out) UnicodeString0 &
 {
     Py_INCREF(obj0);
@@ -196,6 +213,14 @@
         $result = SWIG_NewPointerObj($1, $descriptor(icu::SimpleDateFormat *), 1);
     else
         $result = SWIG_NewPointerObj($1, $descriptor(icu::DateFormat *), 1);
+}
+
+%typemap(out) _Calendar *
+{
+    if ($1->getDynamicClassID() == icu::GregorianCalendar::getStaticClassID())
+        $result = SWIG_NewPointerObj($1, $descriptor(icu::GregorianCalendar *), 1);
+    else
+        $result = SWIG_NewPointerObj($1, $descriptor(icu::Calendar *), 1);
 }
 
 %typemap(out) _MeasureFormat *
@@ -244,6 +269,16 @@
 {
     if (U_FAILURE($2))
         return ICUException($1, $2).reportError();
+}
+
+%typemap(out) LocaleArray1 {
+
+    $result = PyList_New(arg1);
+    for (int32_t i=0; i < arg1; i++) {
+        Locale *locale = (Locale *) $1 + i;
+        PyObject *o = SWIG_NewPointerObj(locale, $descriptor(icu::Locale *), 0);
+        PyList_SET_ITEM($result, i, o);
+    }
 }
 
 
