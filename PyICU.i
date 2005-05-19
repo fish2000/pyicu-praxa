@@ -33,7 +33,6 @@
     from PyICU_string import *
     from PyICU_format import *
     from PyICU_dateformat import *
-    from PyICU_currency import *
     from PyICU_numberformat import *
     from PyICU_calendar import *
 }

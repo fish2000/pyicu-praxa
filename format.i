@@ -103,6 +103,12 @@ namespace icu {
         }
     };
 
+    class MeasureFormat : public Format {
+    public:
+        static _MeasureFormat *createCurrencyFormat(Locale &, UErrorCode);
+        static _MeasureFormat *createCurrencyFormat(UErrorCode);
+    };
+
     class MessageFormat : public Format {
     public:
         MessageFormat(UnicodeString &, UErrorCode);

@@ -179,4 +179,59 @@ namespace icu {
         UBool operator==(UObject &);
         Formattable getNumber();
     };
+
+    class CurrencyUnit : public MeasureUnit {
+    public:
+        CurrencyUnit(ISO3Code, UErrorCode);
+        ISO3Code getISOCurrency();
+
+        %extend {
+            PyObject *__repr__()
+            {
+                UnicodeString u(self->getISOCurrency());
+                PyObject *string = PyUnicode_FromUnicodeString(&u);
+                PyObject *format = PyString_FromString("<CurrencyUnit: %s>");
+                PyObject *tuple = PyTuple_New(1);
+                PyObject *repr;
+
+                PyTuple_SET_ITEM(tuple, 0, string);
+                repr = PyString_Format(format, tuple);
+                Py_DECREF(format);
+                Py_DECREF(tuple);
+
+                return repr;
+            }
+        }
+    };
+
+    class CurrencyAmount : public Measure {
+    public:
+        CurrencyAmount(Formattable &, ISO3Code, UErrorCode);
+        CurrencyAmount(double, ISO3Code, UErrorCode);
+        CurrencyUnit getCurrency();
+        ISO3Code getISOCurrency();
+
+        %extend {
+            PyObject *__repr__()
+            {
+                Formattable number = self->getNumber();
+                PyObject *amount = PyFloat_FromDouble(number.getDouble());
+
+                UnicodeString u(self->getISOCurrency());
+                PyObject *currency = PyUnicode_FromUnicodeString(&u);
+
+                PyObject *format = PyString_FromString("<CurrencyAmount: %0.2f %s>");
+                PyObject *tuple = PyTuple_New(2);
+                PyObject *repr;
+
+                PyTuple_SET_ITEM(tuple, 0, amount);
+                PyTuple_SET_ITEM(tuple, 1, currency);
+                repr = PyString_Format(format, tuple);
+                Py_DECREF(format);
+                Py_DECREF(tuple);
+
+                return repr;
+            }
+        }
+    };
 }
