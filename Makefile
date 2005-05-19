@@ -35,10 +35,10 @@ PYTHON_VER=2.4
 #
 
 # Mac OS X (Darwin)
-PREFIX=/usr/local
-PREFIX_PYTHON=/Library/Frameworks/Python.framework/Versions/$(PYTHON_VER)
-PREFIX_ICU=/usr/local/icu-$(ICU_VER)
-SWIG=$(PREFIX)/bin/swig
+#PREFIX=/usr/local
+#PREFIX_PYTHON=/Library/Frameworks/Python.framework/Versions/$(PYTHON_VER)
+#PREFIX_ICU=/usr/local/icu-$(ICU_VER)
+#SWIG=$(PREFIX)/bin/swig
 
 # Linux
 #PREFIX=/usr/local
@@ -99,9 +99,11 @@ else
 ifeq ($(OS),Linux)
 PYTHON_SITE=$(PREFIX_PYTHON)/lib/python$(PYTHON_VER)/site-packages
 PYTHON_INC=$(PREFIX_PYTHON)/include/python$(PYTHON_VER)
+PYICU_LIB=$(BINDIR)/_PyICU.so
+PYICU_COMMON_LIB=$(BINDIR)/libPyICU.so
+PYICU_MODULE_LIBS:=$(MODULES:%=$(BINDIR)/_PyICU_%.so)
 ICU_INC=$(PREFIX_ICU)/include
 ICU_LIB=$(PREFIX_ICU)/lib
-PYICU_LIB=$(BINDIR)/_PyICU.so
 ifeq ($(DEBUG),1)
 CCFLAGS=-O0 -g -fPIC
 LDFLAGS=-g
@@ -177,8 +179,15 @@ $(PYICU_LIB): PyICU_wrap.cxx $(PYICU_COMMON_LIB)
 else
 
 ifeq ($(OS),Linux)
-$(PYICU_LIB): PyICU_wrap.cxx
-	$(CXX) -shared -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) PyICU_wrap.cxx
+
+$(PYICU_COMMON_LIB): common.cpp common.h
+	$(CXX) -shared -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) common.cpp
+
+$(PYICU_MODULE_LIBS): $(BINDIR)/_PyICU_%.so: %_wrap.cxx common.h
+	$(CXX) -shared -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) $< -L$(BINDIR) -lPyICU -L$(ICU_LIB) -licui18n -licuuc -licudata
+
+$(PYICU_LIB): PyICU_wrap.cxx $(PYICU_COMMON_LIB)
+	$(CXX) -shared -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) PyICU_wrap.cxx -L$(BINDIR) -lPyICU -L$(ICU_LIB) -licui18n -licuuc -licudata
 else
 
 ifeq ($(OS),Cygwin)
