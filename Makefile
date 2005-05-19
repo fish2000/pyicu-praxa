@@ -193,10 +193,8 @@ all: env $(BINDIR) $(LIBS)
 
 install: all
 	mkdir -p $(PYTHON_SITE)
-	install PyICU.py PyICU_*.py $(PYTHON_SITE)
-	install $(PYICU_LIB) $(PYTHON_SITE)
-	install $(PYICU_MODULE_LIBS) $(PYTHON_SITE)
-	install $(MODULES:%=PyICU_%.py) $(PYTHON_SITE)
+	install PyICU.py $(MODULES:%=PyICU_%.py) $(PYTHON_SITE)
+	install $(PYICU_LIB) $(PYICU_MODULE_LIBS) $(PYTHON_SITE)
 	install $(PYICU_COMMON_LIB) $(PREFIX)/lib
 
 clean:

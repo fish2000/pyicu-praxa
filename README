@@ -88,7 +88,7 @@
 
       2. The Python way
 
-        >>> from PyICU import UnicodeString, Locale
+        >>> from PyICU import Locale
         >>> locale = Locale('pt_BR')
         >>> name = locale.getDisplayName()
         >>> name
@@ -127,7 +127,7 @@
     C++ APIs return errors via a UErrorCode reference argument. All such
     APIs are wrapped by Python APIs that omit this argument and throw an
     ICUError Python exception instead. The same is true for ICU APIs taking
-    both a ParseError and a UErrorCode, they are both be omitted.
+    both a ParseError and a UErrorCode, they are both to be omitted.
 
     For example, the 'UnicodeString &DateFormat::format(const Formattable &,
     UnicodeString &, UErrorCode &)' API, documented here
@@ -144,7 +144,7 @@
      
     Of course, the simpler 'UnicodeString &DateFormat::format(UDate,
     UnicodeString &)' documented here:
-        http://icu.sourceforge.net/apiref/icu4c/classDateFormat.html
+        http://icu.sourceforge.net/apiref/icu4c/classDateFormat.html#a5
     can be used too:
 
         >>> from PyICU import DateFormat
@@ -159,11 +159,11 @@
     ICU uses a double floating point type called UDate that represents the
     number of milliseconds elapsed since 1970-jan-01 UTC for dates.
 
-    In Python, the value returned by the time module's time function is the
-    number of seconds since 1970-jan-01 UTC. Because of this difference,
+    In Python, the value returned by the time module's time() function is
+    the number of seconds since 1970-jan-01 UTC. Because of this difference,
     floating point values are multiplied by 1000 when passed to APIs taking
     UDate and divided by 1000 when returned as UDate.
 
     Python's datetime objects, with or without timezone information, can
-    also be used with APIs taking UDate arguments, with or without
-    timezone. The datetime objects get converted to UDate in the SWIG layer.
+    also be used with APIs taking UDate arguments. The datetime objects get
+    converted to UDate in the SWIG layer.
