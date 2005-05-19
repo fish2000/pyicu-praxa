@@ -26,9 +26,24 @@
   Building PyICU
   --------------
 
+  Before building PyICU, SWIG and the ICU libraries must be built and
+  installed. Refer to each system's instructions for more information.
+
   PyICU is built with GNU Make, SWIG and a C++ compiler (g++ on Unix, MinGW
   g++ or Microsoft Visual C++ on Windows). In order to use GNU Make on
   Windows, you need to install the Cygwin environment first.
+
+
+  Running PyICU
+  -------------
+
+    . Mac OS X
+      Make sure that DYLD_LIBRARY_PATH contains paths to the directory(ies)
+      containing the ICU libs and PyICU's libPyICU.dylib
+
+    . Linux
+      Make sure that LD_LIBRARY_PATH contains paths to the directory(ies)
+      containing the ICU libs and PyICU's libPyICU.so
 
 
   API Documentation
