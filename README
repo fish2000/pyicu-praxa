@@ -9,6 +9,7 @@
    - Welcome
    - Building PyICU
    - Running PyICU
+   - What's available
    - API Documentation
 
 
@@ -45,6 +46,13 @@
     . Linux
       Make sure that LD_LIBRARY_PATH contains paths to the directory(ies)
       containing the ICU libs and PyICU's libPyICU.so
+
+
+  What's available
+  ----------------
+
+  PyICU is under active developement. Currently, the string, locale, format,
+  calendar and timezone are available.
 
 
   API Documentation
