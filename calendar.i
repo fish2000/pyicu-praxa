@@ -80,7 +80,6 @@ static PyObject *cal_repr(char *name, Calendar *self)
 %include "common.i"
 %import "bases.i"
 %import "string.i"
-%import "locale.i"
 
 enum UCalendarDateFields {
     UCAL_ERA,
@@ -341,7 +340,7 @@ namespace icu {
         int32_t fieldDifference(UDate, UCalendarDateFields, UErrorCode);
 
         void setTimeZone(TimeZone &);
-        const TimeZone &getTimeZone();
+        const_TimeZone &getTimeZone();
         
         UBool inDaylightTime(UErrorCode);
 

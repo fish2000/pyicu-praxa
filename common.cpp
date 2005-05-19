@@ -199,8 +199,8 @@ UDate PyObject_AsUDate(PyObject *object)
         if (mktime == NULL)
         {
             PyObject *time = PyImport_ImportModule("time");
-            mktime = PyObject_GetAttrString(time, "mktime");
 
+            mktime = PyObject_GetAttrString(time, "mktime");
             Py_DECREF(time);
         }
 
@@ -239,11 +239,11 @@ UDate PyObject_AsUDate(PyObject *object)
             else
             {
                 PyObject *method, *utcoffset, *ordinal;
+                Py_DECREF(tzinfo);
 
                 method = PyString_FromString("utcoffset");
                 utcoffset = PyObject_CallMethodObjArgs(object, method, NULL);
                 Py_DECREF(method);
-                Py_DECREF(tzinfo);
 
                 method = PyString_FromString("toordinal");
                 ordinal = PyObject_CallMethodObjArgs(object, method, NULL);

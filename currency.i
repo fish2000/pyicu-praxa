@@ -32,7 +32,6 @@
 %include "common.i"
 %import "bases.i"
 %import "string.i"
-%import "locale.i"
 %import "format.i"
 
 

@@ -49,10 +49,15 @@
 
 %typemap(in) UChar
 {
-    if (PyUnicode_CheckExact($input))
+    if (PyUnicode_CheckExact($input) && PyUnicode_GetSize($input) == 1)
         $1 = (UChar) PyUnicode_AsUnicode($input)[0];
-    else
+    else if (PyString_CheckExact($input) && PyString_Size($input) == 1)
         $1 = (UChar) PyString_AsString($input)[0];
+    else
+    {
+        PyErr_SetObject(PyExc_ValueError, $input);
+        SWIG_fail;
+    }
 }
 %typemap(out) UChar
 {
@@ -236,12 +241,12 @@
         $result = SWIG_NewPointerObj($1, $descriptor(icu::TimeZone *), 1);
 }
 
-%typemap(out) const TimeZone &
+%typemap(out) const_TimeZone &
 {
-    if ($1.getDynamicClassID() == icu::SimpleTimeZone::getStaticClassID())
-        $result = SWIG_NewPointerObj($1, $descriptor(icu::SimpleTimeZone *), 0);
+    if ($1->getDynamicClassID() == icu::SimpleTimeZone::getStaticClassID())
+        $result = SWIG_NewPointerObj((void *) $1, $descriptor(icu::SimpleTimeZone *), 0);
     else
-        $result = SWIG_NewPointerObj($1, $descriptor(icu::TimeZone *), 0);
+        $result = SWIG_NewPointerObj((void *) $1, $descriptor(icu::TimeZone *), 0);
 }
 
 %typemap(out) _MeasureFormat *
@@ -295,7 +300,7 @@
 %typemap(out) LocaleArray1 {
 
     $result = PyList_New(arg1);
-    for (int32_t i=0; i < arg1; i++) {
+    for (int32_t i = 0; i < arg1; i++) {
         Locale *locale = (Locale *) $1 + i;
         PyObject *o = SWIG_NewPointerObj(locale, $descriptor(icu::Locale *), 0);
         PyList_SET_ITEM($result, i, o);

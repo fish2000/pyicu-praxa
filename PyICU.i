@@ -31,7 +31,6 @@
     from PyICU_errors import *
     from PyICU_bases import *
     from PyICU_string import *
-    from PyICU_locale import *
     from PyICU_format import *
     from PyICU_dateformat import *
     from PyICU_currency import *

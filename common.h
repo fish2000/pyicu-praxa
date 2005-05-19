@@ -53,6 +53,7 @@ typedef icu::DateFormat _DateFormat;
 typedef icu::MeasureFormat _MeasureFormat;
 typedef icu::Calendar _Calendar;
 typedef icu::TimeZone _TimeZone;
+typedef const icu::TimeZone const_TimeZone;
 typedef icu::UnicodeString _UnicodeString;
 typedef icu::UnicodeString UnicodeString0;
 typedef icu::UnicodeString UnicodeString1;
