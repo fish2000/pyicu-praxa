@@ -105,14 +105,17 @@ PyObject *PyUnicode_FromUnicodeString(UnicodeString *string)
                                      (int) string->length());
     else
     {
-        int len = (int) string->length();
-        Py_UNICODE pchars[len];
+        int len = string->length();
+	Py_UNICODE *pchars = new Py_UNICODE[len];
         const UChar *chars = string->getBuffer();
 
         for (int i = 0; i < len; i++)
             pchars[i] = chars[i];
         
-        return PyUnicode_FromUnicode((const Py_UNICODE *) pchars, len);
+	PyObject *u = PyUnicode_FromUnicode((const Py_UNICODE *) pchars, len);
+	delete pchars;
+
+	return u;
     }
 }
 
@@ -128,12 +131,13 @@ UnicodeString &PyUnicode_AsUnicodeString(PyObject *object,
         {
             int len = PyUnicode_GET_SIZE(object);
             Py_UNICODE *pchars = PyUnicode_AS_UNICODE(object);
-            UChar chars[len];
+	    UChar *chars = new UChar[len];
 
             for (int i = 0; i < len; i++)
                 chars[i] = pchars[i];
 
             string.setTo((const UChar *) chars, (int32_t) len);
+	    delete chars;
         }
     }
     else if (PyString_CheckExact(object))

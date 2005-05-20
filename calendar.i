@@ -446,7 +446,19 @@ namespace icu {
 
     class ICUtzinfo(tzinfo):
 
+        instances = {}
+
+        def getInstance(cls, id):
+            try:
+                return cls.instances[id]
+            except KeyError:
+                instance = cls(TimeZone.createTimeZone(id))
+                cls.instances[id] = instance
+                return instance
+        getInstance = classmethod(getInstance)
+
         def __init__(self, timezone):
+            super(ICUtzinfo, self).__init__()
             self.timezone = timezone
 
         def __repr__(self):

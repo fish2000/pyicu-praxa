@@ -24,6 +24,19 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
+#ifdef _MSC_VER
+
+#include <malloc.h>
+#define STACK_ARRAY(type, var, len) \
+    type *var = (type *) alloca((len) * sizeof(type))
+
+#else
+
+#define STACK_ARRAY(type, var, len) \
+    type var[len]
+
+#endif
+
 #include <Python.h>
 #include <unicode/utypes.h>
 #include <unicode/unistr.h>

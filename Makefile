@@ -47,9 +47,9 @@ PYTHON_VER=2.4
 #SWIG=$(PREFIX)/bin/swig
 
 # Windows
-#PREFIX_PYTHON=/cygdrive/o/Python-2.4.1
+#PREFIX_PYTHON=/cygdrive/o/osaf/release/bin
 #PREFIX_ICU=/cygdrive/o/icu-$(ICU_VER)
-#SWIG=/cygdrive/c/utils/bin/swig.exe
+#SWIG=/cygdrive/o/osaf/external/release/bin/swig/swig.exe
 
 #
 # No edits required below
@@ -117,15 +117,19 @@ ifeq ($(OS),Cygwin)
 PYTHON_SITE=`cygpath -aw $(PREFIX_PYTHON)/Lib/site-packages`
 PYTHON_INC=`cygpath -aw $(PREFIX_PYTHON)/Include`
 PYTHON_PC=`cygpath -aw $(PREFIX_PYTHON)/PC`
+PYICU_LIB=$(BINDIR)/_PyICU$(_SUFFIX).pyd
+PYICU_COMMON_LIB=$(BINDIR)/PyICU$(SUFFIX).dll
+PYICU_MODULE_LIBS:=$(MODULES:%=$(BINDIR)/_PyICU_%$(_SUFFIX).pyd)
 ICU_INC=`cygpath -aw $(PREFIX_ICU)/include`
 ICU_LIB=`cygpath -aw $(PREFIX_ICU)/lib`
-PYICU_LIB=$(BINDIR)/_PyICU(_SUFFIX).pyd
+CC=cl
+CXX=cl
 ifeq ($(DEBUG),1)
-CCFLAGS=-O -g
-LDFLAGS=-g
+CCFLAGS=/O /g
+LDFLAGS=/g
 else
-CCFLAGS=-O2
-LDFLAGS=
+CCFLAGS=/O2
+LDFLAGS=/O2
 endif
 else
 
@@ -182,6 +186,15 @@ $(PYICU_LIB): PyICU_wrap.cxx $(PYICU_COMMON_LIB)
 else
 
 ifeq ($(OS),Cygwin)
+$(PYICU_COMMON_LIB): common.cpp common.h
+	$(CXX) /EHsc /I $(PYTHON_INC) /I $(ICU_INC) $(CCFLAGS) $(PYDBG) $(SWIG_OPT) common.cpp
+
+$(PYICU_MODULE_LIBS): $(BINDIR)/_PyICU_%.pyd: %_wrap.cxx common.h
+	$(CXX) /I $(PYTHON_INC) /I $(ICU_INC) $(CCFLAGS) $(PYDBG) $(SWIG_OPT) $< -L$(BINDIR) -lPyICU /LIBPATH $(ICU_LIB) -licui18n -licuuc -licudata
+
+$(PYICU_LIB): PyICU_wrap.cxx $(PYICU_COMMON_LIB)
+	$(CXX) /I $(PYTHON_INC) /I $(ICU_INC) $(CCFLAGS) $(PYDBG) $(SWIG_OPT) PyICU_wrap.cxx /o $(PYICU_LIB)
+
 endif
 endif
 endif
