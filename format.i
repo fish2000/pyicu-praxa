@@ -32,6 +32,7 @@
 %include "common.i"
 %import "bases.i"
 
+
 namespace icu {
 
     class FieldPosition : public UObject {
@@ -124,6 +125,20 @@ namespace icu {
         UnicodeString1 &toPattern(UnicodeString &);
         UnicodeString toPattern(_UnicodeString);
 
+	void setFormats(FormatPointerArray3, _int32_t);
+	FormatPointerArray2 getFormats(_int32_t);
+
         void setFormat(int32_t, Format &);
+
+        UnicodeString2 &format(Formattable &, UnicodeString &, UErrorCode);
+        UnicodeString2 &format(Formattable &, UnicodeString &, FieldPosition &, UErrorCode);
+        UnicodeString format(Formattable &, _UnicodeString, UErrorCode);
+        UnicodeString format(Formattable &, _UnicodeString, FieldPosition &, UErrorCode);
+
+	UnicodeString3 &format(FormattableArray3, _int32_t, UnicodeString &, FieldPosition &, UErrorCode);
+	UnicodeString format(FormattableArray3, _int32_t, _UnicodeString, FieldPosition &, UErrorCode);
+
+	FormattableArray4 parse(UnicodeString &, ParsePosition &, _int32_t);
+	FormattableArray3 parse(UnicodeString &, _int32_t, UErrorCode);
     };
 }

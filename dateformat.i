@@ -48,20 +48,20 @@ namespace icu {
         UBool operator!=(DateFormatSymbols &);
 
         UnicodeStringArray2 getEras(_int32_t);
-        void setEras(UnicodeStringArray3, _int32_t);
+        void setEras(LeakyUnicodeStringArray3, _int32_t);
 
         UnicodeStringArray2 getMonths(_int32_t);
-        void setMonths(UnicodeStringArray3, _int32_t);
+        void setMonths(LeakyUnicodeStringArray3, _int32_t);
         UnicodeStringArray2 getShortMonths(_int32_t);
-        void setShortMonths(UnicodeStringArray3, _int32_t);
+        void setShortMonths(LeakyUnicodeStringArray3, _int32_t);
 
         UnicodeStringArray2 getWeekdays(_int32_t);
-        void setWeekdays(UnicodeStringArray3, _int32_t);
+        void setWeekdays(LeakyUnicodeStringArray3, _int32_t);
         UnicodeStringArray2 getShortWeekdays(_int32_t);
-        void setShortWeekdays(UnicodeStringArray3, _int32_t);
+        void setShortWeekdays(LeakyUnicodeStringArray3, _int32_t);
 
         UnicodeStringArray2 getAmPmStrings(_int32_t);
-        void setAmPmStrings(UnicodeStringArray3, _int32_t);
+        void setAmPmStrings(LeakyUnicodeStringArray3, _int32_t);
 
         UnicodeString1 &getLocalPatternChars(UnicodeString &);
         UnicodeString getLocalPatternChars(_UnicodeString);

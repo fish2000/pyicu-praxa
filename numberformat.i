@@ -90,6 +90,8 @@ namespace icu {
             FRACTION_FIELD = kFractionField
         };
 
+        UBool operator==(NumberFormat &);
+
         UnicodeString2 &format(Formattable &, UnicodeString &, UErrorCode);
         UnicodeString2 &format(Formattable &, UnicodeString &, FieldPosition &, UErrorCode);
         UnicodeString format(Formattable &, _UnicodeString, UErrorCode);
@@ -347,11 +349,36 @@ namespace icu {
     public:
         ChoiceFormat(UnicodeString &, UErrorCode);
         ChoiceFormat(_PyString, UErrorCode);
+        ChoiceFormat(doubleArray3, UnicodeStringArray3, _int32_t);
+        ChoiceFormat(doubleArray4, UBoolArray4, UnicodeStringArray4, _int32_t);
         
         void applyPattern(UnicodeString &, UParseError, UErrorCode);
         void applyPattern(_PyString, UParseError, UErrorCode);
 
         UnicodeString1 &toPattern(UnicodeString &);
         UnicodeString toPattern(_UnicodeString);
+
+        void setChoices(doubleArray4, UnicodeStringArray4, _int32_t);
+        void setChoices(doubleArray5, UBoolArray5, UnicodeStringArray5, _int32_t);
+
+        doubleArray2 getLimits(_int32_t);
+        UBoolArray2 getClosures(_int32_t);
+        UnicodeStringArray2 getFormats(_int32_t);
+
+        UnicodeString2 &format(Formattable &, UnicodeString &, UErrorCode);
+        UnicodeString2 &format(Formattable &, UnicodeString &, FieldPosition &, UErrorCode);
+        UnicodeString format(Formattable &, _UnicodeString, UErrorCode);
+        UnicodeString format(Formattable &, _UnicodeString, FieldPosition &, UErrorCode);
+
+        UnicodeString2 &format(double, UnicodeString &, FieldPosition &);
+        UnicodeString2 &format(int32_t, UnicodeString &, FieldPosition &);
+        UnicodeString2 &format(int64_t, UnicodeString &, FieldPosition &);
+
+        UnicodeString format(double, _UnicodeString, FieldPosition &);
+        UnicodeString format(int32_t, _UnicodeString, FieldPosition &);
+        UnicodeString format(int64_t, _UnicodeString, FieldPosition &);
+
+        UnicodeString3 &format(FormattableArray3, _int32_t, UnicodeString &, FieldPosition &, UErrorCode);
+        UnicodeString format(FormattableArray3, _int32_t, _UnicodeString, FieldPosition &, UErrorCode);
     };
 }

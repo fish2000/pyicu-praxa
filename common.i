@@ -241,6 +241,25 @@
         $result = SWIG_NewPointerObj($1, $descriptor(icu::TimeZone *), 1);
 }
 
+%typemap(in) TimeZone_ *
+{
+    PyObject *thisown = PyObject_GetAttrString($input, "thisown");
+    int isTrue = PyObject_IsTrue(thisown); Py_DECREF(thisown);
+
+    if (!isTrue)
+    {
+        PyErr_Format(PyExc_ValueError,
+                     "TimeZone argument is not owned by caller", NULL);
+        SWIG_fail;
+    }
+
+    if (!SWIG_ConvertPtr($input, (void **) &$1, $descriptor(icu::TimeZone *),
+                         SWIG_POINTER_EXCEPTION | SWIG_POINTER_DISOWN))
+        PyObject_SetAttrString($input, "this", Py_None);
+    else
+        SWIG_fail;
+}
+
 %typemap(out) const_TimeZone &
 {
     if ($1->getDynamicClassID() == icu::SimpleTimeZone::getStaticClassID())
@@ -252,6 +271,11 @@
 %typemap(out) _MeasureFormat *
 {
     $result = SWIG_NewPointerObj($1, $descriptor(icu::MeasureFormat *), 1);
+}
+
+%typemap(out) _StringEnumeration *
+{
+    $result = SWIG_NewPointerObj($1, $descriptor(icu::StringEnumeration *), 1);
 }
 
 %typemap(in) _PyString
@@ -316,6 +340,48 @@
         PyUnicode_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
     $1 = (const UnicodeString *) strings;
 }
+%typemap(argout) UnicodeStringArray3 {
+
+    delete $1;
+}
+
+%typemap(in) UnicodeStringArray4 {
+
+    int len = PyList_Size($input);
+    UnicodeString *strings = new UnicodeString[len];
+    arg4 = len;
+    for (int i = 0; i < len; i++)
+        PyUnicode_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
+    $1 = (const UnicodeString *) strings;
+}
+%typemap(argout) UnicodeStringArray4 {
+
+    delete $1;
+}
+
+%typemap(in) UnicodeStringArray5 {
+
+    int len = PyList_Size($input);
+    UnicodeString *strings = new UnicodeString[len];
+    arg5 = len;
+    for (int i = 0; i < len; i++)
+        PyUnicode_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
+    $1 = (const UnicodeString *) strings;
+}
+%typemap(argout) UnicodeStringArray5 {
+
+    delete $1;
+}
+
+%typemap(in) LeakyUnicodeStringArray3 {
+
+    int len = PyList_Size($input);
+    UnicodeString *strings = new UnicodeString[len]; //leaked
+    arg3 = len;
+    for (int i = 0; i < len; i++)
+        PyUnicode_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
+    $1 = (const UnicodeString *) strings;
+}
 
 %typemap(out) UnicodeStringArray2 {
 
@@ -325,6 +391,162 @@
         PyObject *o = SWIG_NewPointerObj(string, $descriptor(icu::UnicodeString *), 0);
         PyList_SET_ITEM($result, i, o);
     }
+}
+
+%typemap(in) FormattableArray3 {
+
+    int len = PyList_Size($input);
+    Formattable *array = new Formattable[len];
+    arg3 = len;
+    for (int i = 0; i < len; i++) {
+        PyObject *obj = PyList_GetItem($input, i);
+        Formattable *fp;
+        SWIG_ConvertPtr(obj, (void **) &fp, $descriptor(icu::Formattable *),
+                        SWIG_POINTER_EXCEPTION);
+        array[i] = *fp;
+    }
+    $1 = (const Formattable *) array;
+}
+%typemap(argout) FormattableArray3 {
+
+    delete $1;
+}
+
+%typemap(out) FormattableArray3 {
+
+    $result = PyList_New(arg3);
+    for (int32_t i = 0; i < arg3; i++) {
+        Formattable *string = (Formattable *) $1 + i;
+        PyObject *o = SWIG_NewPointerObj(string, $descriptor(icu::Formattable *), 0);
+        PyList_SET_ITEM($result, i, o);
+    }
+    delete $1;
+}
+
+%typemap(out) FormattableArray4 {
+
+    $result = PyList_New(arg4);
+    for (int32_t i = 0; i < arg4; i++) {
+        Formattable *string = (Formattable *) $1 + i;
+        PyObject *o = SWIG_NewPointerObj(string, $descriptor(icu::Formattable *), 0);
+        PyList_SET_ITEM($result, i, o);
+    }
+    delete $1;
+}
+
+
+%typemap(in) FormatPointerArray3 {
+
+    int len = PyList_Size($input);
+    Format **formats = new Format *[len];
+    arg3 = len;
+    for (int i = 0; i < len; i++) {
+        PyObject *obj = PyList_GetItem($input, i);
+        SWIG_ConvertPtr(obj, (void **)(formats + i), $descriptor(icu::Format *),
+                        SWIG_POINTER_EXCEPTION);
+    }
+    $1 = (const Format **) formats;
+}
+%typemap(argout) FormatPointerArray3 {
+
+    delete $1;
+}
+
+%typemap(out) FormatPointerArray2 {
+
+    $result = PyList_New(arg2);
+    for (int32_t i = 0; i < arg2; i++) {
+        PyObject *o = SWIG_NewPointerObj((void *) $1[i], $descriptor(icu::Format *), 0);
+        PyList_SET_ITEM($result, i, o);
+    }
+}
+
+
+%typemap(out) doubleArray2 {
+
+    $result = PyList_New(arg2);
+    for (int32_t i = 0; i < arg2; i++)
+        PyList_SET_ITEM($result, i, PyFloat_FromDouble($1[i]));
+}
+
+%typemap(in) doubleArray3 {
+
+    int len = PyList_Size($input);
+    double *doubles = new double[len];
+    arg3 = len;
+    for (int i = 0; i < len; i++)
+        doubles[i] = PyFloat_AsDouble(PyList_GetItem($input, i));
+    $1 = (const double *) doubles;
+}
+%typemap(argout) doubleArray3 {
+
+    delete $1;
+}
+
+%typemap(in) doubleArray4 {
+
+    int len = PyList_Size($input);
+    double *doubles = new double[len];
+    arg4 = len;
+    for (int i = 0; i < len; i++)
+        doubles[i] = PyFloat_AsDouble(PyList_GetItem($input, i));
+    $1 = (const double *) doubles;
+}
+%typemap(argout) doubleArray4 {
+
+    delete $1;
+}
+
+%typemap(in) doubleArray5 {
+
+    int len = PyList_Size($input);
+    double *doubles = new double[len];
+    arg5 = len;
+    for (int i = 0; i < len; i++)
+        doubles[i] = PyFloat_AsDouble(PyList_GetItem($input, i));
+    $1 = (const double *) doubles;
+}
+%typemap(argout) doubleArray5 {
+
+    delete $1;
+}
+
+
+%typemap(out) UBoolArray2 {
+
+    $result = PyList_New(arg2);
+    for (int32_t i = 0; i < arg2; i++) {
+        PyObject *obj = $1[i] ? Py_True : Py_False; Py_INCREF(obj);
+        PyList_SET_ITEM($result, i, obj);
+    }
+}
+
+%typemap(in) UBoolArray4 {
+
+    int len = PyList_Size($input);
+    UBool *bools = new UBool[len];
+    arg4 = len;
+    for (int i = 0; i < len; i++)
+        bools[i] = (PyList_GetItem($input, i) == Py_True);
+    $1 = (const UBool *) bools;
+}
+%typemap(argout) UBoolArray4 {
+
+    delete $1;
+}
+
+%typemap(in) UBoolArray5 {
+
+    int len = PyList_Size($input);
+    UBool *bools = new UBool[len];
+    arg5 = len;
+    for (int i = 0; i < len; i++)
+        bools[i] = (PyList_GetItem($input, i) == Py_True);
+    $1 = (const UBool *) bools;
+}
+%typemap(argout) UBoolArray5 {
+
+    delete $1;
 }
 
 

@@ -385,4 +385,72 @@ namespace icu {
             }
         }
     };
+
+    class StringEnumeration : public UObject {
+    public:
+
+        int32_t count(UErrorCode);
+        void reset(UErrorCode);
+
+        %extend {
+            PyObject *next()
+            {
+                int32_t len;
+                UErrorCode status = U_ZERO_ERROR;
+                const char *str = self->next(&len, status);
+
+                if (U_FAILURE(status))
+                    throw ICUException(status);
+
+                if (str == NULL)
+                {
+                    PyErr_SetNone(PyExc_StopIteration);
+                    throw ICUException();
+                }
+
+                return PyString_FromStringAndSize(str, len);
+            }
+
+            PyObject *unext()
+            {
+                int32_t len;
+                UErrorCode status = U_ZERO_ERROR;
+                const UChar *str = self->unext(&len, status);
+
+                if (U_FAILURE(status))
+                    throw ICUException(status);
+
+                if (str == NULL)
+                {
+                    PyErr_SetNone(PyExc_StopIteration);
+                    throw ICUException();
+                }
+
+                UnicodeString u(str);
+                return PyUnicode_FromUnicodeString(&u);
+            }
+
+            _UnicodeString *snext()
+            {
+                UErrorCode status = U_ZERO_ERROR;
+                const UnicodeString *str = self->snext(status);
+
+                if (U_FAILURE(status))
+                    throw ICUException(status);
+
+                if (str == NULL)
+                {
+                    PyErr_SetNone(PyExc_StopIteration);
+                    throw ICUException();
+                }
+
+                return new UnicodeString(*str);
+            }                
+
+            StringEnumeration *__iter__()
+            {
+                return self;
+            }
+        }                
+    };
 }

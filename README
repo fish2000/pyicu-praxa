@@ -178,3 +178,22 @@
     Python's datetime objects, with or without timezone information, can
     also be used with APIs taking UDate arguments. The datetime objects get
     converted to UDate in the SWIG layer.
+
+    - arrays
+
+    Many ICU API take array arguments. A list of elements of the array
+    element types is to be passed from Python.
+
+    - StringEnumeration
+
+    An ICU StringEnumeration has three 'next' methods: next() which returns
+    a 'str' objects, unext() which returns 'unicode' objects and snext()
+    which returns 'UnicodeString' objects.
+    Any of these methods can be used as an iterator, using the Python
+    built-in 'iter' function. 
+
+    For example, let e be a StringEnumeration instance:
+
+      [s for s in e] is a list of 'str' objects
+      [s for s in iter(e.unext, None)] is a list of 'unicode' objects
+      [s for s in iter(e.snext, None)] is a list of 'UnicodeString' objects

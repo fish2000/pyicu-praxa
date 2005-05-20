@@ -47,16 +47,31 @@
 #include <unicode/simpletz.h>
 #include <unicode/dtfmtsym.h>
 #include <unicode/dcfmtsym.h>
+#include <unicode/strenum.h>
 
 
 typedef int32_t _int32_t;
+typedef const double *doubleArray2;
+typedef const double *doubleArray3;
+typedef const double *doubleArray4;
+typedef const double *doubleArray5;
+typedef const UBool *UBoolArray2;
+typedef const UBool *UBoolArray4;
+typedef const UBool *UBoolArray5;
 typedef const icu::Locale *LocaleArray1;
 typedef const icu::UnicodeString *UnicodeStringArray2;
 typedef const icu::UnicodeString *UnicodeStringArray3;
+typedef const icu::UnicodeString *UnicodeStringArray4;
+typedef const icu::UnicodeString *UnicodeStringArray5;
+typedef const icu::UnicodeString *LeakyUnicodeStringArray3;
+typedef const icu::Format **FormatPointerArray2;
+typedef const icu::Format **FormatPointerArray3;
 typedef icu::DateFormat _DateFormat;
 typedef icu::MeasureFormat _MeasureFormat;
 typedef icu::Calendar _Calendar;
 typedef icu::TimeZone _TimeZone;
+typedef icu::TimeZone TimeZone_;
+typedef icu::StringEnumeration _StringEnumeration;
 typedef const icu::TimeZone const_TimeZone;
 typedef icu::UnicodeString _UnicodeString;
 typedef icu::UnicodeString UnicodeString0;
@@ -66,6 +81,9 @@ typedef icu::UnicodeString UnicodeString3;
 typedef icu::UnicodeString _PyString;
 typedef const UChar *ISO3Code;
 typedef icu::Formattable Formattable2;
+typedef const icu::Formattable *FormattableArray2;
+typedef const icu::Formattable *FormattableArray3;
+typedef const icu::Formattable *FormattableArray4;
 typedef icu::NumberFormat _NumberFormat;
 
 extern PyObject *PyExc_ICUError;
