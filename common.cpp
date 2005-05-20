@@ -142,7 +142,7 @@ UnicodeString &PyUnicode_AsUnicodeString(PyObject *object,
         UConverter *conv = ucnv_open("utf-8", &status);
 
         if (U_FAILURE(status))
-            throw ICUException(status, "couldn't open utf-8 converter");
+            throw ICUException(status);
 
         char *src;
         int len;

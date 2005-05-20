@@ -166,7 +166,7 @@ namespace icu {
         UnicodeString getDisplayName(_UnicodeString);
         UnicodeString getDisplayName(Locale &, _UnicodeString);
         UnicodeString3 &getDisplayName(UBool, EDisplayType, UnicodeString &);
-        UnicodeString &getDisplayName(UBool, EDisplayType, _UnicodeString);
+        UnicodeString getDisplayName(UBool, EDisplayType, _UnicodeString);
 
         UBool useDaylightTime();
         UBool inDaylightTime(UDate, UErrorCode);
@@ -437,4 +437,38 @@ namespace icu {
             }
         };
     };
+}
+
+
+%pythoncode {
+
+    from datetime import tzinfo, timedelta
+
+    class ICUtzinfo(tzinfo):
+
+        def __init__(self, timezone):
+            self.timezone = timezone
+
+        def __repr__(self):
+            return "<ICUtzinfo: %s>" %(self.timezone.getID())
+
+        def getID(self):
+            return str(self.timezone.getID())
+
+        def _notzsecs(self, dt):
+            return ((dt.toordinal() - 719163) * 86400.0 +
+                    dt.hour * 3600.0 + dt.minute * 60.0 +
+                    float(dt.second) + dt.microsecond / 1e6)
+
+        def utcoffset(self, dt):
+            raw, dst = self.timezone.getOffset(self._notzsecs(dt), True)
+            return timedelta(seconds = (raw + dst) / 1000)
+
+        def dst(self, dt):
+            raw, dst = self.timezone.getOffset(self._notzsecs(dt), True)
+            return timedelta(seconds = dst / 1000)
+
+        def tzname(self, dt):
+            inDST=self.timezone.inDaylightTime(self._notzsecs(dt))
+            return str(self.timezone.getDisplayName(inDST, TimeZone.SHORT))
 }
