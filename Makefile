@@ -191,11 +191,11 @@ ifeq ($(OS),Cygwin)
 $(PYICU_COMMON_LIB): common.cpp common.h
 	$(CXX) $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) $(SWIG_OPT) /Tpcommon.cpp /Fe$@ /link $(LDFLAGS) /LIBPATH:`cygpath -aw $(PREFIX_PYTHON)/libs` /LIBPATH:`cygpath -aw $(PREFIX_ICU)/lib` icuuc$(SUFFIX).lib icuin$(SUFFIX).lib
 
-$(PYICU_MODULE_LIBS): $(BINDIR)/_PyICU_%.pyd: %_wrap.cxx common.h
-	$(CXX) $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) $(SWIG_OPT) /Tp$< /Fe$@ /link $(LDFLAGS) /LIBPATH:`cygpath -aw $(PREFIX_PYTHON)/libs` /LIBPATH:`cygpath -aw $(PREFIX_ICU)/lib` icuuc$(SUFFIX).lib icuin$(SUFFIX).lib icudt$(SUFFIX).lib `cygpath -aw $(PYICU_COMMON_LIB:.dll=.lib)`
+$(PYICU_MODULE_LIBS): $(BINDIR)/_PyICU_%$(_SUFFIX).pyd: %_wrap.cxx common.h
+	$(CXX) $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) $(SWIG_OPT) /Tp$< /Fe$@ /link $(LDFLAGS) /LIBPATH:`cygpath -aw $(PREFIX_PYTHON)/libs` /LIBPATH:`cygpath -aw $(PREFIX_ICU)/lib` icuuc$(SUFFIX).lib icuin$(SUFFIX).lib icudt.lib `cygpath -aw $(PYICU_COMMON_LIB:.dll=.lib)`
 
 $(PYICU_LIB): PyICU_wrap.cxx $(PYICU_COMMON_LIB)
-	$(CXX) $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) $(SWIG_OPT) /TpPyICU_wrap.cxx /Fe$@ /link $(LDFLAGS) /LIBPATH:`cygpath -aw $(PREFIX_PYTHON)/libs` /LIBPATH:`cygpath -aw $(PREFIX_ICU)/lib` icuuc$(SUFFIX).lib icuin$(SUFFIX).lib icudt$(SUFFIX).lib `cygpath -aw $(PYICU_COMMON_LIB:.dll=.lib)`
+	$(CXX) $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) $(SWIG_OPT) /TpPyICU_wrap.cxx /Fe$@ /link $(LDFLAGS) /LIBPATH:`cygpath -aw $(PREFIX_PYTHON)/libs` /LIBPATH:`cygpath -aw $(PREFIX_ICU)/lib` icuuc$(SUFFIX).lib icuin$(SUFFIX).lib icudt.lib `cygpath -aw $(PYICU_COMMON_LIB:.dll=.lib)`
 
 endif
 endif
