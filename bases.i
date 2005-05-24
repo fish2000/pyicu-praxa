@@ -261,7 +261,9 @@ namespace icu {
         static Locale getUS();
         static Locale getCanada();
         static Locale getCanadaFrench();
+
         static Locale getDefault();
+        static void setDefault(Locale &, UErrorCode);
 
 	static Locale createFromName(char *);
 	static Locale createCanonical(char *);
