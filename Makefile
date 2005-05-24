@@ -126,7 +126,7 @@ CC=cl
 CXX=cl
 LD=link
 ifeq ($(DEBUG),1)
-CCFLAGS=/nologo /GX /Od /Zi /LD /MD /D_DEBUG
+CCFLAGS=/nologo /GX /Od /Zi /LDd /MDd /D_DEBUG
 LDFLAGS=/INCREMENTAL:no /INCREMENTAL:no /OPT:noref /DEBUG
 else
 CCFLAGS=/nologo /GX /Ox /LD /MD
