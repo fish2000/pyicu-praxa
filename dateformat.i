@@ -171,12 +171,12 @@ namespace icu {
 
         static _DateFormat *createInstance();
         static _DateFormat *createTimeInstance(EStyle=kDefault,
-                                               Locale &=Locale::getDefault());
+                                               Locale=Locale::getDefault());
         static _DateFormat *createDateInstance(EStyle=kDefault,
-                                               Locale &=Locale::getDefault());
+                                               Locale=Locale::getDefault());
         static _DateFormat *createDateTimeInstance(EStyle=kDefault,
                                                    EStyle=kDefault,
-                                                   Locale &=Locale::getDefault());
+                                                   Locale=Locale::getDefault());
         static LocaleArray1 getAvailableLocales(_int32_t);
     };
 

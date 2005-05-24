@@ -329,10 +329,10 @@ typedef enum {
     void initializeStaticMembers()
     {
         PyObject *module = PyImport_ImportModule("PyICU_errors");
-        PyObject *messages;
+        PyObject *errorClass = PyObject_GetAttrString(module, "ICUError");
+        PyObject *messages = PyObject_GetAttrString(errorClass, "messages");
 
-        PyExc_ICUError = PyObject_GetAttrString(module, "ICUError");
-        messages = PyObject_GetAttrString(PyExc_ICUError, "messages");
+        setICUErrorClass(errorClass);
         registerErrors(messages);
 
         Py_DECREF(messages);

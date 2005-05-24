@@ -26,16 +26,21 @@
 #include <unicode/ucnv.h>
 #include <datetime.h>
 
-PyObject *PyExc_ICUError;
+static PyObject *PyExc_ICUError;
+
+EXPORT void setICUErrorClass(PyObject *pycls)
+{
+    PyExc_ICUError = pycls;
+}
 
 
-ICUException::ICUException()
+EXPORT ICUException::ICUException()
 {
     code = NULL;
     msg = NULL;
 }
 
-ICUException::ICUException(UErrorCode status)
+EXPORT ICUException::ICUException(UErrorCode status)
 {
     PyObject *messages = PyObject_GetAttrString(PyExc_ICUError, "messages");
 
@@ -44,7 +49,7 @@ ICUException::ICUException(UErrorCode status)
     Py_DECREF(messages);
 }
 
-ICUException::ICUException(UErrorCode status, char *format, ...)
+EXPORT ICUException::ICUException(UErrorCode status, char *format, ...)
 {
     ICUException::code = PyInt_FromLong((long) status);
 
@@ -54,7 +59,7 @@ ICUException::ICUException(UErrorCode status, char *format, ...)
     va_end(ap);
 }
 
-ICUException::ICUException(UParseError &pe, UErrorCode status)
+EXPORT ICUException::ICUException(UParseError &pe, UErrorCode status)
 {
     PyObject *messages = PyObject_GetAttrString(PyExc_ICUError, "messages");
     UnicodeString pre((const UChar *) pe.preContext, U_PARSE_CONTEXT_LEN);
@@ -73,13 +78,13 @@ ICUException::ICUException(UParseError &pe, UErrorCode status)
     Py_DECREF(messages);
 }
 
-ICUException::~ICUException()
+EXPORT ICUException::~ICUException()
 {
     Py_XDECREF(ICUException::code);
     Py_XDECREF(ICUException::msg);
 }
 
-PyObject *ICUException::reportError()
+EXPORT PyObject *ICUException::reportError()
 {
     if (ICUException::code)
     {
@@ -93,7 +98,7 @@ PyObject *ICUException::reportError()
 }
 
 
-PyObject *PyUnicode_FromUnicodeString(UnicodeString *string)
+EXPORT PyObject *PyUnicode_FromUnicodeString(UnicodeString *string)
 {
     if (!string)
     {
@@ -119,8 +124,8 @@ PyObject *PyUnicode_FromUnicodeString(UnicodeString *string)
     }
 }
 
-UnicodeString &PyUnicode_AsUnicodeString(PyObject *object,
-                                         UnicodeString &string)
+EXPORT UnicodeString &PyUnicode_AsUnicodeString(PyObject *object,
+						UnicodeString &string)
 {
     if (PyUnicode_CheckExact(object))
     {
@@ -168,7 +173,7 @@ UnicodeString &PyUnicode_AsUnicodeString(PyObject *object,
     return string;
 }
 
-UnicodeString *PyUnicode_AsUnicodeString(PyObject *object)
+EXPORT UnicodeString *PyUnicode_AsUnicodeString(PyObject *object)
 {
     if (object == Py_None)
         return NULL;
@@ -188,7 +193,7 @@ UnicodeString *PyUnicode_AsUnicodeString(PyObject *object)
 }
 
 
-UDate PyObject_AsUDate(PyObject *object)
+EXPORT UDate PyObject_AsUDate(PyObject *object)
 {
     if (PyFloat_CheckExact(object))
         return (UDate) (PyFloat_AsDouble(object) * 1000.0);

@@ -458,14 +458,13 @@ namespace icu {
         getInstance = classmethod(getInstance)
 
         def __init__(self, timezone):
+            if not isinstance(timezone, TimeZone):
+                raise TypeError, timezone
             super(ICUtzinfo, self).__init__()
             self.timezone = timezone
 
         def __repr__(self):
             return "<ICUtzinfo: %s>" %(self.timezone.getID())
-
-        def getID(self):
-            return str(self.timezone.getID())
 
         def _notzsecs(self, dt):
             return ((dt.toordinal() - 719163) * 86400.0 +
@@ -481,6 +480,5 @@ namespace icu {
             return timedelta(seconds = dst / 1000)
 
         def tzname(self, dt):
-            inDST=self.timezone.inDaylightTime(self._notzsecs(dt))
-            return str(self.timezone.getDisplayName(inDST, TimeZone.SHORT))
+            return str(self.timezone.getID())
 }

@@ -27,11 +27,14 @@
 #ifdef _MSC_VER
 
 #include <malloc.h>
+
+#define EXPORT __declspec(dllexport)
 #define STACK_ARRAY(type, var, len) \
     type *var = (type *) alloca((len) * sizeof(type))
 
 #else
 
+#define EXPORT
 #define STACK_ARRAY(type, var, len) \
     type var[len]
 
@@ -99,26 +102,26 @@ typedef const icu::Formattable *FormattableArray3;
 typedef const icu::Formattable *FormattableArray4;
 typedef icu::NumberFormat _NumberFormat;
 
-extern PyObject *PyExc_ICUError;
+EXPORT void setICUErrorClass(PyObject *);
 
 class ICUException {
 private:
     PyObject *code;
     PyObject *msg;
 public:
-    ICUException();
-    ICUException(UErrorCode status);
-    ICUException(UErrorCode status, char *format, ...);
-    ICUException(UParseError &pe, UErrorCode status);
-    ~ICUException();
-    PyObject *reportError();
+    EXPORT ICUException();
+    EXPORT ICUException(UErrorCode status);
+    EXPORT ICUException(UErrorCode status, char *format, ...);
+    EXPORT ICUException(UParseError &pe, UErrorCode status);
+    EXPORT ~ICUException();
+    EXPORT PyObject *reportError();
 };
 
 
-PyObject *PyUnicode_FromUnicodeString(UnicodeString *string);
-UnicodeString &PyUnicode_AsUnicodeString(PyObject *object,
-                                         UnicodeString &string);
-UnicodeString *PyUnicode_AsUnicodeString(PyObject *object);
-UDate PyObject_AsUDate(PyObject *object);
+EXPORT PyObject *PyUnicode_FromUnicodeString(UnicodeString *string);
+EXPORT UnicodeString &PyUnicode_AsUnicodeString(PyObject *object,
+                                                UnicodeString &string);
+EXPORT UnicodeString *PyUnicode_AsUnicodeString(PyObject *object);
+EXPORT UDate PyObject_AsUDate(PyObject *object);
 
 #endif

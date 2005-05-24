@@ -290,9 +290,9 @@ namespace icu {
         UnicodeString getRuleSetName(int32_t);
         int32_t getNumberOfRuleSetDisplayNameLocales();
         Locale getRuleSetDisplayNameLocale(int32_t, UErrorCode);
-        UnicodeString getRuleSetDisplayName(int32_t, Locale &=Locale::getDefault());
-        UnicodeString getRuleSetDisplayName(UnicodeString &, Locale &=Locale::getDefault());
-        UnicodeString getRuleSetDisplayName(_PyString, Locale &=Locale::getDefault());
+        UnicodeString getRuleSetDisplayName(int32_t, Locale=Locale::getDefault());
+        UnicodeString getRuleSetDisplayName(UnicodeString &, Locale=Locale::getDefault());
+        UnicodeString getRuleSetDisplayName(_PyString, Locale=Locale::getDefault());
 
         UnicodeString2 &format(Formattable &, UnicodeString &, UErrorCode);
         UnicodeString2 &format(Formattable &, UnicodeString &, FieldPosition &, UErrorCode);
