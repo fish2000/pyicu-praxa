@@ -71,13 +71,19 @@
     The ICU string type, UnicodeString, is a type pointing at a mutable
     array of UChar Unicode 16-bit wide characters. The Python unicode type
     is an immutable string of 16-bit or 32-bit wide Unicode characters.
+
     Because of these differences, UnicodeString and Python's unicode type
     are not merged into the same type when crossing the SWIG boundary.
     ICU APIs taking UnicodeString arguments have been overloaded to also
     accept Python str or unicode type arguments. In the case of str objects,
     utf-8 encoding is assumed when converting them to UnicodeString
-    objects. There are several ways ICU C++ API accept and return
-    UnicodeString arguments: by value, by pointer or by reference.
+    objects.
+
+    To convert a Python str encoded in a encoding other than utf-8 to an ICU
+    UnicodeString use the UnicodeString(str, encodingName) constructor.
+
+    There are several ways ICU C++ API accept and return UnicodeString
+    arguments: by value, by pointer or by reference.
     When an ICU C++ API is documented to accept a UnicodeString & parameter,
     it is safe to assume that there are several corresponding PyICU python
     APIs making it accessible in simpler ways:
@@ -107,15 +113,15 @@
 
         A UnicodeString object was allocated for Python and returned.
 
-    A UnicodeString can be coerced to a Python unicode string with the
-    toUnicode() method. The usual len(), str(), comparison, [] and [:]
+    A UnicodeString can be coerced to a Python unicode string with Python's
+    unicode() constructor. The usual len(), str(), comparison, [] and [:]
     operators are all available, with the additional twists that slicing is
     not read-only and that += is also available since a UnicodeString is
     mutable. For example:
 
         >>> name = locale.getDisplayName()
         <UnicodeString: Portuguese (Brazil)>
-        >>> name.toUnicode()
+        >>> unicode(name)
         u'Portuguese (Brazil)'
         >>> len(name)
         19

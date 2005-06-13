@@ -129,6 +129,19 @@
     $1 = PyInt_CheckExact($input);
 }
 
+%typemap(in) uint32_t
+{
+    $1 = (int32_t) PyInt_AsLong($input);
+}
+%typemap(out) uint32_t
+{
+    $result = (unsigned long) PyInt_FromLong((long) $1);
+}
+%typecheck(SWIG_TYPECHECK_UINT32) uint32_t
+{
+    $1 = PyInt_CheckExact($input);
+}
+
 %typemap(in) int64_t
 {
     $1 = (int64_t) PyInt_AsLong($input);
@@ -295,6 +308,23 @@
 {
     $1 = $input != Py_None;
 }
+
+%typemap(in, numinputs=1) (UChar *, _int32_t) (UnicodeString u)
+{
+    try {
+        PyUnicode_AsUnicodeString($input, u);
+        $1 = (UChar *) u.getBuffer();
+        $2 = u.length();
+    } catch (ICUException e) {
+        e.reportError();
+        SWIG_fail;
+    }
+}
+%typecheck(SWIG_TYPECHECK_POINTER) (UChar *, _int32_t)
+{
+    $1 = $input != Py_None;
+}
+
 
 %typemap(out) _PyString *
 {
@@ -547,6 +577,30 @@
 %typemap(argout) UBoolArray5 {
 
     delete $1;
+}
+
+%typemap(in) _UConverter *
+{
+    char *encoding = PyString_AsString($input);
+    UErrorCode status = U_ZERO_ERROR;
+    
+    $1 = ucnv_open(encoding, &status);
+
+    if (U_FAILURE(status))
+        throw ICUException(status);
+}
+%typemap(argout) _UConverter * {
+
+    ucnv_close($1);
+}
+%typecheck(SWIG_TYPECHECK_STRING) _UConverter * {
+
+    $1 = PyString_Check($input);
+}
+
+%typemap(in, numinputs=1) (char *, _int32_t)
+{
+    PyString_AsStringAndSize($input, &$1, &$2);
 }
 
 

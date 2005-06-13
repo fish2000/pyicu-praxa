@@ -36,6 +36,10 @@ typedef enum {
     ULOC_VALID_LOCALE  = 1,
 } icu::ULocDataLocaleType;
 
+#define U_FOLD_CASE_DEFAULT           0
+#define U_FOLD_CASE_EXCLUDE_SPECIAL_I 1
+#define U_COMPARE_CODE_POINT_ORDER    0x8000
+
 namespace icu {
 
     class UMemory {
@@ -45,6 +49,12 @@ namespace icu {
     class UObject : public UMemory {
     public:
     };
+
+}
+
+%import "iterators.i"
+
+namespace icu {
 
     class Replaceable : public UObject {
     public:
@@ -58,6 +68,7 @@ namespace icu {
         UnicodeString();
         UnicodeString(UnicodeString &);
         UnicodeString(_PyString);
+        UnicodeString(char *, _int32_t, _UConverter *, UErrorCode);
         UBool operator==(UnicodeString &);
         UBool operator!=(UnicodeString &);
         UBool operator>(UnicodeString &);
@@ -78,12 +89,69 @@ namespace icu {
         UnicodeString0 &append(_PyString, int32_t, int32_t);
         UnicodeString0 &append(UChar);
 
-        %extend {
-            _PyString *toUnicode()
-            {
-                return self;
-            }
+        int8_t compare(UnicodeString &);
+        int8_t compare(_PyString);
+        int8_t compare(int32_t, int32_t, UnicodeString &);
+        int8_t compare(int32_t, int32_t, _PyString);
 
+        int8_t compareBetween(int32_t, int32_t, UnicodeString &, int32_t, int32_t);
+        int8_t compareBetween(int32_t, int32_t, _PyString, int32_t, int32_t);
+
+        int8_t compareCodePointOrder(UnicodeString &);
+        int8_t compareCodePointOrder(_PyString);
+        int8_t compareCodePointOrder(int32_t, int32_t, UnicodeString &);
+        int8_t compareCodePointOrder(int32_t, int32_t, _PyString);
+
+        int8_t compareCodePointOrderBetween(int32_t, int32_t, UnicodeString &, int32_t, int32_t);
+        int8_t compareCodePointOrderBetween(int32_t, int32_t, _PyString, int32_t, int32_t);
+
+        int8_t caseCompare(UnicodeString &, uint32_t);
+        int8_t caseCompare(_PyString, uint32_t);
+        int8_t caseCompare(int32_t, int32_t, UnicodeString &, uint32_t);
+        int8_t caseCompare(int32_t, int32_t, _PyString, uint32_t);
+
+        int8_t caseCompareBetween(int32_t, int32_t, UnicodeString &, int32_t, int32_t, uint32_t);
+        int8_t caseCompareBetween(int32_t, int32_t, _PyString, int32_t, int32_t, uint32_t);
+
+	UBool startsWith(UnicodeString &);
+	UBool startsWith(_PyString);
+	UBool startsWith(UnicodeString &, int32_t, int32_t);
+	UBool startsWith(_PyString, int32_t, int32_t);
+
+	UBool endsWith(UnicodeString &);
+	UBool endsWith(_PyString);
+	UBool endsWith(UnicodeString &, int32_t, int32_t);
+	UBool endsWith(_PyString, int32_t, int32_t);
+
+	int32_t indexOf(UnicodeString &);
+	int32_t indexOf(_PyString);
+	int32_t indexOf(UnicodeString &, int32_t);
+	int32_t indexOf(_PyString, int32_t);
+	int32_t indexOf(UnicodeString &, int32_t, int32_t);
+	int32_t indexOf(_PyString, int32_t, int32_t);
+	int32_t indexOf(UnicodeString &, int32_t, int32_t, int32_t, int32_t);
+	int32_t indexOf(_PyString, int32_t, int32_t, int32_t, int32_t);
+
+	int32_t lastIndexOf(UnicodeString &);
+	int32_t lastIndexOf(_PyString);
+	int32_t lastIndexOf(UnicodeString &, int32_t);
+	int32_t lastIndexOf(_PyString, int32_t);
+	int32_t lastIndexOf(UnicodeString &, int32_t, int32_t);
+	int32_t lastIndexOf(_PyString, int32_t, int32_t);
+	int32_t lastIndexOf(UnicodeString &, int32_t, int32_t, int32_t, int32_t);
+	int32_t lastIndexOf(_PyString, int32_t, int32_t, int32_t, int32_t);
+
+	UnicodeString0 &trim();
+	UnicodeString0 &reverse();
+	UnicodeString0 &toUpper();
+	UnicodeString0 &toUpper(Locale &);
+	UnicodeString0 &toLower();
+	UnicodeString0 &toLower(Locale &);
+        UnicodeString0 &toTitle(BreakIterator *);
+        UnicodeString0 &toTitle(BreakIterator *, icu::Locale &);
+	UnicodeString0 &foldCase(uint32_t=0);
+
+        %extend {
             UChar __getitem__(int32_t index)
             {
                 if (index < 0)
@@ -161,6 +229,16 @@ namespace icu {
                 Py_DECREF(string);
 
                 return str;
+            }
+
+            _PyString *__unicode__()
+            {
+                return self;
+            }
+
+	    int8_t __cmp__(UnicodeString &other)
+            {
+                return self->compare(other);
             }
         }
     };

@@ -43,6 +43,7 @@
 #include <Python.h>
 #include <unicode/utypes.h>
 #include <unicode/unistr.h>
+#include <unicode/ucnv.h>
 #include <unicode/locid.h>
 #include <unicode/calendar.h>
 #include <unicode/gregocal.h>
@@ -64,6 +65,12 @@
 #include <unicode/dtfmtsym.h>
 #include <unicode/dcfmtsym.h>
 #include <unicode/strenum.h>
+#include <unicode/chariter.h>
+#include <unicode/uchriter.h>
+#include <unicode/schriter.h>
+#include <unicode/brkiter.h>
+#include <unicode/rbbi.h>
+#include <unicode/dbbi.h>
 
 
 typedef int32_t _int32_t;
@@ -101,6 +108,7 @@ typedef const icu::Formattable *FormattableArray2;
 typedef const icu::Formattable *FormattableArray3;
 typedef const icu::Formattable *FormattableArray4;
 typedef icu::NumberFormat _NumberFormat;
+typedef UConverter _UConverter;
 
 EXPORT void setICUErrorClass(PyObject *);
 

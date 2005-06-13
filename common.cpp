@@ -23,7 +23,6 @@
 
 #include "common.h"
 #include <stdarg.h>
-#include <unicode/ucnv.h>
 #include <datetime.h>
 
 static PyObject *PyExc_ICUError;

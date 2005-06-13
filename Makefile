@@ -20,7 +20,7 @@
 # You need to verify that the version of python below is correct.
 # 
 
-VERSION=0.1
+VERSION=0.2
 ICU_VER=3.2
 PYTHON_VER=2.4
 
@@ -77,7 +77,7 @@ endif
 
 SWIG_OPT=-DSWIG_COBJECT_TYPES -DSWIG_COBJECT_PYTHON -DPYICU_VER="'$(VERSION)'" -DICU_VER="'$(ICU_VER)'"
 
-MODULES=errors bases format dateformat numberformat calendar
+MODULES=errors bases iterators format dateformat numberformat calendar
 
 ifeq ($(OS),Darwin)
 PYTHON_SITE=$(PREFIX_PYTHON)/lib/python$(PYTHON_VER)/site-packages
@@ -127,7 +127,7 @@ CXX=cl
 LD=link
 ifeq ($(DEBUG),1)
 CCFLAGS=/nologo /GX /Od /Zi /LDd /MDd /D_DEBUG
-LDFLAGS=/INCREMENTAL:no /INCREMENTAL:no /OPT:noref /DEBUG
+LDFLAGS=/INCREMENTAL:no /OPT:noref /DEBUG
 else
 CCFLAGS=/nologo /GX /Ox /LD /MD
 LDFLAGS=/INCREMENTAL:no /OPT:noref
