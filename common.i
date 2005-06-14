@@ -579,15 +579,13 @@
     delete $1;
 }
 
-%typemap(in) _UConverter *
-{
+%typemap(in) _UConverter * {
     char *encoding = PyString_AsString($input);
     UErrorCode status = U_ZERO_ERROR;
     
     $1 = ucnv_open(encoding, &status);
-
     if (U_FAILURE(status))
-        throw ICUException(status);
+        return ICUException(status).reportError();
 }
 %typemap(argout) _UConverter * {
 
@@ -598,8 +596,8 @@
     $1 = PyString_Check($input);
 }
 
-%typemap(in, numinputs=1) (char *, _int32_t)
-{
+%typemap(in, numinputs=1) (char *, _int32_t) {
+
     PyString_AsStringAndSize($input, &$1, &$2);
 }
 
