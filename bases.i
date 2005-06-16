@@ -240,6 +240,11 @@ namespace icu {
             {
                 return self->compare(other);
             }
+
+	    int8_t __cmp__(_PyString other)
+            {
+                return self->compare(other);
+            }
         }
     };
 

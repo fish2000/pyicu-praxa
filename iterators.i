@@ -171,4 +171,40 @@ namespace icu {
     public:
         DictionaryBasedBreakIterator();
     };
+
+    class CanonicalIterator : public UObject {
+    public:
+        CanonicalIterator(UnicodeString &, UErrorCode);
+        CanonicalIterator(_PyString, UErrorCode);
+
+        UnicodeString getSource();
+        void setSource(UnicodeString &, UErrorCode);
+        void setSource(_PyString, UErrorCode);
+        void reset();
+        UnicodeString next();
+    };
+
+    class CollationElementIterator : public UObject {
+    public:
+        UBool operator==(CollationElementIterator &);
+        UBool operator!=(CollationElementIterator &);
+
+        void reset();
+        int32_t next(UErrorCode);
+        int32_t previous(UErrorCode);
+        int32_t getMaxExpansion(int32_t);
+        int32_t strengthOrder(int32_t);
+        
+        void setText(UnicodeString &, UErrorCode);
+        void setText(_PyString, UErrorCode);
+        void setText(CharacterIterator &, UErrorCode);
+
+        int32_t getOffset();
+        void setOffset(int32_t, UErrorCode);
+
+        static int32_t primaryOrder(int32_t);
+        static int32_t secondaryOrder(int32_t);
+        static int32_t tertiaryOrder(int32_t);
+        static UBool isIgnorable(int32_t);
+    };
 }

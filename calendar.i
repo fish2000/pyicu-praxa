@@ -466,6 +466,9 @@ namespace icu {
         def __repr__(self):
             return "<ICUtzinfo: %s>" %(self.timezone.getID())
 
+        def __str__(self):
+            return str(self.timezone.getID())
+
         def _notzsecs(self, dt):
             return ((dt.toordinal() - 719163) * 86400.0 +
                     dt.hour * 3600.0 + dt.minute * 60.0 +

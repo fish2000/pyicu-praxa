@@ -71,6 +71,8 @@
 #include <unicode/brkiter.h>
 #include <unicode/rbbi.h>
 #include <unicode/dbbi.h>
+#include <unicode/caniter.h>
+#include <unicode/coleitr.h>
 
 
 typedef int32_t _int32_t;

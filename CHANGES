@@ -11,3 +11,8 @@ Version 0.1 -> 0.2
 ------------------
   - added most missing UnicodeString methods
   - added support for the BreakIterator and CharacterIterator classes
+
+
+Version 0.2 -> 0.3
+------------------
+  - added support for CanonicalIterator, CollationElementIterator
