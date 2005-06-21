@@ -31,9 +31,9 @@
   Before building PyICU, SWIG 1.3.24 and the ICU 3.2 libraries must be built
   and installed. Refer to each system's instructions for more information.
 
-  PyICU is built with GNU Make, SWIG and a C++ compiler (g++ on Unix, MinGW
-  g++ or Microsoft Visual C++ on Windows). In order to use GNU Make on
-  Windows, you need to install the Cygwin environment first.
+  PyICU is built with GNU Make, SWIG and a C++ compiler (g++ on Unix,
+  Microsoft Visual C++ on Windows). In order to use GNU Make on Windows, you
+  need to install the Cygwin environment first.
 
   Edit the section in the Makefile for your operating system.
   Run make and make install.
@@ -50,12 +50,17 @@
       Make sure that LD_LIBRARY_PATH contains paths to the directory(ies)
       containing the ICU libs and PyICU's libPyICU.so
 
+    . Windows
+      Make sure that PATH contains paths to the directory(ies)
+      containing the ICU DLLs and PyICU's libPyICU.dll
+
 
   What's available
   ----------------
 
   PyICU is under active development. Currently, the string, locale, format,
-  calendar and timezone classes are available.
+  calendar, timezone and various iterator classes are available.
+  See the CHANGES file for an up to date log of changes and additions.
 
 
   API Documentation
@@ -82,8 +87,8 @@
     To convert a Python str encoded in a encoding other than utf-8 to an ICU
     UnicodeString use the UnicodeString(str, encodingName) constructor.
 
-    There are several ways ICU C++ API accept and return UnicodeString
-    arguments: by value, by pointer or by reference.
+    ICU's C++ APIs accept and return UnicodeString arguments in several
+    ways: by value, by pointer or by reference.
     When an ICU C++ API is documented to accept a UnicodeString & parameter,
     it is safe to assume that there are several corresponding PyICU python
     APIs making it accessible in simpler ways:
@@ -216,3 +221,13 @@
 
        tz = ICUtzinfo.getInstance('Pacific/Fiji')
        datetime.now(tz)
+
+    To get the default time zone use:
+
+       defaultTZ = ICUtzinfo.getDefault()
+
+    To get the time zone's id, use the 'id' attribute or coerce the time
+    zone to a string:
+
+       ICUtzinfo.getInstance('Pacific/Fiji').id -> 'Pacific/Fiji'
+       str(ICUtzinfo.getInstance('Pacific/Fiji')) -> 'Pacific/Fiji'

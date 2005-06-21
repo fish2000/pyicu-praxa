@@ -457,6 +457,10 @@ namespace icu {
                 return instance
         getInstance = classmethod(getInstance)
 
+        def getDefault(cls):
+            return cls(TimeZone.createDefault())    
+        getDefault = classmethod(getDefault)
+
         def __init__(self, timezone):
             if not isinstance(timezone, TimeZone):
                 raise TypeError, timezone
@@ -484,4 +488,6 @@ namespace icu {
 
         def tzname(self, dt):
             return str(self.timezone.getID())
+
+        id = property(__str__)
 }
