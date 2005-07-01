@@ -378,7 +378,7 @@ namespace icu {
         static _Calendar *createInstance(Locale &, UErrorCode);
         static _Calendar *createInstance(TimeZone &, UErrorCode);
         static _Calendar *createInstance(TimeZone &, Locale &, UErrorCode);
-        static LocaleArray1 getAvailableLocales(_int32_t);
+        static LocaleDict1 getAvailableLocales(_int32_t);
         static UDate getNow();
 
         %extend {
@@ -489,5 +489,5 @@ namespace icu {
         def tzname(self, dt):
             return str(self.timezone.getID())
 
-        id = property(__str__)
+        tzid = property(__str__)
 }

@@ -351,13 +351,14 @@
         return ICUException($1, $2).reportError();
 }
 
-%typemap(out) LocaleArray1 {
+%typemap(out) LocaleDict1 {
 
-    $result = PyList_New(arg1);
+    $result = PyDict_New();
     for (int32_t i = 0; i < arg1; i++) {
         Locale *locale = (Locale *) $1 + i;
         PyObject *o = SWIG_NewPointerObj(locale, $descriptor(icu::Locale *), 0);
-        PyList_SET_ITEM($result, i, o);
+        PyDict_SetItemString($result, locale->getName(), o);
+	Py_DECREF(o);
     }
 }
 

@@ -177,7 +177,7 @@ namespace icu {
         static _DateFormat *createDateTimeInstance(EStyle=kDefault,
                                                    EStyle=kDefault,
                                                    Locale=Locale::getDefault());
-        static LocaleArray1 getAvailableLocales(_int32_t);
+        static LocaleDict1 getAvailableLocales(_int32_t);
     };
 
     class SimpleDateFormat : public DateFormat {

@@ -83,7 +83,7 @@ typedef const double *doubleArray5;
 typedef const UBool *UBoolArray2;
 typedef const UBool *UBoolArray4;
 typedef const UBool *UBoolArray5;
-typedef const icu::Locale *LocaleArray1;
+typedef const icu::Locale *LocaleDict1;
 typedef const icu::UnicodeString *UnicodeStringArray2;
 typedef const icu::UnicodeString *UnicodeStringArray3;
 typedef const icu::UnicodeString *UnicodeStringArray4;

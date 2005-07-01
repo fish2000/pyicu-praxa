@@ -351,7 +351,7 @@ namespace icu {
 	static Locale createFromName(char *);
 	static Locale createCanonical(char *);
 
-        static LocaleArray1 getAvailableLocales(_int32_t);
+        static LocaleDict1 getAvailableLocales(_int32_t);
 
         %extend {
             PyObject *__repr__()

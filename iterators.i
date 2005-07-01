@@ -149,7 +149,7 @@ namespace icu {
         static BreakIterator *createCharacterInstance(Locale &, UErrorCode);
         static BreakIterator *createSentenceInstance(Locale &, UErrorCode);
         static BreakIterator *createTitleInstance(Locale &, UErrorCode);
-        static LocaleArray1 getAvailableLocales(_int32_t);
+        static LocaleDict1 getAvailableLocales(_int32_t);
         static UnicodeString2 &getDisplayName(Locale &, Locale &, UnicodeString &);
         static UnicodeString1 &getDisplayName(Locale &, UnicodeString &);
         static UnicodeString getDisplayName(Locale &, Locale &, _UnicodeString);

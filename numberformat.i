@@ -144,7 +144,7 @@ namespace icu {
         static _NumberFormat *createScientificInstance(UErrorCode);
         static _NumberFormat *createScientificInstance(Locale &, UErrorCode);
 
-	static LocaleArray1 getAvailableLocales(_int32_t);
+	static LocaleDict1 getAvailableLocales(_int32_t);
 
         %extend {
 
