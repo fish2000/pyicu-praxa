@@ -140,5 +140,60 @@ namespace icu {
 
 	FormattableArray4 parse(UnicodeString &, ParsePosition &, _int32_t);
 	FormattableArray3 parse(UnicodeString &, _int32_t, UErrorCode);
+
+        %extend {
+            static UnicodeString formatMessage(PyObject *format, PyObject *args,
+                                               _UnicodeString string)
+            {
+                UErrorCode status = U_ZERO_ERROR;
+                UnicodeString *formatString;
+                int own = 0;
+
+                if (!PyList_Check(args))
+                {
+                    PyErr_SetObject(PyExc_TypeError, args);
+                    throw ICUException();
+                }
+                    
+                if (SWIG_Python_ConvertPtr(format, (void **) &formatString,
+                                           SWIGTYPE_p_icu__UnicodeString, 0))
+                {
+                    formatString = PyUnicode_AsUnicodeString(format);
+                    own = 1;
+                }
+
+                int len = PyList_Size(args);
+                /* ?? allocating array with new causes
+                 * python to complain on delete ??
+                 */
+                Formattable *array = 
+                    (Formattable *) calloc(sizeof(Formattable), len);
+
+                for (int i = 0; i < len; i++) {
+                    PyObject *obj = PyList_GetItem(args, i);
+                    Formattable *fp;
+                    if (SWIG_ConvertPtr(obj, (void **) &fp,
+                                        SWIGTYPE_p_icu__Formattable,
+                                        SWIG_POINTER_EXCEPTION))
+                    {
+                        free(array);
+                        if (own) delete formatString;
+
+                        throw ICUException();
+                    }
+                    array[i] = *fp;
+                }
+
+                MessageFormat::format(*formatString, array, len, string,
+                                      status);
+                free(array);
+                if (own) delete formatString;
+
+                if (U_FAILURE(status))
+                    throw ICUException(status);
+
+                return string;
+            }	
+        }	
     };
 }

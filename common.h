@@ -106,7 +106,6 @@ typedef icu::UnicodeString UnicodeString3;
 typedef icu::UnicodeString _PyString;
 typedef const UChar *ISO3Code;
 typedef icu::Formattable Formattable2;
-typedef const icu::Formattable *FormattableArray2;
 typedef const icu::Formattable *FormattableArray3;
 typedef const icu::Formattable *FormattableArray4;
 typedef icu::NumberFormat _NumberFormat;

@@ -432,8 +432,12 @@
     for (int i = 0; i < len; i++) {
         PyObject *obj = PyList_GetItem($input, i);
         Formattable *fp;
-        SWIG_ConvertPtr(obj, (void **) &fp, $descriptor(icu::Formattable *),
-                        SWIG_POINTER_EXCEPTION);
+        if (SWIG_ConvertPtr(obj, (void **) &fp, $descriptor(icu::Formattable *),
+                            SWIG_POINTER_EXCEPTION))
+        {
+            delete array;
+            SWIG_fail;
+        }
         array[i] = *fp;
     }
     $1 = (const Formattable *) array;
