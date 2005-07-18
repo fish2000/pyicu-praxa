@@ -135,7 +135,7 @@ namespace icu {
         UnicodeString format(Formattable &, _UnicodeString, UErrorCode);
         UnicodeString format(Formattable &, _UnicodeString, FieldPosition &, UErrorCode);
 
-	UnicodeString3 &format(FormattableArray3, _int32_t, UnicodeString &, FieldPosition &, UErrorCode);
+	UnicodeString2 &format(FormattableArray3, _int32_t, UnicodeString &, FieldPosition &, UErrorCode);
 	UnicodeString format(FormattableArray3, _int32_t, _UnicodeString, FieldPosition &, UErrorCode);
 
 	FormattableArray4 parse(UnicodeString &, ParsePosition &, _int32_t);
