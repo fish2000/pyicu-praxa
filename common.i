@@ -456,6 +456,10 @@
     }
     $1 = (const Formattable *) array;
 }
+%typecheck(SWIG_TYPECHECK_POINTER) FormattableArray3 {
+
+    $1 = PyList_Check($input);
+}
 %typemap(argout) FormattableArray3 {
 
     delete $1;
