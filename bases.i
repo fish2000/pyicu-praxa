@@ -68,7 +68,6 @@ namespace icu {
         UnicodeString();
         UnicodeString(UnicodeString &);
         UnicodeString(_PyString);
-        UnicodeString(char *, _int32_t, _UConverter *, UErrorCode);
         UBool operator==(UnicodeString &);
         UBool operator!=(UnicodeString &);
         UBool operator>(UnicodeString &);
@@ -244,6 +243,69 @@ namespace icu {
 	    int8_t __cmp__(_PyString other)
             {
                 return self->compare(other);
+            }
+
+            UnicodeString(PyObject *text, char *encoding)
+            {
+                UnicodeString string;
+                PyObject_AsUnicodeString(text, encoding, "strict", string);
+
+                return new UnicodeString(string);
+            }
+
+            UnicodeString(PyObject *text, char *encoding, char *mode)
+            {
+                UnicodeString string;
+                PyObject_AsUnicodeString(text, encoding, mode, string);
+
+                return new UnicodeString(string);
+            }
+
+            static PyObject *getAvailableStandards()
+            {
+                UErrorCode status = U_ZERO_ERROR;
+                int count = ucnv_countStandards();
+                PyObject *list = PyList_New(count);
+
+                for (int i = 0; i < count; i++) {
+                    const char *name = ucnv_getStandard(i, &status);
+                    PyList_SetItem(list, i, PyString_FromString(name));
+                }
+
+                return list;
+            }
+
+            static PyObject *getAvailableEncodings(char *standard=0)
+            {
+                int count = ucnv_countAvailable();
+                PyObject *list = PyList_New(0);
+
+                for (int i = 0; i < count; i++) {
+                    const char *name = ucnv_getAvailableName(i);
+
+                    if (standard)
+                    {
+                        UErrorCode status = U_ZERO_ERROR;
+                        name = ucnv_getStandardName(name, standard, &status);
+                    }
+
+                    if (name)
+                        PyList_Append(list, PyString_FromString(name));
+                }
+
+                return list;
+            }
+
+            static PyObject *getStandardEncoding(char *name, char *standard)
+            {
+                UErrorCode status = U_ZERO_ERROR;
+                const char *standardName =
+                    ucnv_getStandardName(name, standard, &status);
+
+                if (standardName)
+                    return PyString_FromString(standardName);
+
+                Py_RETURN_NONE;
             }
         }
     };
@@ -536,6 +598,6 @@ namespace icu {
             {
                 return self;
             }
-        }                
+        }
     };
 }

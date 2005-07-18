@@ -126,11 +126,17 @@ public:
     EXPORT PyObject *reportError();
 };
 
-
 EXPORT PyObject *PyUnicode_FromUnicodeString(UnicodeString *string);
-EXPORT UnicodeString &PyUnicode_AsUnicodeString(PyObject *object,
-                                                UnicodeString &string);
-EXPORT UnicodeString *PyUnicode_AsUnicodeString(PyObject *object);
+
+EXPORT UnicodeString &PyString_AsUnicodeString(PyObject *object,
+                                               char *encoding, char *mode,
+                                               UnicodeString &string);
+EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
+                                               char *encoding, char *mode,
+                                               UnicodeString &string);
+EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
+                                               UnicodeString &string);
+EXPORT UnicodeString *PyObject_AsUnicodeString(PyObject *object);
 EXPORT UDate PyObject_AsUDate(PyObject *object);
 
 #endif

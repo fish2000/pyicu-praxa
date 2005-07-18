@@ -25,6 +25,29 @@
 #include <stdarg.h>
 #include <datetime.h>
 
+
+typedef struct {
+    UConverterCallbackReason reason;
+    char chars[8];
+    int32_t length;
+} _STOPReason;
+
+U_STABLE void U_EXPORT2 _stopDecode(const void *context,
+                                    UConverterToUnicodeArgs *args,
+                                    const char *chars, int32_t length,
+                                    UConverterCallbackReason reason,
+                                    UErrorCode *err)
+{
+    _STOPReason *stop = (_STOPReason *) context;
+    int len = length < sizeof(stop->chars)-1 ? length : sizeof(stop->chars)-1;
+
+    stop->reason = reason;
+    if (chars && len)
+        strncpy(stop->chars, chars, len); stop->chars[len] = '\0';
+    stop->length = length;
+}
+
+
 static PyObject *PyExc_ICUError;
 
 EXPORT void setICUErrorClass(PyObject *pycls)
@@ -123,8 +146,72 @@ EXPORT PyObject *PyUnicode_FromUnicodeString(UnicodeString *string)
     }
 }
 
-EXPORT UnicodeString &PyUnicode_AsUnicodeString(PyObject *object,
-						UnicodeString &string)
+EXPORT UnicodeString &PyString_AsUnicodeString(PyObject *object,
+                                               char *encoding, char *mode,
+                                               UnicodeString &string)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    UConverter *conv = ucnv_open(encoding, &status);
+    UnicodeString result;
+
+    if (U_FAILURE(status))
+        throw ICUException(status);
+
+    _STOPReason stop;
+    char *src;
+    int len;
+
+    memset(&stop, 0, sizeof(stop));
+
+    if (!strcmp(mode, "strict"))
+    {
+        ucnv_setToUCallBack(conv, _stopDecode, &stop, NULL, NULL, &status);
+        if (U_FAILURE(status))
+            throw ICUException(status);
+    }
+
+    PyString_AsStringAndSize(object, &src, &len);
+    result = UnicodeString((const char *) src, (int32_t) len, conv, status);
+
+    if (U_FAILURE(status))
+    {
+        char *reasonName;
+
+        switch (stop.reason) {
+          case UCNV_UNASSIGNED:
+            reasonName = "the code point is unassigned";
+            break;
+          case UCNV_ILLEGAL:
+            reasonName = "the code point is illegal";
+            break;
+          case UCNV_IRREGULAR:
+            reasonName = "the code point is not a regular sequence in the encoding";
+            break;
+          default:
+            reasonName = "unexpected";
+            break;
+        }
+        status = U_ZERO_ERROR;
+
+        int position = strstr(src, stop.chars) - src;
+        PyObject *msg = PyString_FromFormat("'%s' codec can't decode byte 0x%x in position %d: %d (%s)", ucnv_getName(conv, &status), (int) (unsigned char) stop.chars[0], position, stop.reason, reasonName);
+
+        PyErr_SetObject(PyExc_ValueError, msg);
+        Py_DECREF(msg);
+        ucnv_close(conv);
+
+        throw ICUException();
+    }
+
+    ucnv_close(conv);
+    string.setTo(result);
+
+    return string;
+}
+
+EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
+                                               char *encoding, char *mode,
+                                               UnicodeString &string)
 {
     if (PyUnicode_CheckExact(object))
     {
@@ -145,24 +232,7 @@ EXPORT UnicodeString &PyUnicode_AsUnicodeString(PyObject *object,
         }
     }
     else if (PyString_CheckExact(object))
-    {
-        UErrorCode status = U_ZERO_ERROR;
-        UConverter *conv = ucnv_open("utf-8", &status);
-
-        if (U_FAILURE(status))
-            throw ICUException(status);
-
-        char *src;
-        int len;
-
-        PyString_AsStringAndSize(object, &src, &len);
-        string.setTo(UnicodeString((const char *) src, (int32_t) len,
-                                   conv, status));
-        ucnv_close(conv);
-
-        if (U_FAILURE(status))
-            throw ICUException(status, "python str is not unicode or utf-8 encoded: %s", src);
-    }
+        PyString_AsUnicodeString(object, encoding, mode, string);
     else
     {
         PyErr_SetObject(PyExc_TypeError, object);
@@ -172,22 +242,27 @@ EXPORT UnicodeString &PyUnicode_AsUnicodeString(PyObject *object,
     return string;
 }
 
-EXPORT UnicodeString *PyUnicode_AsUnicodeString(PyObject *object)
+EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
+                                               UnicodeString &string)
+{
+    return PyObject_AsUnicodeString(object, "utf-8", "strict", string);
+}
+
+EXPORT UnicodeString *PyObject_AsUnicodeString(PyObject *object)
 {
     if (object == Py_None)
         return NULL;
     else
     {
-        UnicodeString *string = new UnicodeString();
+        UnicodeString string;
 
         try {
-            PyUnicode_AsUnicodeString(object, *string);
+            PyObject_AsUnicodeString(object, string);
         } catch (ICUException e) {
-            delete string;
             throw e;
         }
 
-        return string;
+        return new UnicodeString(string);
     }
 }
 

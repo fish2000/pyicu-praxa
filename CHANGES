@@ -17,3 +17,5 @@ Version 0.2 -> 0.3
 ------------------
   - added support for CanonicalIterator, CollationElementIterator
   - added static formatMessage() method on MessageFormat
+  - added static encoding helper methods to UnicodeString
+  - reworked PyString_AsUnicodeString() to report decode errors by default

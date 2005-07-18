@@ -73,7 +73,7 @@
 %typemap(in) ISO3Code (UnicodeString u)
 {
     try {
-        PyUnicode_AsUnicodeString($input, u);
+        PyObject_AsUnicodeString($input, u);
     } catch (ICUException e) {
         SWIG_fail;
     }
@@ -294,7 +294,7 @@
 %typemap(in) _PyString
 {
     try {
-        PyUnicode_AsUnicodeString($input, $1);
+        PyObject_AsUnicodeString($input, $1);
     } catch (ICUException e) {
         e.reportError();
         SWIG_fail;
@@ -312,7 +312,7 @@
 %typemap(in, numinputs=1) (UChar *, _int32_t) (UnicodeString u)
 {
     try {
-        PyUnicode_AsUnicodeString($input, u);
+        PyObject_AsUnicodeString($input, u);
         $1 = (UChar *) u.getBuffer();
         $2 = u.length();
     } catch (ICUException e) {
@@ -368,7 +368,7 @@
     UnicodeString *strings = new UnicodeString[len];
     arg3 = len;
     for (int i = 0; i < len; i++)
-        PyUnicode_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
+        PyObject_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
     $1 = (const UnicodeString *) strings;
 }
 %typemap(argout) UnicodeStringArray3 {
@@ -382,7 +382,7 @@
     UnicodeString *strings = new UnicodeString[len];
     arg4 = len;
     for (int i = 0; i < len; i++)
-        PyUnicode_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
+        PyObject_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
     $1 = (const UnicodeString *) strings;
 }
 %typemap(argout) UnicodeStringArray4 {
@@ -396,7 +396,7 @@
     UnicodeString *strings = new UnicodeString[len];
     arg5 = len;
     for (int i = 0; i < len; i++)
-        PyUnicode_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
+        PyObject_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
     $1 = (const UnicodeString *) strings;
 }
 %typemap(argout) UnicodeStringArray5 {
@@ -410,7 +410,7 @@
     UnicodeString *strings = new UnicodeString[len]; //leaked
     arg3 = len;
     for (int i = 0; i < len; i++)
-        PyUnicode_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
+        PyObject_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
     $1 = (const UnicodeString *) strings;
 }
 
@@ -602,6 +602,11 @@
 }
 
 %typemap(in, numinputs=1) (char *, _int32_t) {
+
+    PyString_AsStringAndSize($input, &$1, &$2);
+}
+
+%typemap(in, numinputs=1) (char *text, _int32_t len) {
 
     PyString_AsStringAndSize($input, &$1, &$2);
 }

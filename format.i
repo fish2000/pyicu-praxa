@@ -158,7 +158,7 @@ namespace icu {
                 if (SWIG_Python_ConvertPtr(format, (void **) &formatString,
                                            SWIGTYPE_p_icu__UnicodeString, 0))
                 {
-                    formatString = PyUnicode_AsUnicodeString(format);
+                    formatString = PyObject_AsUnicodeString(format);
                     own = 1;
                 }
 
