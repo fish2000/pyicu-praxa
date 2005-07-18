@@ -110,8 +110,8 @@ typedef icu::UnicodeString _PyString;
 typedef icu::CollationKey CollationKey2;
 typedef const UChar *ISO3Code;
 typedef icu::Formattable Formattable2;
-typedef const icu::Formattable *FormattableArray3;
-typedef const icu::Formattable *FormattableArray4;
+typedef icu::Formattable *FormattableArray3;
+typedef icu::Formattable *FormattableArray4;
 typedef icu::NumberFormat _NumberFormat;
 typedef UConverter _UConverter;
 

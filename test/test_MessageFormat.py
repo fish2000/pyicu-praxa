@@ -27,22 +27,33 @@ from unittest import TestCase, main
 from PyICU import *
 
 
-class TestCollator(TestCase):
+class TestMessageFormat(TestCase):
 
-    def testSort(self):
+    def testFormatMessage(self):
 
-        collator = Collator.createInstance(Locale.getFrance())
-        module = sys.modules[TestCollator.__module__].__file__
-        input = file(os.path.join(os.path.dirname(module), 'noms.txt'))
-        names = [unicode(n.strip(), 'utf-8') for n in input.readlines()]
-        input.close()
-        ecole = names[0]
+        x = 'x'
+        f = Formattable(UnicodeString(x))
 
-        names.sort()
-        self.assert_(names[-1] is ecole)
+        text = MessageFormat.formatMessage("This is a string: {0}.", [f])
+        self.assert_(text == "This is a string: x.")
 
-        names.sort(collator.compare)
-        self.assert_(names[2] is ecole)
+    def testFormat(self):
+
+        x = 'x'
+        f = Formattable(UnicodeString(x))
+        msgFormat = MessageFormat("This is a string: {0}")
+
+        text = msgFormat.format([f], FieldPosition())
+        self.assert_(text == "This is a string: x")
+
+    def testFormatAppend(self):
+
+        x = 'x'
+        f = Formattable(UnicodeString(x))
+        msgFormat = MessageFormat("This is a string: {0}")
+
+        text = msgFormat.format([f], UnicodeString("x"), FieldPosition())
+        self.assert_(text == "xThis is a string: x")
 
 
 if __name__ == "__main__":

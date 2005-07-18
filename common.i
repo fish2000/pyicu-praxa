@@ -379,7 +379,7 @@
 %typemap(in) UnicodeStringArray3 {
 
     int len = PyList_Size($input);
-    UnicodeString *strings = new UnicodeString[len];
+    UnicodeString *strings = (UnicodeString *) calloc(len, sizeof(UnicodeString));
     arg3 = len;
     for (int i = 0; i < len; i++)
         PyObject_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
@@ -387,13 +387,13 @@
 }
 %typemap(argout) UnicodeStringArray3 {
 
-    delete $1;
+    free((void *) $1);
 }
 
 %typemap(in) UnicodeStringArray4 {
 
     int len = PyList_Size($input);
-    UnicodeString *strings = new UnicodeString[len];
+    UnicodeString *strings = (UnicodeString *) calloc(len, sizeof(UnicodeString));
     arg4 = len;
     for (int i = 0; i < len; i++)
         PyObject_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
@@ -401,13 +401,13 @@
 }
 %typemap(argout) UnicodeStringArray4 {
 
-    delete $1;
+    free((void *) $1);
 }
 
 %typemap(in) UnicodeStringArray5 {
 
     int len = PyList_Size($input);
-    UnicodeString *strings = new UnicodeString[len];
+    UnicodeString *strings = (UnicodeString *) calloc(len, sizeof(UnicodeString));
     arg5 = len;
     for (int i = 0; i < len; i++)
         PyObject_AsUnicodeString(PyList_GET_ITEM($input, i), strings[i]);
@@ -415,7 +415,7 @@
 }
 %typemap(argout) UnicodeStringArray5 {
 
-    delete $1;
+    free((void *) $1);
 }
 
 %typemap(in) LeakyUnicodeStringArray3 {
@@ -441,7 +441,7 @@
 %typemap(in) FormattableArray3 {
 
     int len = PyList_Size($input);
-    Formattable *array = new Formattable[len];
+    Formattable *array = (Formattable *) calloc(len, sizeof(Formattable));
     arg3 = len;
     for (int i = 0; i < len; i++) {
         PyObject *obj = PyList_GetItem($input, i);
@@ -449,12 +449,12 @@
         if (SWIG_ConvertPtr(obj, (void **) &fp, $descriptor(icu::Formattable *),
                             SWIG_POINTER_EXCEPTION))
         {
-            delete array;
+            free(array);
             SWIG_fail;
         }
         array[i] = *fp;
     }
-    $1 = (const Formattable *) array;
+    $1 = array;
 }
 %typecheck(SWIG_TYPECHECK_POINTER) FormattableArray3 {
 
@@ -462,7 +462,7 @@
 }
 %typemap(argout) FormattableArray3 {
 
-    delete $1;
+    free($1);
 }
 
 %typemap(out) FormattableArray3 {
@@ -491,18 +491,22 @@
 %typemap(in) FormatPointerArray3 {
 
     int len = PyList_Size($input);
-    Format **formats = new Format *[len];
+    Format **formats = (Format **) calloc(len, sizeof(Format *));
     arg3 = len;
     for (int i = 0; i < len; i++) {
         PyObject *obj = PyList_GetItem($input, i);
-        SWIG_ConvertPtr(obj, (void **)(formats + i), $descriptor(icu::Format *),
-                        SWIG_POINTER_EXCEPTION);
+        if (SWIG_ConvertPtr(obj, (void **)(formats + i), $descriptor(icu::Format *), SWIG_POINTER_EXCEPTION))
+        {
+            free(formats);
+            SWIG_fail;
+        }
+
     }
     $1 = (const Format **) formats;
 }
 %typemap(argout) FormatPointerArray3 {
 
-    delete $1;
+    free($1);
 }
 
 %typemap(out) FormatPointerArray2 {
@@ -525,7 +529,7 @@
 %typemap(in) doubleArray3 {
 
     int len = PyList_Size($input);
-    double *doubles = new double[len];
+    double *doubles = (double *) calloc(len, sizeof(double));
     arg3 = len;
     for (int i = 0; i < len; i++)
         doubles[i] = PyFloat_AsDouble(PyList_GetItem($input, i));
@@ -533,13 +537,13 @@
 }
 %typemap(argout) doubleArray3 {
 
-    delete $1;
+    free((void *) $1);
 }
 
 %typemap(in) doubleArray4 {
 
     int len = PyList_Size($input);
-    double *doubles = new double[len];
+    double *doubles = (double *) calloc(len, sizeof(double));
     arg4 = len;
     for (int i = 0; i < len; i++)
         doubles[i] = PyFloat_AsDouble(PyList_GetItem($input, i));
@@ -547,13 +551,13 @@
 }
 %typemap(argout) doubleArray4 {
 
-    delete $1;
+    free((void *) $1);
 }
 
 %typemap(in) doubleArray5 {
 
     int len = PyList_Size($input);
-    double *doubles = new double[len];
+    double *doubles = (double *) calloc(len, sizeof(double));
     arg5 = len;
     for (int i = 0; i < len; i++)
         doubles[i] = PyFloat_AsDouble(PyList_GetItem($input, i));
@@ -561,7 +565,7 @@
 }
 %typemap(argout) doubleArray5 {
 
-    delete $1;
+    free((void *) $1);
 }
 
 
@@ -577,7 +581,7 @@
 %typemap(in) UBoolArray4 {
 
     int len = PyList_Size($input);
-    UBool *bools = new UBool[len];
+    UBool *bools = (UBool *) calloc(len, sizeof(UBool));
     arg4 = len;
     for (int i = 0; i < len; i++)
         bools[i] = (PyList_GetItem($input, i) == Py_True);
@@ -585,13 +589,13 @@
 }
 %typemap(argout) UBoolArray4 {
 
-    delete $1;
+    free((void *) $1);
 }
 
 %typemap(in) UBoolArray5 {
 
     int len = PyList_Size($input);
-    UBool *bools = new UBool[len];
+    UBool *bools = (UBool *) calloc(len, sizeof(UBool));
     arg5 = len;
     for (int i = 0; i < len; i++)
         bools[i] = (PyList_GetItem($input, i) == Py_True);
@@ -599,7 +603,7 @@
 }
 %typemap(argout) UBoolArray5 {
 
-    delete $1;
+    free((void *) $1);
 }
 
 %typemap(in) _UConverter * {

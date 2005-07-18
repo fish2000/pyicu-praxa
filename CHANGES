@@ -21,3 +21,5 @@ Version 0.2 -> 0.3
   - reworked PyString_AsUnicodeString() to report decode errors by default
   - added support for Collator, RuleBasedCollator and CollationKey
   - added test_Collator unittest
+  - added test_MessageFormat unittest
+  - fixed various MessageFormat bugs
