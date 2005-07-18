@@ -77,7 +77,7 @@ endif
 
 SWIG_OPT=-DSWIG_COBJECT_TYPES -DSWIG_COBJECT_PYTHON -DPYICU_VER="'$(VERSION)'" -DICU_VER="'$(ICU_VER)'"
 
-MODULES=errors bases iterators format dateformat numberformat calendar
+MODULES=errors bases iterators format dateformat numberformat calendar collator
 
 ifeq ($(OS),Darwin)
 PYTHON_SITE=$(PREFIX_PYTHON)/lib/python$(PYTHON_VER)/site-packages

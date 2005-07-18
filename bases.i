@@ -143,9 +143,9 @@ namespace icu {
 	UnicodeString0 &trim();
 	UnicodeString0 &reverse();
 	UnicodeString0 &toUpper();
-	UnicodeString0 &toUpper(Locale &);
+	UnicodeString0 &toUpper(icu::Locale &);
 	UnicodeString0 &toLower();
-	UnicodeString0 &toLower(Locale &);
+	UnicodeString0 &toLower(icu::Locale &);
         UnicodeString0 &toTitle(BreakIterator *);
         UnicodeString0 &toTitle(BreakIterator *, icu::Locale &);
 	UnicodeString0 &foldCase(uint32_t=0);

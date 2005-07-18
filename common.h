@@ -73,6 +73,8 @@
 #include <unicode/dbbi.h>
 #include <unicode/caniter.h>
 #include <unicode/coleitr.h>
+#include <unicode/coll.h>
+#include <unicode/tblcoll.h>
 
 
 typedef int32_t _int32_t;
@@ -97,6 +99,7 @@ typedef icu::Calendar _Calendar;
 typedef icu::TimeZone _TimeZone;
 typedef icu::TimeZone TimeZone_;
 typedef icu::StringEnumeration _StringEnumeration;
+typedef icu::Collator _Collator;
 typedef const icu::TimeZone const_TimeZone;
 typedef icu::UnicodeString _UnicodeString;
 typedef icu::UnicodeString UnicodeString0;
@@ -104,6 +107,7 @@ typedef icu::UnicodeString UnicodeString1;
 typedef icu::UnicodeString UnicodeString2;
 typedef icu::UnicodeString UnicodeString3;
 typedef icu::UnicodeString _PyString;
+typedef icu::CollationKey CollationKey2;
 typedef const UChar *ISO3Code;
 typedef icu::Formattable Formattable2;
 typedef const icu::Formattable *FormattableArray3;

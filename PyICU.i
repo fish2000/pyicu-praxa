@@ -35,4 +35,5 @@
     from PyICU_dateformat import *
     from PyICU_numberformat import *
     from PyICU_calendar import *
+    from PyICU_collator import *
 }

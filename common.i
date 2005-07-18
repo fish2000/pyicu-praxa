@@ -217,6 +217,12 @@
     $result = obj2;
 }
 
+%typemap(out) CollationKey2 &
+{
+    Py_INCREF(obj2);
+    $result = obj2;
+}
+
 %typemap(out) _UnicodeString *
 {
     $result = SWIG_NewPointerObj($1, $descriptor(icu::UnicodeString *), 1);
@@ -252,6 +258,14 @@
         $result = SWIG_NewPointerObj($1, $descriptor(icu::SimpleTimeZone *), 1);
     else
         $result = SWIG_NewPointerObj($1, $descriptor(icu::TimeZone *), 1);
+}
+
+%typemap(out) _Collator *
+{
+    if ($1->getDynamicClassID() == icu::RuleBasedCollator::getStaticClassID())
+        $result = SWIG_NewPointerObj($1, $descriptor(icu::RuleBasedCollator *), 1);
+    else
+        $result = SWIG_NewPointerObj($1, $descriptor(icu::Collator *), 1);
 }
 
 %typemap(in) TimeZone_ *
