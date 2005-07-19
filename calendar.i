@@ -473,6 +473,19 @@ namespace icu {
         def __str__(self):
             return str(self._timezone.getID())
 
+        def __eq__(self, other):
+            if isinstance(other, ICUtzinfo):
+                return self._timezone == other._timezone
+            return False
+
+        def __ne__(self, other):
+            if isinstance(other, ICUtzinfo):
+                return self._timezone != other._timezone
+            return True
+
+        def __hash__(self):
+            return hash(self.tzid)
+
         def _notzsecs(self, dt):
             return ((dt.toordinal() - 719163) * 86400.0 +
                     dt.hour * 3600.0 + dt.minute * 60.0 +
