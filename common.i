@@ -252,14 +252,6 @@
         $result = SWIG_NewPointerObj($1, $descriptor(icu::Calendar *), 1);
 }
 
-%typemap(out) _TimeZone *
-{
-    if ($1->getDynamicClassID() == icu::SimpleTimeZone::getStaticClassID())
-        $result = SWIG_NewPointerObj($1, $descriptor(icu::SimpleTimeZone *), 1);
-    else
-        $result = SWIG_NewPointerObj($1, $descriptor(icu::TimeZone *), 1);
-}
-
 %typemap(out) _Collator *
 {
     if ($1->getDynamicClassID() == icu::RuleBasedCollator::getStaticClassID())
@@ -268,16 +260,30 @@
         $result = SWIG_NewPointerObj($1, $descriptor(icu::Collator *), 1);
 }
 
+%typemap(out) _TimeZone *
+{
+    if ($1->getDynamicClassID() == icu::SimpleTimeZone::getStaticClassID())
+        $result = SWIG_NewPointerObj($1, $descriptor(icu::SimpleTimeZone *), 1);
+    else
+        $result = SWIG_NewPointerObj($1, $descriptor(icu::TimeZone *), 1);
+}
+
 %typemap(in) TimeZone_ *
 {
-    PyObject *thisown = PyObject_GetAttrString($input, "thisown");
-    int isTrue = PyObject_IsTrue(thisown); Py_DECREF(thisown);
-
-    if (!isTrue)
-    {
-        PyErr_Format(PyExc_ValueError,
-                     "TimeZone argument is not owned by caller", NULL);
+    if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(icu::TimeZone *),
+                        SWIG_POINTER_EXCEPTION))
         SWIG_fail;
+    else
+    {
+        PyObject *thisown = PyObject_GetAttrString($input, "thisown");
+        int isTrue = PyObject_IsTrue(thisown); Py_DECREF(thisown);
+
+        if (!isTrue)
+        {
+            PyErr_Format(PyExc_ValueError,
+                         "TimeZone argument is not owned by caller", NULL);
+            SWIG_fail;
+        }
     }
 
     if (!SWIG_ConvertPtr($input, (void **) &$1, $descriptor(icu::TimeZone *),
@@ -286,6 +292,7 @@
     else
         SWIG_fail;
 }
+
 
 %typemap(out) const_TimeZone &
 {

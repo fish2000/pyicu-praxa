@@ -465,13 +465,13 @@ namespace icu {
             if not isinstance(timezone, TimeZone):
                 raise TypeError, timezone
             super(ICUtzinfo, self).__init__()
-            self.timezone = timezone
+            self._timezone = timezone
 
         def __repr__(self):
-            return "<ICUtzinfo: %s>" %(self.timezone.getID())
+            return "<ICUtzinfo: %s>" %(self._timezone.getID())
 
         def __str__(self):
-            return str(self.timezone.getID())
+            return str(self._timezone.getID())
 
         def _notzsecs(self, dt):
             return ((dt.toordinal() - 719163) * 86400.0 +
@@ -479,15 +479,19 @@ namespace icu {
                     float(dt.second) + dt.microsecond / 1e6)
 
         def utcoffset(self, dt):
-            raw, dst = self.timezone.getOffset(self._notzsecs(dt), True)
+            raw, dst = self._timezone.getOffset(self._notzsecs(dt), True)
             return timedelta(seconds = (raw + dst) / 1000)
 
         def dst(self, dt):
-            raw, dst = self.timezone.getOffset(self._notzsecs(dt), True)
+            raw, dst = self._timezone.getOffset(self._notzsecs(dt), True)
             return timedelta(seconds = dst / 1000)
 
         def tzname(self, dt):
-            return str(self.timezone.getID())
+            return str(self._timezone.getID())
+
+        def _getTimezone(self):
+            return TimeZone.createTimeZone(self._timezone.getID())
 
         tzid = property(__str__)
+        timezone = property(_getTimezone)
 }

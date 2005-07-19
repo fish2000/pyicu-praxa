@@ -23,3 +23,5 @@ Version 0.2 -> 0.3
   - added test_Collator unittest
   - added test_MessageFormat unittest
   - fixed various MessageFormat bugs
+  - fixed bug in ICUtzinfo, now returning copy of ICU TimeZone instance
+  - fixed bug in TimeZone.adoptDefault() not checking type of pointer
