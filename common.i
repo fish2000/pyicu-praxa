@@ -520,7 +520,42 @@
 
     $result = PyList_New(arg2);
     for (int32_t i = 0; i < arg2; i++) {
-        PyObject *o = SWIG_NewPointerObj((void *) $1[i], $descriptor(icu::Format *), 0);
+        Format *format = (Format *) $1[i];
+        UClassID classID = format->getDynamicClassID();
+        swig_type_info *descriptor;
+
+        if (classID == SimpleDateFormat::getStaticClassID())
+        {
+            format = new SimpleDateFormat(*(SimpleDateFormat *) format);
+            descriptor = $descriptor(icu::SimpleDateFormat *);
+        }
+        else if (classID == MessageFormat::getStaticClassID())
+        {
+            format = new MessageFormat(*(MessageFormat *) format);
+            descriptor = $descriptor(icu::MessageFormat *);
+        }
+        else if (classID == ChoiceFormat::getStaticClassID())
+        {
+            format = new ChoiceFormat(*(ChoiceFormat *) format);
+            descriptor = $descriptor(icu::ChoiceFormat *);
+        }
+        else if (classID == DecimalFormat::getStaticClassID())
+        {
+            format = new DecimalFormat(*(DecimalFormat *) format);
+            descriptor = $descriptor(icu::DecimalFormat *);
+        }
+        else if (classID == RuleBasedNumberFormat::getStaticClassID())
+        {
+            format = new RuleBasedNumberFormat(*(RuleBasedNumberFormat *) format);
+            descriptor = $descriptor(icu::RuleBasedNumberFormat *);
+        }
+        else
+        {
+            PyErr_Format(PyExc_TypeError, "Unknown format type: %d", classID);
+            throw ICUException();
+        }
+
+        PyObject *o = SWIG_NewPointerObj((void *) format, descriptor, 1);
         PyList_SET_ITEM($result, i, o);
     }
 }
