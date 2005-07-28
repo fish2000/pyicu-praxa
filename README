@@ -7,6 +7,7 @@
   --------
 
    - Welcome
+   - Installing PyICU
    - Building PyICU
    - Running PyICU
    - What's available
@@ -23,6 +24,25 @@
 
   IBM's ICU homepage is: http://www-306.ibm.com/software/globalization/icu/
   SWIG's homepage is: http://www.swig.org/
+
+
+  Installing PyICU
+  ----------------
+
+  To build PyICU from sources, see next topic
+
+  To install PyICU binaries you just downloaded:
+
+    - install the files in the python directory into your python
+      installation's site-packages directory
+
+    Linux only:
+    - install the files in the lib directory into /usr/local/lib or a
+      directory that is on your LD_LIBRARY_PATH
+
+    Mac OS X only:
+    - install the files in the lib directory into /usr/local/lib or a
+      directory that is on your DYLD_LIBRARY_PATH
 
 
   Building PyICU
