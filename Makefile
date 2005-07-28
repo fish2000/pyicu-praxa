@@ -20,7 +20,7 @@
 # You need to verify that the version of python below is correct.
 # 
 
-VERSION=0.2
+VERSION=0.3
 ICU_VER=3.2
 PYTHON_VER=2.4
 

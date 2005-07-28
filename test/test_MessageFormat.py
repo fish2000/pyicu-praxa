@@ -55,6 +55,19 @@ class TestMessageFormat(TestCase):
         text = msgFormat.format([f], UnicodeString("x"), FieldPosition())
         self.assert_(text == "xThis is a string: x")
 
+    def testFormats(self):
+
+        orig = TimeZone.createDefault().getID()
+        tzid = 'America/Indiana/Vevay'        
+        msgFormat = MessageFormat("{0,time,short} {0,time,z}")
+        formats = msgFormat.getFormats()
+
+        formats[0].setTimeZone(TimeZone.createTimeZone(tzid))
+        self.assert_(msgFormat.getFormats()[0].getTimeZone().getID() == orig)
+
+        msgFormat.setFormats(formats)
+        self.assert_(msgFormat.getFormats()[0].getTimeZone().getID() == tzid)
+
 
 if __name__ == "__main__":
     main()

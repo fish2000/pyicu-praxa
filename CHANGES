@@ -20,10 +20,10 @@ Version 0.2 -> 0.3
   - added static encoding helper methods to UnicodeString
   - reworked PyString_AsUnicodeString() to report decode errors by default
   - added support for Collator, RuleBasedCollator and CollationKey
-  - added test_Collator unittest
-  - added test_MessageFormat unittest
+  - added test_Collator unit tests
+  - added test_MessageFormat unit tests
   - fixed various MessageFormat bugs
   - fixed bug in ICUtzinfo, now returning copy of ICU TimeZone instance
   - fixed bug in TimeZone.adoptDefault() not checking type of pointer
   - added __eq__, __ne__ and __hash__ methods to ICUtzinfo
-  - MessageFormat.getFormats() now return copies of formats
+  - MessageFormat.getFormats() now returns copies of concrete formats
