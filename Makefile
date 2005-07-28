@@ -220,3 +220,22 @@ clean:
 	rm -f PyICU.py* PyICU_wrap.cxx
 	rm -f $(MODULES:%=%_wrap.cxx) $(MODULES:%=PyICU_%.py*)
 	rm -f $(PYICU_MODULE_LIBS)
+
+realclean: clean
+	rm -rf $(DISTRIB)
+
+distrib: all
+	mkdir -p $(DISTRIB)/python
+	install PyICU.py $(MODULES:%=PyICU_%.py) $(DISTRIB)/python
+	install $(PYICU_LIB) $(PYICU_MODULE_LIBS) $(DISTRIB)/python
+ifeq ($(OS),Cygwin)
+	install $(PYICU_COMMON_LIB) $(DISTRIB)/python
+else
+	mkdir -p $(DISTRIB)/lib
+	install $(PYICU_COMMON_LIB) $(DISTRIB)/lib
+endif
+	tar --exclude .svn -cf - test/*.py | tar -C $(DISTRIB) -xf -
+	install README $(DISTRIB)
+	install CHANGES $(DISTRIB)
+	install CREDITS $(DISTRIB)
+	tar -cvzf $(DISTRIB).tar.gz $(DISTRIB)
