@@ -550,10 +550,7 @@
             descriptor = $descriptor(icu::RuleBasedNumberFormat *);
         }
         else
-        {
-            PyErr_Format(PyExc_TypeError, "Unknown format type: %d", classID);
-            throw ICUException();
-        }
+            descriptor = $descriptor(icu::Format *);
 
         PyObject *o = SWIG_NewPointerObj((void *) format, descriptor, 1);
         PyList_SET_ITEM($result, i, o);

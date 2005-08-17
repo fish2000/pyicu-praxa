@@ -27,3 +27,8 @@ Version 0.2 -> 0.3
   - fixed bug in TimeZone.adoptDefault() not checking type of pointer
   - added __eq__, __ne__ and __hash__ methods to ICUtzinfo
   - MessageFormat.getFormats() now returns copies of concrete formats
+
+
+Version 0.3 -> 0.4
+------------------
+  - PyICU now wraps ICU 3.4
