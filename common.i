@@ -135,7 +135,7 @@
 }
 %typemap(out) uint32_t
 {
-    $result = (unsigned long) PyInt_FromLong((long) $1);
+    $result = PyInt_FromLong((long) $1);
 }
 %typecheck(SWIG_TYPECHECK_UINT32) uint32_t
 {

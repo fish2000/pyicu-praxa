@@ -31,11 +31,6 @@
 
 %include "common.i"
 
-typedef enum {
-    ULOC_ACTUAL_LOCALE = 0,
-    ULOC_VALID_LOCALE  = 1,
-} icu::ULocDataLocaleType;
-
 #define U_FOLD_CASE_DEFAULT           0
 #define U_FOLD_CASE_EXCLUDE_SPECIAL_I 1
 #define U_COMPARE_CODE_POINT_ORDER    0x8000
@@ -53,6 +48,7 @@ namespace icu {
 }
 
 %import "iterators.i"
+%import "locale.i"
 
 namespace icu {
 
@@ -349,122 +345,6 @@ namespace icu {
         void setDate(UDate);
         void setString(UnicodeString &);
         void setString(_PyString);
-    };
-
-    class Locale : public UObject {
-    public:
-        Locale();
-        Locale(char *language, char *country=0, char *variant=0);
-        char *getLanguage();
-        char *getScript();
-        char *getCountry();
-        char *getVariant();
-        char *getName();
-        char *getBaseName();
-        char *getISO3Language();
-        char *getISO3Country();
-        int32_t getLCID();
-        UnicodeString1 &getDisplayLanguage(UnicodeString &);
-        UnicodeString2 &getDisplayLanguage(Locale &, UnicodeString &);
-        UnicodeString1 &getDisplayScript(UnicodeString &);
-        UnicodeString2 &getDisplayScript(Locale &, UnicodeString &);
-        UnicodeString1 &getDisplayCountry(UnicodeString &);
-        UnicodeString2 &getDisplayCountry(Locale &, UnicodeString &);
-        UnicodeString1 &getDisplayVariant(UnicodeString &);
-        UnicodeString2 &getDisplayVariant(Locale &, UnicodeString &);
-        UnicodeString1 &getDisplayName(UnicodeString &);
-        UnicodeString2 &getDisplayName(Locale &, UnicodeString &);
-        UnicodeString getDisplayLanguage(_UnicodeString);
-        UnicodeString getDisplayLanguage(Locale &, _UnicodeString);
-        UnicodeString getDisplayScript(_UnicodeString);
-        UnicodeString getDisplayScript(Locale &, _UnicodeString);
-        UnicodeString getDisplayCountry(_UnicodeString);
-        UnicodeString getDisplayCountry(Locale &, _UnicodeString);
-        UnicodeString getDisplayVariant(_UnicodeString);
-        UnicodeString getDisplayVariant(Locale &, _UnicodeString);
-        UnicodeString getDisplayName(_UnicodeString);
-        UnicodeString getDisplayName(Locale &, _UnicodeString);
-
-        static Locale getEnglish();
-        static Locale getFrench();
-        static Locale getGerman();
-        static Locale getItalian();
-        static Locale getJapanese();
-        static Locale getKorean();
-        static Locale getChinese();
-        static Locale getSimplifiedChinese();
-        static Locale getTraditionalChinese();
-        static Locale getFrance();
-        static Locale getGermany();
-        static Locale getItaly();
-        static Locale getJapan();
-        static Locale getKorea();
-        static Locale getChina();
-        static Locale getPRC();
-        static Locale getTaiwan();
-        static Locale getUK();
-        static Locale getUS();
-        static Locale getCanada();
-        static Locale getCanadaFrench();
-
-        static Locale getDefault();
-        static void setDefault(Locale &, UErrorCode);
-
-	static Locale createFromName(char *);
-	static Locale createCanonical(char *);
-
-        static LocaleDict1 getAvailableLocales(_int32_t);
-
-        %extend {
-            PyObject *__repr__()
-            {
-                PyObject *string = PyString_FromString(self->getName());
-                PyObject *format = PyString_FromString("<Locale: %s>");
-                PyObject *tuple = PyTuple_New(1);
-                PyObject *repr;
-
-                PyTuple_SET_ITEM(tuple, 0, string);
-                repr = PyString_Format(format, tuple);
-                Py_DECREF(format);
-                Py_DECREF(tuple);
-
-                return repr;
-            }
-
-            static PyObject *getISOCountries()
-            {
-                const char *const *countries = Locale::getISOCountries();
-                PyObject *list;
-                int len = 0;
-
-                while (countries[len] != NULL) len += 1;
-                list = PyList_New(len);
-
-                for (int i = 0; i < len; i++) {
-                    PyObject *str = PyString_FromStringAndSize(countries[i], 2);
-                    PyList_SET_ITEM(list, i, str);
-                }
-
-                return list;
-            }
-
-            static PyObject *getISOLanguages()
-            {
-                const char *const *languages = Locale::getISOLanguages();
-                PyObject *list;
-                int len = 0;
-
-                while (languages[len] != NULL) len += 1;
-                list = PyList_New(len);
-
-                for (int i = 0; i < len; i++) {
-                    PyObject *str = PyString_FromString(languages[i]);
-                    PyList_SET_ITEM(list, i, str);
-                }
-
-                return list;
-            }
-        }
     };
 
     class MeasureUnit : public UObject {

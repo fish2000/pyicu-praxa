@@ -31,6 +31,7 @@
 
 %include "common.i"
 %import "bases.i"
+%import "locale.i"
 
 enum UCollationResult {
     UCOL_LESS    = -1,

@@ -32,3 +32,6 @@ Version 0.2 -> 0.3
 Version 0.3 -> 0.4
 ------------------
   - PyICU now wraps ICU 3.4
+  - added Calendar.getType(), changed Calendar.__repr__()
+  - added Locale.createKeywords(), Locale.getKeywordValue()
+  - moved Locale to locale.i and added support for ResourceBundle

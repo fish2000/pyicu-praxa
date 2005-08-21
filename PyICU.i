@@ -30,6 +30,7 @@
 
     from PyICU_errors import *
     from PyICU_bases import *
+    from PyICU_locale import *
     from PyICU_iterators import *
     from PyICU_format import *
     from PyICU_dateformat import *

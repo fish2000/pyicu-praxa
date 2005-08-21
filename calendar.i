@@ -45,7 +45,7 @@ static PyObject *tz_repr(char *name, TimeZone *self)
     return repr;
 }
 
-static PyObject *cal_repr(char *name, Calendar *self)
+static PyObject *cal_repr(Calendar *self)
 {
     UErrorCode status = U_ZERO_ERROR;
     UDate date = self->getTime(status);
@@ -61,8 +61,8 @@ static PyObject *cal_repr(char *name, Calendar *self)
     }
 
     PyObject *string = PyUnicode_FromUnicodeString(&u);
-    PyObject *pyname = PyString_FromString(name);
-    PyObject *format = PyString_FromString("<%s: %s>");
+    PyObject *pyname = PyString_FromString(self->getType());
+    PyObject *format = PyString_FromString("<Calendar (%s): %s>");
     PyObject *tuple = PyTuple_New(2);
     PyObject *repr;
 
@@ -79,6 +79,7 @@ static PyObject *cal_repr(char *name, Calendar *self)
 
 %include "common.i"
 %import "bases.i"
+%import "locale.i"
 
 enum UCalendarDateFields {
     UCAL_ERA,
@@ -330,6 +331,7 @@ namespace icu {
         void setTime(UDate, UErrorCode);
 
         UBool isEquivalentTo(Calendar &);
+        char *getType();
 
         UBool equals(Calendar &, UErrorCode);
         UBool before(Calendar &, UErrorCode);
@@ -406,7 +408,7 @@ namespace icu {
 
             PyObject *__repr__()
             {
-                return cal_repr("Calendar", self);
+                return cal_repr(self);
             }
         }
     };
@@ -433,9 +435,9 @@ namespace icu {
         %extend {
             PyObject *__repr__()
             {
-                return cal_repr("GregorianCalendar", self);
+                return cal_repr(self);
             }
-        };
+        }
     };
 }
 
