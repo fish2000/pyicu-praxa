@@ -35,3 +35,4 @@ Version 0.3 -> 0.4
   - added Calendar.getType(), changed Calendar.__repr__()
   - added Locale.createKeywords(), Locale.getKeywordValue()
   - moved Locale to locale.i and added support for ResourceBundle
+  - replaced TimeZone.adoptDefault() with TimeZone.getDefault()

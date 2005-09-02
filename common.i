@@ -268,32 +268,6 @@
         $result = SWIG_NewPointerObj($1, $descriptor(icu::TimeZone *), 1);
 }
 
-%typemap(in) TimeZone_ *
-{
-    if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(icu::TimeZone *),
-                        SWIG_POINTER_EXCEPTION))
-        SWIG_fail;
-    else
-    {
-        PyObject *thisown = PyObject_GetAttrString($input, "thisown");
-        int isTrue = PyObject_IsTrue(thisown); Py_DECREF(thisown);
-
-        if (!isTrue)
-        {
-            PyErr_Format(PyExc_ValueError,
-                         "TimeZone argument is not owned by caller", NULL);
-            SWIG_fail;
-        }
-    }
-
-    if (!SWIG_ConvertPtr($input, (void **) &$1, $descriptor(icu::TimeZone *),
-                         SWIG_POINTER_EXCEPTION | SWIG_POINTER_DISOWN))
-        PyObject_SetAttrString($input, "this", Py_None);
-    else
-        SWIG_fail;
-}
-
-
 %typemap(out) const_TimeZone &
 {
     if ($1->getDynamicClassID() == icu::SimpleTimeZone::getStaticClassID())

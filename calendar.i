@@ -184,7 +184,7 @@ namespace icu {
         static UnicodeString getEquivalentID(UnicodeString &, int32_t);
         static UnicodeString getEquivalentID(_PyString, int32_t);
         static _TimeZone *createDefault();
-        static void adoptDefault(TimeZone_ *);
+        static void setDefault(TimeZone &);
 
         %extend {
             PyObject *__repr__()

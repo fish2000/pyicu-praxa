@@ -246,8 +246,8 @@
 
        defaultTZ = ICUtzinfo.getDefault()
 
-    To get the time zone's id, use the 'id' attribute or coerce the time
+    To get the time zone's id, use the 'tzid' attribute or coerce the time
     zone to a string:
 
-       ICUtzinfo.getInstance('Pacific/Fiji').id -> 'Pacific/Fiji'
+       ICUtzinfo.getInstance('Pacific/Fiji').tzid -> 'Pacific/Fiji'
        str(ICUtzinfo.getInstance('Pacific/Fiji')) -> 'Pacific/Fiji'
