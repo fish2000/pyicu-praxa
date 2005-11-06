@@ -36,7 +36,8 @@ PYTHON_VER=2.4
 
 # Mac OS X (Darwin)
 #PREFIX=/usr/local
-#PREFIX_PYTHON=/Library/Frameworks/Python.framework/Versions/$(PYTHON_VER)
+#PREFIX_FRAMEWORKS=/Library/Frameworks
+#PREFIX_PYTHON=$(PREFIX_FRAMEWORKS)/Python.framework/Versions/$(PYTHON_VER)
 #PREFIX_ICU=/usr/local/icu-$(ICU_VER)
 #SWIG=$(PREFIX)/bin/swig
 
@@ -166,13 +167,13 @@ $(BINDIR):
 ifeq ($(OS),Darwin)
 
 $(PYICU_COMMON_LIB): common.cpp common.h
-	$(CXX) -dynamiclib -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) common.cpp -undefined dynamic_lookup
+	$(CXX) -dynamiclib -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) common.cpp -L$(ICU_LIB) -licuuc -licudata -F$(PREFIX_FRAMEWORKS) -framework Python
 
 $(PYICU_MODULE_LIBS): $(BINDIR)/_PyICU_%.so: %_wrap.cxx common.h
-	$(CXX) -dynamic -bundle -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) $< -dylib_file libPyICU.dylib:$(PYICU_COMMON_LIB) -L$(BINDIR) -lPyICU -L$(ICU_LIB) -licui18n -licuuc -licudata -undefined dynamic_lookup	
+	$(CXX) -dynamic -bundle -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) $< -dylib_file libPyICU.dylib:$(PYICU_COMMON_LIB) -L$(BINDIR) -lPyICU -L$(ICU_LIB) -licui18n -licuuc -licudata -F$(PREFIX_FRAMEWORKS) -framework Python
 
 $(PYICU_LIB): PyICU_wrap.cxx $(PYICU_COMMON_LIB)
-	$(CXX) -dynamic -bundle -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) PyICU_wrap.cxx -dylib_file libPyICU.dylib:$(PYICU_COMMON_LIB) -L$(BINDIR) -lPyICU -L$(ICU_LIB) -licui18n -licuuc -licudata -undefined dynamic_lookup
+	$(CXX) -dynamic -bundle -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) PyICU_wrap.cxx -dylib_file libPyICU.dylib:$(PYICU_COMMON_LIB) -L$(BINDIR) -lPyICU -L$(ICU_LIB) -licui18n -licuuc -licudata -F$(PREFIX_FRAMEWORKS) -framework Python
 else
 
 ifeq ($(OS),Linux)
