@@ -38,3 +38,4 @@ Version 0.3 -> 0.4
   - replaced TimeZone.adoptDefault() with TimeZone.getDefault()
 
   - changed OS X linking to resolve all symbols at link time
+  - Collator.getCollationKey() wasn't working

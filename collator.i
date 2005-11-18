@@ -41,6 +41,28 @@ enum UCollationResult {
 
 namespace icu {
 
+    class CollationKey : public UObject {
+    public:
+
+        CollationKey();
+
+        UBool operator==(CollationKey &);
+        UBool operator!=(CollationKey &);
+        UBool isBogus();
+        UCollationResult compareTo(CollationKey &, UErrorCode);
+
+        %extend {
+
+            PyObject *getByteArray()
+            {
+                int32_t count;
+                const uint8_t *array = self->getByteArray(count);
+
+                return PyString_FromStringAndSize((char *) array, count);
+            }
+        }
+    };
+
     class Collator : public UObject {
     public:
         enum ECollationStrength {
@@ -61,6 +83,7 @@ namespace icu {
         UCollationResult compare(_PyString, _PyString, int32_t, UErrorCode);
         
         CollationKey2 &getCollationKey(UnicodeString &, CollationKey &, UErrorCode);
+        CollationKey2 &getCollationKey(_PyString, CollationKey &, UErrorCode);
 
         UBool greater(UnicodeString &, UnicodeString &);
         UBool greaterOrEqual(UnicodeString &, UnicodeString &);
@@ -124,27 +147,5 @@ namespace icu {
         RuleBasedCollator(_PyString, ECollationStrength, UErrorCode);
 
         UnicodeString getRules();
-    };
-
-    class CollationKey : public UObject {
-    public:
-
-        CollationKey();
-
-        UBool operator==(CollationKey &);
-        UBool operator!=(CollationKey &);
-        UBool isBogus();
-        UCollationResult compareTo(CollationKey &, UErrorCode);
-
-        %extend {
-
-            PyObject *getByteArray()
-            {
-                int32_t count;
-                const uint8_t *array = self->getByteArray(count);
-
-                return PyString_FromStringAndSize((char *) array, count);
-            }
-        }
     };
 }
