@@ -84,6 +84,7 @@ namespace icu {
         
         CollationKey2 &getCollationKey(UnicodeString &, CollationKey &, UErrorCode);
         CollationKey2 &getCollationKey(_PyString, CollationKey &, UErrorCode);
+        CollationKey getCollationKey(_PyString, _CollationKey, UErrorCode);
 
         UBool greater(UnicodeString &, UnicodeString &);
         UBool greaterOrEqual(UnicodeString &, UnicodeString &);

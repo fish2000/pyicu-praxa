@@ -25,6 +25,8 @@
 #include <stdarg.h>
 #include <datetime.h>
 
+#include <unicode/ustring.h>
+
 
 typedef struct {
     UConverterCallbackReason reason;
@@ -133,16 +135,16 @@ EXPORT PyObject *PyUnicode_FromUnicodeString(UnicodeString *string)
     else
     {
         int len = string->length();
-	Py_UNICODE *pchars = new Py_UNICODE[len];
+        Py_UNICODE *pchars = new Py_UNICODE[len];
         const UChar *chars = string->getBuffer();
 
         for (int i = 0; i < len; i++)
             pchars[i] = chars[i];
         
-	PyObject *u = PyUnicode_FromUnicode((const Py_UNICODE *) pchars, len);
-	delete pchars;
+        PyObject *u = PyUnicode_FromUnicode((const Py_UNICODE *) pchars, len);
+        delete pchars;
 
-	return u;
+        return u;
     }
 }
 
@@ -220,15 +222,23 @@ EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
                          (int32_t) PyUnicode_GET_SIZE(object));
         else
         {
-            int len = PyUnicode_GET_SIZE(object);
+            int32_t len = (int32_t) PyUnicode_GET_SIZE(object);
             Py_UNICODE *pchars = PyUnicode_AS_UNICODE(object);
-	    UChar *chars = new UChar[len];
+            UChar *chars = new UChar[len * 3];
+            UErrorCode status = U_ZERO_ERROR;
+            int32_t dstLen;
 
-            for (int i = 0; i < len; i++)
-                chars[i] = pchars[i];
+            u_strFromUTF32(chars, len * 3, &dstLen,
+                           (const UChar32 *) pchars, len, &status);
 
-            string.setTo((const UChar *) chars, (int32_t) len);
-	    delete chars;
+            if (U_FAILURE(status))
+            {
+                delete chars;
+                throw ICUException(status);
+            }
+
+            string.setTo((const UChar *) chars, (int32_t) dstLen);
+            delete chars;
         }
     }
     else if (PyString_CheckExact(object))

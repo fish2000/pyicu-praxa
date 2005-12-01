@@ -39,3 +39,5 @@ Version 0.3 -> 0.4
 
   - changed OS X linking to resolve all symbols at link time
   - Collator.getCollationKey() wasn't working
+  - added Collator.getCollationKey(string) overload
+  - using u_strFromUTF32() now to convert 4 byte unicode to 2 byte unicode

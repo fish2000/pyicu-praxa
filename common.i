@@ -646,6 +646,10 @@
     PyString_AsStringAndSize($input, &$1, &$2);
 }
 
+%typemap(in, numinputs=0) (_CollationKey) {
+
+}
+
 
 %exception
 {
