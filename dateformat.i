@@ -30,12 +30,12 @@
 %}
 
 %include "common.i"
-%include "calendar.i"
-%include "numberformat.i"
 
 %import "bases.i"
 %import "locale.i"
 %import "format.i"
+%import "calendar.i"
+%import "numberformat.i"
 
 namespace icu {
 
