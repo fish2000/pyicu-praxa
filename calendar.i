@@ -445,6 +445,7 @@ namespace icu {
 %pythoncode {
 
     from datetime import tzinfo, timedelta
+    FLOATING_TZNAME = "World/Floating"
 
     class ICUtzinfo(tzinfo):
 
@@ -454,6 +455,8 @@ namespace icu {
             try:
                 return cls.instances[id]
             except KeyError:
+                if id == FLOATING_TZNAME:
+                    return cls.getFloating()
                 instance = cls(TimeZone.createTimeZone(id))
                 cls.instances[id] = instance
                 return instance
@@ -462,6 +465,10 @@ namespace icu {
         def getDefault(cls):
             return cls(TimeZone.createDefault())    
         getDefault = classmethod(getDefault)
+
+        def getFloating(cls):
+            return FloatingTZ(TimeZone.createDefault())    
+        getFloating = classmethod(getFloating)
 
         def __init__(self, timezone):
             if not isinstance(timezone, TimeZone):
@@ -509,4 +516,21 @@ namespace icu {
 
         tzid = property(__str__)
         timezone = property(_getTimezone)
+
+
+    class FloatingTZ(ICUtzinfo):
+
+        def __repr__(self):
+            return "<FloatingTZ: %s>" %(self._timezone.getID())
+
+        def __str__(self):
+            return FLOATING_TZNAME
+
+        def __hash__(self):
+            return hash(FLOATING_TZNAME)
+
+        def tzname(self, dt):
+            return FLOATING_TZNAME
+    
+        tzid = FLOATING_TZNAME
 }
