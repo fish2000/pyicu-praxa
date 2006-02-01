@@ -456,8 +456,9 @@ namespace icu {
                 return cls.instances[id]
             except KeyError:
                 if id == FLOATING_TZNAME:
-                    return cls.getFloating()
-                instance = cls(TimeZone.createTimeZone(id))
+                    instance = cls.getFloating()
+                else:
+                    instance = cls(TimeZone.createTimeZone(id))
                 cls.instances[id] = instance
                 return instance
         getInstance = classmethod(getInstance)
