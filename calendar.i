@@ -184,7 +184,6 @@ namespace icu {
         static UnicodeString getEquivalentID(UnicodeString &, int32_t);
         static UnicodeString getEquivalentID(_PyString, int32_t);
         static _TimeZone *createDefault();
-        static void setDefault(TimeZone &);
 
         %extend {
             PyObject *__repr__()
@@ -206,6 +205,21 @@ namespace icu {
                 PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(dstOffset));
 
                 return tuple;
+            }
+
+	    static PyObject *setDefault(TimeZone &tz)
+            {
+                TimeZone::setDefault(tz);
+
+                PyObject *m = PyImport_ImportModule("PyICU");
+                PyObject *cls = PyObject_GetAttrString(m, "ICUtzinfo");
+                PyObject *result =
+                    PyObject_CallMethod(cls, "_resetDefault", "", NULL);
+
+                Py_DECREF(m);
+                Py_DECREF(cls);
+
+                return result;
             }
         }
     };
@@ -451,12 +465,16 @@ namespace icu {
 
         instances = {}
 
+        def _resetDefault(cls):
+            cls.default = ICUtzinfo(TimeZone.createDefault())
+        _resetDefault = classmethod(_resetDefault)
+
         def getInstance(cls, id):
             try:
                 return cls.instances[id]
             except KeyError:
                 if id == FLOATING_TZNAME:
-                    instance = cls.getFloating()
+                    instance = cls.floating
                 else:
                     instance = cls(TimeZone.createTimeZone(id))
                 cls.instances[id] = instance
@@ -464,11 +482,11 @@ namespace icu {
         getInstance = classmethod(getInstance)
 
         def getDefault(cls):
-            return cls(TimeZone.createDefault())    
+            return cls.default
         getDefault = classmethod(getDefault)
 
         def getFloating(cls):
-            return FloatingTZ(TimeZone.createDefault())    
+            return cls.floating
         getFloating = classmethod(getFloating)
 
         def __init__(self, timezone):
@@ -485,12 +503,12 @@ namespace icu {
 
         def __eq__(self, other):
             if isinstance(other, ICUtzinfo):
-                return self._timezone == other._timezone
+                return str(self) == str(other)
             return False
 
         def __ne__(self, other):
             if isinstance(other, ICUtzinfo):
-                return self._timezone != other._timezone
+                return str(self) != str(other)
             return True
 
         def __hash__(self):
@@ -521,8 +539,11 @@ namespace icu {
 
     class FloatingTZ(ICUtzinfo):
 
+        def __init__(self):
+            pass
+
         def __repr__(self):
-            return "<FloatingTZ: %s>" %(self._timezone.getID())
+            return "<FloatingTZ: %s>" %(ICUtzinfo.default._timezone.getID())
 
         def __str__(self):
             return FLOATING_TZNAME
@@ -530,8 +551,29 @@ namespace icu {
         def __hash__(self):
             return hash(FLOATING_TZNAME)
 
+        def utcoffset(self, dt):
+            tz = ICUtzinfo.default._timezone
+            raw, dst = tz.getOffset(self._notzsecs(dt), True)
+            return timedelta(seconds = (raw + dst) / 1000)
+
+        def dst(self, dt):
+            tz = ICUtzinfo.default._timezone
+            raw, dst = tz.getOffset(self._notzsecs(dt), True)
+            return timedelta(seconds = dst / 1000)
+
+        def _getTimezone(self):
+            return TimeZone.createTimeZone(ICUtzinfo.default._timezone.getID())
+
+        def __getTimezone(self):
+            return ICUtzinfo.default._timezone
+
         def tzname(self, dt):
             return FLOATING_TZNAME
     
         tzid = FLOATING_TZNAME
+        _timezone = property(__getTimezone)
+
+
+    ICUtzinfo.default = ICUtzinfo(TimeZone.createDefault())
+    ICUtzinfo.floating = FloatingTZ()
 }
