@@ -41,6 +41,16 @@ namespace icu {
 
     class DateFormatSymbols : public UObject {
     public:
+        enum DtContextType {
+            FORMAT = 0,
+            STANDALONE = 1,
+        };
+        enum DtWidthType {
+            WIDE = 4,
+            ABBREVIATED = 3,
+            NARROW = 5
+        };
+
         DateFormatSymbols(UErrorCode);
         DateFormatSymbols(Locale &, UErrorCode);
         DateFormatSymbols(char *, UErrorCode);
@@ -53,11 +63,13 @@ namespace icu {
         void setEras(LeakyUnicodeStringArray3, _int32_t);
 
         UnicodeStringArray2 getMonths(_int32_t);
+        UnicodeStringArray2 getMonths(_int32_t, DtContextType, DtWidthType);
         void setMonths(LeakyUnicodeStringArray3, _int32_t);
         UnicodeStringArray2 getShortMonths(_int32_t);
         void setShortMonths(LeakyUnicodeStringArray3, _int32_t);
 
         UnicodeStringArray2 getWeekdays(_int32_t);
+        UnicodeStringArray2 getWeekdays(_int32_t, DtContextType, DtWidthType);
         void setWeekdays(LeakyUnicodeStringArray3, _int32_t);
         UnicodeStringArray2 getShortWeekdays(_int32_t);
         void setShortWeekdays(LeakyUnicodeStringArray3, _int32_t);
