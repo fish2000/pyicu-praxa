@@ -13,5 +13,6 @@ below.
     http://www.osafoundation.org
 
   - Andi Vajda, PyICU project founder and maintainer
+  - David Bolen for Python 2.3 support and finding a huge memory leak
 
 Thank you all !

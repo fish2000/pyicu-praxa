@@ -268,12 +268,12 @@
         $result = SWIG_NewPointerObj($1, $descriptor(icu::TimeZone *), 1);
 }
 
-%typemap(out) const_TimeZone &
+%typemap(out) cloned_TimeZone &
 {
     if ($1->getDynamicClassID() == icu::SimpleTimeZone::getStaticClassID())
-        $result = SWIG_NewPointerObj((void *) $1, $descriptor(icu::SimpleTimeZone *), 0);
+        $result = SWIG_NewPointerObj((void *) $1->clone(), $descriptor(icu::SimpleTimeZone *), 1);
     else
-        $result = SWIG_NewPointerObj((void *) $1, $descriptor(icu::TimeZone *), 0);
+        $result = SWIG_NewPointerObj((void *) $1->clone(), $descriptor(icu::TimeZone *), 1);
 }
 
 %typemap(out) _MeasureFormat *

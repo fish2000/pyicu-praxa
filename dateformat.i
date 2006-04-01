@@ -180,7 +180,7 @@ namespace icu {
         void setCalendar(Calendar &);
         NumberFormat *getNumberFormat();
         void setNumberFormat(NumberFormat &);
-        const_TimeZone &getTimeZone();
+        cloned_TimeZone &getTimeZone();
         void setTimeZone(TimeZone &);
 
         static _DateFormat *createInstance();

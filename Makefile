@@ -20,7 +20,7 @@
 # You need to verify that the version of python below is correct.
 # 
 
-VERSION=0.4
+VERSION=0.5
 ICU_VER=3.4
 PYTHON_VER=2.4
 
@@ -76,7 +76,7 @@ _SUFFIX=
 BINDIR=release
 endif
 
-SWIG_OPT=-DSWIG_COBJECT_TYPES -DSWIG_COBJECT_PYTHON -DPYICU_VER="'$(VERSION)'" -DICU_VER="'$(ICU_VER)'"
+SWIG_OPT=-DPYICU_VER="'$(VERSION)'" -DICU_VER="'$(ICU_VER)'"
 
 MODULES=errors bases locale iterators format dateformat numberformat \
         calendar collator
@@ -161,7 +161,7 @@ $(BINDIR):
 	mkdir -p $(BINDIR)
 
 %_wrap.cxx: %.i
-	$(SWIG) $(SWIG_OPT) -I$(ICU_INC) -c++ -nodefault -python -modern $<
+	$(SWIG) $(SWIG_OPT) -I$(ICU_INC) -c++ -nodefaultctor -python -modern $<
 
 
 ifeq ($(OS),Darwin)

@@ -277,18 +277,38 @@ EXPORT UnicodeString *PyObject_AsUnicodeString(PyObject *object)
 }
 
 
+#if PY_VERSION_HEX < 0x02040000
+    /* Replace some _CheckExact macros for Python < 2.4 since the actual
+     * datetime types are private until then.  This is ugly, but allows
+     * support for datetime objects in Python 2.3.
+     */
+    #include <string.h>
+
+    #undef PyDateTime_CheckExact
+    #define PyDateTime_CheckExact(op) \
+       (!strcmp((op)->ob_type->tp_name, "datetime.datetime"))
+
+    #undef PyDelta_CheckExact
+    #define PyDelta_CheckExact(op) \
+       (!strcmp((op)->ob_type->tp_name, "datetime.timedelta"))
+#endif
+
+
 EXPORT UDate PyObject_AsUDate(PyObject *object)
 {
     if (PyFloat_CheckExact(object))
         return (UDate) (PyFloat_AsDouble(object) * 1000.0);
     else
     {
+#if PY_VERSION_HEX > 0x02040000
         static PyDateTime_CAPI *PyDateTimeAPI = NULL;
-        static PyObject *mktime = NULL;
 
         if (PyDateTimeAPI == NULL)
             PyDateTimeAPI = (PyDateTime_CAPI *)
                 PyCObject_Import("datetime", "datetime_CAPI");
+#endif
+        
+        static PyObject *mktime = NULL;
         if (mktime == NULL)
         {
             PyObject *time = PyImport_ImportModule("time");

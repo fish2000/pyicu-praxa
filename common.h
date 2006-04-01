@@ -101,7 +101,7 @@ typedef icu::TimeZone _TimeZone;
 typedef icu::TimeZone TimeZone_;
 typedef icu::StringEnumeration _StringEnumeration;
 typedef icu::Collator _Collator;
-typedef const icu::TimeZone const_TimeZone;
+typedef const icu::TimeZone cloned_TimeZone;
 typedef icu::UnicodeString _UnicodeString;
 typedef icu::UnicodeString UnicodeString0;
 typedef icu::UnicodeString UnicodeString1;

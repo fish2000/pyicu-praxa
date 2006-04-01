@@ -1,17 +1,22 @@
 
 For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 
-Version 0.0 -> 0.1
+Version 0.4 -> 0.5
 ------------------
+  - changed OS X linking to resolve all symbols at link time
+  - Collator.getCollationKey() wasn't working
+  - added Collator.getCollationKey(string) overload
+  - using u_strFromUTF32() now to convert 4 byte unicode to 2 byte unicode
+  - improved support for Python 2.3
+  - resolved major memory leak by switching to SWIG 1.3.29
 
-- initial release
-
-
-Version 0.1 -> 0.2
+Version 0.3 -> 0.4
 ------------------
-  - added most missing UnicodeString methods
-  - added support for the BreakIterator and CharacterIterator classes
-
+  - PyICU now wraps ICU 3.4
+  - added Calendar.getType(), changed Calendar.__repr__()
+  - added Locale.createKeywords(), Locale.getKeywordValue()
+  - moved Locale to locale.i and added support for ResourceBundle
+  - replaced TimeZone.adoptDefault() with TimeZone.getDefault()
 
 Version 0.2 -> 0.3
 ------------------
@@ -28,16 +33,12 @@ Version 0.2 -> 0.3
   - added __eq__, __ne__ and __hash__ methods to ICUtzinfo
   - MessageFormat.getFormats() now returns copies of concrete formats
 
-
-Version 0.3 -> 0.4
+Version 0.1 -> 0.2
 ------------------
-  - PyICU now wraps ICU 3.4
-  - added Calendar.getType(), changed Calendar.__repr__()
-  - added Locale.createKeywords(), Locale.getKeywordValue()
-  - moved Locale to locale.i and added support for ResourceBundle
-  - replaced TimeZone.adoptDefault() with TimeZone.getDefault()
+  - added most missing UnicodeString methods
+  - added support for the BreakIterator and CharacterIterator classes
 
-  - changed OS X linking to resolve all symbols at link time
-  - Collator.getCollationKey() wasn't working
-  - added Collator.getCollationKey(string) overload
-  - using u_strFromUTF32() now to convert 4 byte unicode to 2 byte unicode
+Version 0.0 -> 0.1
+------------------
+
+- initial release

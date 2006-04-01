@@ -358,7 +358,7 @@ namespace icu {
         int32_t fieldDifference(UDate, UCalendarDateFields, UErrorCode);
 
         void setTimeZone(TimeZone &);
-        const_TimeZone &getTimeZone();
+        cloned_TimeZone &getTimeZone();
         
         UBool inDaylightTime(UErrorCode);
 
