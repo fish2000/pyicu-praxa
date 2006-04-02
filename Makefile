@@ -20,7 +20,7 @@
 # You need to verify that the version of python below is correct.
 # 
 
-VERSION=0.5
+VERSION=0.4
 ICU_VER=3.4
 PYTHON_VER=2.4
 
@@ -161,7 +161,7 @@ $(BINDIR):
 	mkdir -p $(BINDIR)
 
 %_wrap.cxx: %.i
-	$(SWIG) $(SWIG_OPT) -I$(ICU_INC) -c++ -nodefaultctor -python -modern $<
+	$(SWIG) $(SWIG_OPT) -I$(ICU_INC) -c++ -nodefault -python -modern $<
 
 
 ifeq ($(OS),Darwin)
