@@ -27,6 +27,8 @@
 
 #include <unicode/ustring.h>
 
+#include "bases.h"
+
 
 typedef struct {
     UConverterCallbackReason reason;
@@ -50,12 +52,8 @@ U_STABLE void U_EXPORT2 _stopDecode(const void *context,
 }
 
 
-static PyObject *PyExc_ICUError;
-
-EXPORT void setICUErrorClass(PyObject *pycls)
-{
-    PyExc_ICUError = pycls;
-}
+PyObject *PyExc_ICUError;
+PyObject *PyExc_InvalidArgsError;
 
 
 EXPORT ICUException::ICUException()
@@ -293,6 +291,34 @@ EXPORT UnicodeString *PyObject_AsUnicodeString(PyObject *object)
        (!strcmp((op)->ob_type->tp_name, "datetime.timedelta"))
 #endif
 
+int isDate(PyObject *object)
+{
+    if (PyFloat_CheckExact(object))
+        return 1;
+
+#if PY_VERSION_HEX > 0x02040000
+    static PyDateTime_CAPI *PyDateTimeAPI = NULL;
+
+    if (PyDateTimeAPI == NULL)
+        PyDateTimeAPI = (PyDateTime_CAPI *)
+            PyCObject_Import("datetime", "datetime_CAPI");
+#endif
+
+    return PyDateTime_CheckExact(object);
+}
+
+int isDateExact(PyObject *object)
+{
+#if PY_VERSION_HEX > 0x02040000
+    static PyDateTime_CAPI *PyDateTimeAPI = NULL;
+
+    if (PyDateTimeAPI == NULL)
+        PyDateTimeAPI = (PyDateTime_CAPI *)
+            PyCObject_Import("datetime", "datetime_CAPI");
+#endif
+
+    return PyDateTime_CheckExact(object);
+}
 
 EXPORT UDate PyObject_AsUDate(PyObject *object)
 {
@@ -388,4 +414,589 @@ EXPORT UDate PyObject_AsUDate(PyObject *object)
     
     PyErr_SetObject(PyExc_TypeError, object);
     throw ICUException();
+}
+
+int abstract_init(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    PyObject *err =
+        Py_BuildValue("(sO)", "instantiating java class", self->ob_type);
+
+    PyErr_SetObject(PyExc_NotImplementedError, err);
+    Py_DECREF(err);
+
+    return -1;
+}
+
+static PyObject *types;
+
+void registerType(PyTypeObject *type, UClassID id)
+{
+    PyObject *n = PyInt_FromLong((long) id);
+    PyObject *list = PyList_New(0);
+    PyObject *bn;
+
+    PyDict_SetItem(types, n, list); Py_DECREF(list);
+    PyDict_SetItem(types, (PyObject *) type, n);
+
+    while (type != &UObjectType) {
+        type = type->tp_base;
+        bn = PyDict_GetItem(types, (PyObject *) type);
+        list = PyDict_GetItem(types, bn);
+        PyList_Append(list, n);
+    }
+
+    Py_DECREF(n);
+}
+
+int isInstance(PyObject *arg, UClassID id, PyTypeObject *type)
+{
+    if (PyObject_TypeCheck(arg, &UObjectType))
+    {
+        UClassID oid = ((t_uobject *) arg)->object->getDynamicClassID();
+
+        if (id == oid)
+            return 1;
+
+        PyObject *bn = PyInt_FromLong((long) id);
+        PyObject *n = PyInt_FromLong((long) oid);
+        PyObject *list = PyDict_GetItem(types, bn);
+        int b = PySequence_Contains(list, n);
+        
+        Py_DECREF(bn);
+        Py_DECREF(n);
+
+        return b ? b : PyObject_TypeCheck(arg, type);
+    }
+
+    return 0;
+}
+
+icu::UObject **pl2cpa(PyObject *arg, int *len, UClassID id, PyTypeObject *type)
+{
+    if (PySequence_Check(arg))
+    {
+        *len = PySequence_Size(arg);
+        icu::UObject **array = (icu::UObject **)
+            calloc(*len, sizeof(icu::UObject *));
+
+        for (int i = 0; i < *len; i++) {
+            PyObject *obj = PySequence_GetItem(arg, i);
+
+            if (isInstance(obj, id, type))
+            {
+                array[i] = ((t_uobject *) obj)->object;
+                Py_DECREF(obj);
+            }
+            else
+            {
+                Py_DECREF(obj);
+                free(array);
+                return NULL;
+            }
+        }
+
+        return array;
+    }
+    
+    return NULL;
+}
+
+PyObject *cpa2pl(icu::UObject **array, int len,
+                PyObject *(*wrap)(UObject *, int))
+{
+    PyObject *list = PyList_New(len);
+
+    for (int i = 0; i < len; i++)
+        PyList_SET_ITEM(list, i, wrap(array[i], T_OWNED));
+
+    return list;
+}
+
+icu::Formattable *toFormattableArray(PyObject *arg, int *len,
+                                     UClassID id, PyTypeObject *type)
+{
+    if (PySequence_Check(arg))
+    {
+        *len = PySequence_Size(arg);
+        icu::Formattable *array = new icu::Formattable[*len + 1];
+
+        for (int i = 0; i < *len; i++) {
+            PyObject *obj = PySequence_GetItem(arg, i);
+
+            if (isInstance(obj, id, type))
+            {
+                array[i] = *(icu::Formattable *) ((t_uobject *) obj)->object;
+                Py_DECREF(obj);
+            }
+            else
+            {
+                Py_DECREF(obj);
+                delete[] array;
+                return NULL;
+            }
+        }
+
+        return array;
+    }
+
+    return NULL;
+}
+
+static icu::UnicodeString *toUnicodeStringArray(PyObject *arg, int *len)
+{
+    if (PySequence_Check(arg))
+    {
+        *len = PySequence_Size(arg);
+        icu::UnicodeString *array = new icu::UnicodeString[*len + 1];
+
+        for (int i = 0; i < *len; i++) {
+            PyObject *obj = PySequence_GetItem(arg, i);
+            
+            if (PyObject_TypeCheck(obj, &UObjectType))
+            {
+                array[i] = *(icu::UnicodeString *) ((t_uobject *) obj)->object;
+                Py_DECREF(obj);
+            }
+            else
+            {
+                try {
+                    PyObject_AsUnicodeString(obj, array[i]);
+                } catch (ICUException e) {
+                    Py_DECREF(obj);
+                    e.reportError();
+                    delete[] array;
+                    return NULL;
+                }
+            }
+        }
+
+        return array;
+    }
+
+    return NULL;
+}
+
+static double *toDoubleArray(PyObject *arg, int *len)
+{
+    if (PySequence_Check(arg))
+    {
+        *len = PySequence_Size(arg);
+        double *array = new double[*len + 1];
+
+        for (int i = 0; i < *len; i++) {
+            PyObject *obj = PySequence_GetItem(arg, i);
+
+            if (PyFloat_Check(obj))
+            {
+                array[i] = PyFloat_AsDouble(obj);
+                Py_DECREF(obj);
+            }
+            else if (PyInt_Check(obj))
+            {
+                array[i] = (double) PyInt_AsLong(obj);
+                Py_DECREF(obj);
+            }
+            else if (PyLong_Check(obj))
+            {
+                array[i] = PyLong_AsDouble(obj);
+                Py_DECREF(obj);
+            }
+            else
+            {
+                Py_DECREF(obj);
+                delete[] array;
+                return NULL;
+            }
+        }
+
+        return array;
+    }
+
+    return NULL;
+}
+
+static UBool *toUBoolArray(PyObject *arg, int *len)
+{
+    if (PySequence_Check(arg))
+    {
+        *len = PySequence_Size(arg);
+        UBool *array = new UBool[*len + 1];
+
+        for (int i = 0; i < *len; i++) {
+            PyObject *obj = PySequence_GetItem(arg, i);
+
+            array[i] = (UBool) PyObject_IsTrue(obj);
+            Py_DECREF(obj);
+        }
+
+        return array;
+    }
+
+    return NULL;
+}
+
+int _parseArgs(PyObject **args, int count, char *types, ...)
+{
+    va_list list;
+
+    if (count != strlen(types))
+        return -1;
+
+    va_start(list, types);
+    for (int i = 0; i < count; i++) {
+        PyObject *arg = args[i];
+        
+        switch (types[i]) {
+          case 'c':           /* string */
+          case 'C':           /* string, not to be unpacked */
+            if (PyString_Check(arg))
+                break;
+            return -1;
+
+          case 's':           /* string or unicode */
+            if (PyString_Check(arg) || PyUnicode_Check(arg))
+                break;
+            return -1;
+
+          case 'S':           /* string, unicode or UnicodeString */
+            if (PyString_Check(arg) || PyUnicode_Check(arg) ||
+                isUnicodeString(arg))
+                break;
+            return -1;
+
+          case 'T':           /* array of string, unicode or UnicodeString */
+            if (PySequence_Check(arg))
+            {
+                if (PySequence_Length(arg) > 0)
+                {
+                    PyObject *obj = PySequence_GetItem(arg, 0);
+                    int ok = (PyString_Check(obj) || PyUnicode_Check(obj) ||
+                              isUnicodeString(obj));
+                    Py_DECREF(obj);
+                    if (ok)
+                        break;
+                }
+                else
+                    break;
+            }
+            return -1;
+
+          case 'U':           /* UnicodeString */
+            if (isUnicodeString(arg))
+                break;
+            return -1;
+
+          case 'P':           /* wrapped ICU object */
+          {
+              UClassID id = va_arg(list, UClassID);
+              PyTypeObject *type = va_arg(list, PyTypeObject *);
+
+              if (isInstance(arg, id, type))
+                  break;
+              return -1;
+          }
+
+          case 'Q':           /* array of wrapped ICU object pointers */
+          case 'R':           /* array of wrapped ICU objects */
+          {
+              UClassID id = va_arg(list, UClassID);
+              PyTypeObject *type = va_arg(list, PyTypeObject *);
+              
+              if (PySequence_Check(arg))
+              {
+                  if (PySequence_Length(arg) > 0)
+                  {
+                      PyObject *obj = PySequence_GetItem(arg, 0);
+                      int ok = isInstance(obj, id, type);
+
+                      Py_DECREF(obj);
+                      if (ok)
+                          break;
+                  }
+                  else
+                      break;
+              }
+              return -1;
+          }
+
+          case 'D':           /* date as UDate float or datetime */
+            if (isDate(arg))
+                break;
+            return -1;
+
+          case 'E':           /* date as datetime */
+            if (isDateExact(arg))
+                break;
+            return -1;
+
+          case 'a':           /* byte */
+            if (PyString_Check(arg) && (PyString_Size(arg) == 1))
+                break;
+            return -1;
+
+          case 'B':           /* boolean, strict */
+            if (arg == Py_True || arg == Py_False)
+                break;
+            return -1;
+
+          case 'b':           /* boolean */
+            break;
+
+          case 'i':           /* int */
+            if (PyInt_Check(arg))
+                break;
+            return -1;
+
+          case 'd':           /* double */
+            if (PyFloat_Check(arg) || PyInt_Check(arg) || PyLong_Check(arg))
+                break;
+            return -1;
+
+          case 'F':           /* array of double */
+            if (PySequence_Check(arg))
+            {
+                if (PySequence_Length(arg) > 0)
+                {
+                    PyObject *obj = PySequence_GetItem(arg, 0);
+                    int ok = (PyFloat_Check(obj) ||
+                              PyInt_Check(obj) ||
+                              PyLong_Check(obj));
+                    Py_DECREF(obj);
+                    if (ok)
+                        break;
+                }
+                else
+                    break;
+            }
+            return -1;
+
+          case 'G':           /* array of bool */
+            if (PySequence_Check(arg))
+                break;
+            return -1;
+
+          case 'L':           /* long long */
+            if (PyLong_Check(arg) || PyInt_Check(arg))
+                break;
+            return -1;
+
+          default:
+            return -1;
+        }
+    }
+
+    for (int i = 0; i < count; i++) {
+        PyObject *arg = args[i];
+        
+        switch (types[i]) {
+          case 'c':           /* string */
+          {
+              char **c = va_arg(list, char **);
+              *c = PyString_AS_STRING(arg);
+              break;
+          }
+
+          case 'C':           /* string, not to be unpacked */
+          {
+              PyObject **obj = va_arg(list, PyObject **);
+              *obj = arg;
+              break;
+          }
+
+          case 's':           /* string or unicode  */
+          {
+              icu::UnicodeString **u = va_arg(list, icu::UnicodeString **);
+              try {
+                  *u = PyObject_AsUnicodeString(arg);
+              } catch (ICUException e) {
+                  e.reportError();
+                  return -1;
+              }
+              break;
+          }
+
+          case 'S':           /* string, unicode or UnicodeString */
+          {
+              icu::UnicodeString **u = va_arg(list, icu::UnicodeString **);
+              icu::UnicodeString *_u = va_arg(list, icu::UnicodeString *);
+              if (PyObject_TypeCheck(arg, &UObjectType))
+                  *u = (icu::UnicodeString *) ((t_uobject *) arg)->object;
+              else
+              {
+                  try {
+                      PyObject_AsUnicodeString(arg, *_u);
+                      *u = _u;
+                  } catch (ICUException e) {
+                      e.reportError();
+                      return -1;
+                  }
+              }
+              break;
+          }
+
+          case 'T':           /* array of string, unicode or UnicodeString */
+          {
+              icu::UnicodeString **array = va_arg(list, icu::UnicodeString **);
+              int *len = va_arg(list, int *);
+              *array = toUnicodeStringArray(arg, len);
+              if (!*array)
+                  return -1;
+              break;
+          }
+
+          case 'U':           /* UnicodeString */
+          {
+              icu::UnicodeString **u = va_arg(list, icu::UnicodeString **);
+              *u = (icu::UnicodeString *) ((t_uobject *) arg)->object;
+              break;
+          }
+
+          case 'P':           /* wrapped ICU object */
+          {
+              icu::UObject **obj = va_arg(list, icu::UObject **);
+              *obj = ((t_uobject *) arg)->object;
+              break;
+          }
+
+          case 'Q':           /* array of wrapped ICU object pointers */
+          {
+              icu::UObject ***array = va_arg(list, icu::UObject ***);
+              int *len = va_arg(list, int *);
+              UClassID id = va_arg(list, UClassID);
+              PyTypeObject *type = va_arg(list, PyTypeObject *);
+              *array = pl2cpa(arg, len, id, type);
+              if (!*array)
+                  return -1;
+              break;
+          }
+
+          case 'R':           /* array of wrapped ICU objects */
+          {
+              icu::UObject **array = va_arg(list, icu::UObject **);
+              int *len = va_arg(list, int *);
+              UClassID id = va_arg(list, UClassID);
+              PyTypeObject *type = va_arg(list, PyTypeObject *);
+              icu::UObject *(*fn)(PyObject *, int *, UClassID, PyTypeObject *) =
+                  va_arg(list, icu::UObject *(*)(PyObject *, int *, UClassID, PyTypeObject *));
+              *array = fn(arg, len, id, type);
+              if (!*array)
+                  return -1;
+              break;
+          }
+
+          case 'D':           /* date as UDate float or datetime */
+          case 'E':           /* date as datetime */
+          {
+              UDate *d = va_arg(list, UDate *);
+              *d = PyObject_AsUDate(arg);
+              break;
+          }
+
+          case 'a':           /* byte */
+          {
+              unsigned char *a = va_arg(list, unsigned char *);
+              *a = (unsigned char) PyString_AS_STRING(arg)[0];
+              break;
+          }
+
+          case 'B':           /* boolean, strict */
+          case 'b':           /* boolean */
+          {
+              int *b = va_arg(list, int *);
+              *b = PyObject_IsTrue(arg);
+              break;
+          }
+
+          case 'i':           /* int */
+          {
+              int *n = va_arg(list, int *);
+              *n = PyInt_AsLong(arg);
+              break;
+          }
+
+          case 'd':           /* double */
+          {
+              double *d = va_arg(list, double *);
+              if (PyFloat_Check(arg))
+                  *d = PyFloat_AsDouble(arg);
+              else if (PyInt_Check(arg))
+                  *d = (double) PyInt_AsLong(arg);
+              else
+                  *d = PyLong_AsDouble(arg);
+              break;
+          }
+
+          case 'F':           /* array of double */
+          {
+              double **array = va_arg(list, double **);
+              int *len = va_arg(list, int *);
+              *array = toDoubleArray(arg, len);
+              if (!*array)
+                  return -1;
+              break;
+          }
+
+          case 'G':           /* array of UBool */
+          {
+              UBool **array = va_arg(list, UBool **);
+              int *len = va_arg(list, int *);
+              *array = toUBoolArray(arg, len);
+              if (!*array)
+                  return -1;
+              break;
+          }
+
+          case 'L':           /* long long */
+          {
+              long long *l = va_arg(list, long long *);
+              *l = PyLong_AsLongLong(arg);
+              break;
+          }
+
+          default:
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+PyObject *PyErr_SetArgsError(PyObject *self, char *name, PyObject *args)
+{
+    if (!PyErr_Occurred())
+    {
+        PyObject *type = (PyObject *) self->ob_type;
+        PyObject *err = Py_BuildValue("(OsO)", type, name, args);
+
+        PyErr_SetObject(PyExc_InvalidArgsError, err);
+        Py_DECREF(err);
+    }
+
+    return NULL;
+}
+
+PyObject *PyErr_SetArgsError(PyTypeObject *type, char *name, PyObject *args)
+{
+    if (!PyErr_Occurred())
+    {
+        PyObject *err = Py_BuildValue("(OsO)", type, name, args);
+
+        PyErr_SetObject(PyExc_InvalidArgsError, err);
+        Py_DECREF(err);
+    }
+
+    return NULL;
+}
+
+int isUnicodeString(PyObject *arg)
+{
+    return (PyObject_TypeCheck(arg, &UObjectType) &&
+            (((t_uobject *) arg)->object->getDynamicClassID() ==
+             icu::UnicodeString::getStaticClassID()));
+}
+
+void _init_common(PyObject *m)
+{
+    types = PyDict_New();
+    PyModule_AddObject(m, "__types__", types);
 }

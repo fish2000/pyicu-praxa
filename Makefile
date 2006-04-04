@@ -20,7 +20,7 @@
 # You need to verify that the version of python below is correct.
 # 
 
-VERSION=0.4
+VERSION=0.5
 ICU_VER=3.4
 PYTHON_VER=2.4
 
@@ -39,18 +39,15 @@ PYTHON_VER=2.4
 #PREFIX_FRAMEWORKS=/Library/Frameworks
 #PREFIX_PYTHON=$(PREFIX_FRAMEWORKS)/Python.framework/Versions/$(PYTHON_VER)
 #PREFIX_ICU=/usr/local/icu-$(ICU_VER)
-#SWIG=$(PREFIX)/bin/swig
 
 # Linux
 #PREFIX=/usr/local
 #PREFIX_PYTHON=$(PREFIX)
 #PREFIX_ICU=/usr/local/icu-$(ICU_VER)
-#SWIG=$(PREFIX)/bin/swig
 
 # Windows
 #PREFIX_PYTHON=/cygdrive/o/osaf/release/bin
 #PREFIX_ICU=/cygdrive/o/icu-$(ICU_VER)
-#SWIG=/cygdrive/o/osaf/external/release/bin/swig/swig.exe
 
 #
 # No edits required below
@@ -76,17 +73,14 @@ _SUFFIX=
 BINDIR=release
 endif
 
-SWIG_OPT=-DPYICU_VER="'$(VERSION)'" -DICU_VER="'$(ICU_VER)'"
-
-MODULES=errors bases locale iterators format dateformat numberformat \
+MODULES=common \
+        errors bases locale iterators format dateformat numberformat \
         calendar collator
 
 ifeq ($(OS),Darwin)
 PYTHON_SITE=$(PREFIX_PYTHON)/lib/python$(PYTHON_VER)/site-packages
 PYTHON_INC=$(PREFIX_PYTHON)/include/python$(PYTHON_VER)
 PYICU_LIB=$(BINDIR)/_PyICU.so
-PYICU_COMMON_LIB=$(BINDIR)/libPyICU.dylib
-PYICU_MODULE_LIBS:=$(MODULES:%=$(BINDIR)/_PyICU_%.so)
 ICU_INC=$(PREFIX_ICU)/include
 ICU_LIB=$(PREFIX_ICU)/lib
 ifeq ($(DEBUG),1)
@@ -96,14 +90,13 @@ else
 CCFLAGS=-O2
 LDFLAGS=
 endif
+OBJS=$(MODULES:%=$(BINDIR)/%.o)
 else
 
 ifeq ($(OS),Linux)
 PYTHON_SITE=$(PREFIX_PYTHON)/lib/python$(PYTHON_VER)/site-packages
 PYTHON_INC=$(PREFIX_PYTHON)/include/python$(PYTHON_VER)
 PYICU_LIB=$(BINDIR)/_PyICU.so
-PYICU_COMMON_LIB=$(BINDIR)/libPyICU.so
-PYICU_MODULE_LIBS:=$(MODULES:%=$(BINDIR)/_PyICU_%.so)
 ICU_INC=$(PREFIX_ICU)/include
 ICU_LIB=$(PREFIX_ICU)/lib
 ifeq ($(DEBUG),1)
@@ -113,6 +106,7 @@ else
 CCFLAGS=-O2 -fPIC
 LDFLAGS=
 endif
+OBJS=$(MODULES:%=$(BINDIR)/%.o)
 else
 
 ifeq ($(OS),Cygwin)
@@ -120,8 +114,6 @@ PYTHON_SITE=`cygpath -aw $(PREFIX_PYTHON)/Lib/site-packages`
 PYTHON_INC=`cygpath -aw $(PREFIX_PYTHON)/Include`
 PYTHON_PC=`cygpath -aw $(PREFIX_PYTHON)/PC`
 PYICU_LIB=$(BINDIR)/_PyICU$(_SUFFIX).pyd
-PYICU_COMMON_LIB=$(BINDIR)/libPyICU$(SUFFIX).dll
-PYICU_MODULE_LIBS:=$(MODULES:%=$(BINDIR)/_PyICU_%$(_SUFFIX).pyd)
 ICU_INC=`cygpath -aw $(PREFIX_ICU)/include`
 ICU_LIB=`cygpath -aw $(PREFIX_ICU)/lib`
 CC=cl
@@ -134,6 +126,7 @@ else
 CCFLAGS=/nologo /GX /Ox /LD /MD
 LDFLAGS=/INCREMENTAL:no /OPT:noref
 endif
+OBJS=$(MODULES:%=$(BINDIR)/%.obj)
 else
 
 PYTHON=unknown
@@ -143,7 +136,7 @@ endif
 endif
 
 DISTRIB=PyICU-$(VERSION)
-LIBS=$(PYICU_COMMON_LIB) $(PYICU_LIB) $(PYICU_MODULE_LIBS)
+LIBS=$(PYICU_LIB)
 
 default: all
 
@@ -160,44 +153,31 @@ endif
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
-%_wrap.cxx: %.i
-	$(SWIG) $(SWIG_OPT) -I$(ICU_INC) -c++ -nodefault -python -modern $<
-
-
 ifeq ($(OS),Darwin)
 
-$(PYICU_COMMON_LIB): common.cpp common.h
-	$(CXX) -dynamiclib -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) common.cpp -L$(ICU_LIB) -licuuc -licudata -F$(PREFIX_FRAMEWORKS) -framework Python
+$(OBJS): $(BINDIR)/%.o: %.cpp
+	$(CXX) -c -o $@ $(CCFLAGS) $(PYDBG) -I$(PYTHON_INC) -I$(ICU_INC) $<
 
-$(PYICU_MODULE_LIBS): $(BINDIR)/_PyICU_%.so: %_wrap.cxx common.h
-	$(CXX) -dynamic -bundle -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) $< -dylib_file libPyICU.dylib:$(PYICU_COMMON_LIB) -L$(BINDIR) -lPyICU -L$(ICU_LIB) -licui18n -licuuc -licudata -F$(PREFIX_FRAMEWORKS) -framework Python
-
-$(PYICU_LIB): PyICU_wrap.cxx $(PYICU_COMMON_LIB)
-	$(CXX) -dynamic -bundle -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) PyICU_wrap.cxx -dylib_file libPyICU.dylib:$(PYICU_COMMON_LIB) -L$(BINDIR) -lPyICU -L$(ICU_LIB) -licui18n -licuuc -licudata -F$(PREFIX_FRAMEWORKS) -framework Python
+$(PYICU_LIB): $(OBJS) _PyICU.cpp
+	$(CXX) -dynamic -bundle -o $@ $(CCFLAGS) $(PYDBG) -I$(PYTHON_INC) -I$(ICU_INC) _PyICU.cpp $(OBJS) -L$(ICU_LIB) -licui18n -licuuc -licudata -F$(PREFIX_FRAMEWORKS) -framework Python
 else
 
 ifeq ($(OS),Linux)
 
-$(PYICU_COMMON_LIB): common.cpp common.h
-	$(CXX) -shared -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) common.cpp
+$(OBJS): $(BINDIR)/%.o: %.cpp
+	$(CXX) -c -o $@ $(CCFLAGS) $(PYDBG) -I$(PYTHON_INC) -I$(ICU_INC) $<
 
-$(PYICU_MODULE_LIBS): $(BINDIR)/_PyICU_%.so: %_wrap.cxx common.h
-	$(CXX) -shared -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) $< -L$(BINDIR) -lPyICU -L$(ICU_LIB) -licui18n -licuuc -licudata
-
-$(PYICU_LIB): PyICU_wrap.cxx $(PYICU_COMMON_LIB)
-	$(CXX) -shared -o $@ $(CCFLAGS) $(PYDBG) $(SWIG_OPT) -I$(PYTHON_INC) -I$(ICU_INC) PyICU_wrap.cxx -L$(BINDIR) -lPyICU -L$(ICU_LIB) -licui18n -licuuc -licudata
+$(PYICU_LIB): $(OBJS) PyICU.cpp
+	$(CXX) -shared -o $@ $(CCFLAGS) $(PYDBG) -I$(PYTHON_INC) -I$(ICU_INC) _PyICU.cpp $(OBJS) -L$(ICU_LIB) -licui18n -licuuc -licudata
 else
 
 ifeq ($(OS),Cygwin)
 
-$(PYICU_COMMON_LIB): common.cpp common.h
-	$(CXX) $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) $(SWIG_OPT) /Tpcommon.cpp /Fe$@ /link $(LDFLAGS) /LIBPATH:`cygpath -aw $(PREFIX_PYTHON)/libs` /LIBPATH:`cygpath -aw $(PREFIX_ICU)/lib` icuuc$(SUFFIX).lib icuin$(SUFFIX).lib
+$(OBJS): $(BINDIR)/%.obj: %.cpp
+	$(CXX) $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) /Tp$< /Fe$@
 
-$(PYICU_MODULE_LIBS): $(BINDIR)/_PyICU_%$(_SUFFIX).pyd: %_wrap.cxx common.h
-	$(CXX) $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) $(SWIG_OPT) /Tp$< /Fe$@ /link $(LDFLAGS) /LIBPATH:`cygpath -aw $(PREFIX_PYTHON)/libs` /LIBPATH:`cygpath -aw $(PREFIX_ICU)/lib` icuuc$(SUFFIX).lib icuin$(SUFFIX).lib icudt.lib `cygpath -aw $(PYICU_COMMON_LIB:.dll=.lib)`
-
-$(PYICU_LIB): PyICU_wrap.cxx $(PYICU_COMMON_LIB)
-	$(CXX) $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) $(SWIG_OPT) /TpPyICU_wrap.cxx /Fe$@ /link $(LDFLAGS) /LIBPATH:`cygpath -aw $(PREFIX_PYTHON)/libs` /LIBPATH:`cygpath -aw $(PREFIX_ICU)/lib` icuuc$(SUFFIX).lib icuin$(SUFFIX).lib icudt.lib `cygpath -aw $(PYICU_COMMON_LIB:.dll=.lib)`
+$(PYICU_LIB): $(OBJS) _PyICU.cpp
+	$(CXX) $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) /Tp_PyICU.cpp /Fe$@ /link $(LDFLAGS) $(OBJS) /LIBPATH:`cygpath -aw $(PREFIX_PYTHON)/libs` /LIBPATH:`cygpath -aw $(PREFIX_ICU)/lib` icuuc$(SUFFIX).lib icuin$(SUFFIX).lib icudt.lib
 
 endif
 endif
@@ -209,33 +189,19 @@ all: env $(BINDIR) $(LIBS)
 
 install: all
 	mkdir -p $(PYTHON_SITE)
-	install PyICU.py $(MODULES:%=PyICU_%.py) $(PYTHON_SITE)
-	install $(PYICU_LIB) $(PYICU_MODULE_LIBS) $(PYTHON_SITE)
-ifeq ($(OS),Cygwin)
-	install $(PYICU_COMMON_LIB) $(PYTHON_SITE)
-else
-	install $(PYICU_COMMON_LIB) $(PREFIX)/lib
-endif
+	install PyICU.py $(PYTHON_SITE)
+	install $(PYICU_LIB) $(PYTHON_SITE)
 
 clean:
 	rm -rf $(BINDIR)
-	rm -f PyICU.py* PyICU_wrap.cxx
-	rm -f $(MODULES:%=%_wrap.cxx) $(MODULES:%=PyICU_%.py*)
-	rm -f $(PYICU_MODULE_LIBS)
 
 realclean: clean
 	rm -rf $(DISTRIB)
 
 distrib: all
 	mkdir -p $(DISTRIB)/python
-	install PyICU.py $(MODULES:%=PyICU_%.py) $(DISTRIB)/python
-	install $(PYICU_LIB) $(PYICU_MODULE_LIBS) $(DISTRIB)/python
-ifeq ($(OS),Cygwin)
-	install $(PYICU_COMMON_LIB) $(DISTRIB)/python
-else
-	mkdir -p $(DISTRIB)/lib
-	install $(PYICU_COMMON_LIB) $(DISTRIB)/lib
-endif
+	install PyICU.py $(DISTRIB)/python
+	install $(PYICU_LIB) $(DISTRIB)/python
 	tar --exclude .svn -cf - test/*.py | tar -C $(DISTRIB) -xf -
 	install README $(DISTRIB)
 	install CHANGES $(DISTRIB)

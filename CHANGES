@@ -8,7 +8,9 @@ Version 0.4 -> 0.5
   - added Collator.getCollationKey(string) overload
   - using u_strFromUTF32() now to convert 4 byte unicode to 2 byte unicode
   - improved support for Python 2.3
-  - resolved major memory leak by switching to SWIG 1.3.29
+  - PyICU no longers uses SWIG, wrappers are written by hand
+  - all APIs returning UnicodeString now return 'unicode'
+  - all APIs returning UnicodeString also take a UnicodeString arg to return it
 
 Version 0.3 -> 0.4
 ------------------

@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2005 Open Source Applications Foundation.
+ * Copyright (c) 2004-2006 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,20 +21,10 @@
  * ====================================================================
  */
 
-%module PyICU
+#ifndef _collator_h
+#define _collator_h
 
-%pythoncode {
+void _init_collator(PyObject *m);
 
-    VERSION = PYICU_VER
-    ICU_VERSION = ICU_VER
 
-    from PyICU_errors import *
-    from PyICU_bases import *
-    from PyICU_locale import *
-    from PyICU_iterators import *
-    from PyICU_format import *
-    from PyICU_dateformat import *
-    from PyICU_numberformat import *
-    from PyICU_calendar import *
-    from PyICU_collator import *
-}
+#endif /* _collator_h */

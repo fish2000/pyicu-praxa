@@ -21,23 +21,13 @@
  * ====================================================================
  */
 
-#ifndef _COMMON_H
-#define _COMMON_H
+#ifndef _common_h
+#define _common_h
 
 #ifdef _MSC_VER
-
-#include <malloc.h>
-
 #define EXPORT __declspec(dllexport)
-#define STACK_ARRAY(type, var, len) \
-    type *var = (type *) alloca((len) * sizeof(type))
-
 #else
-
 #define EXPORT
-#define STACK_ARRAY(type, var, len) \
-    type var[len]
-
 #endif
 
 #include <Python.h>
@@ -77,47 +67,26 @@
 #include <unicode/coll.h>
 #include <unicode/tblcoll.h>
 
+extern PyObject *PyExc_ICUError;
+extern PyObject *PyExc_InvalidArgsError;
 
-typedef int32_t _int32_t;
-typedef const double *doubleArray2;
-typedef const double *doubleArray3;
-typedef const double *doubleArray4;
-typedef const double *doubleArray5;
-typedef const UBool *UBoolArray2;
-typedef const UBool *UBoolArray4;
-typedef const UBool *UBoolArray5;
-typedef const icu::Locale *LocaleDict1;
-typedef const icu::UnicodeString *UnicodeStringArray2;
-typedef const icu::UnicodeString *UnicodeStringArray3;
-typedef const icu::UnicodeString *UnicodeStringArray4;
-typedef const icu::UnicodeString *UnicodeStringArray5;
-typedef const icu::UnicodeString *LeakyUnicodeStringArray3;
-typedef const icu::Format **FormatPointerArray2;
-typedef const icu::Format **FormatPointerArray3;
-typedef icu::DateFormat _DateFormat;
-typedef icu::MeasureFormat _MeasureFormat;
-typedef icu::Calendar _Calendar;
-typedef icu::TimeZone _TimeZone;
-typedef icu::TimeZone TimeZone_;
-typedef icu::StringEnumeration _StringEnumeration;
-typedef icu::Collator _Collator;
-typedef const icu::TimeZone cloned_TimeZone;
-typedef icu::UnicodeString _UnicodeString;
-typedef icu::UnicodeString UnicodeString0;
-typedef icu::UnicodeString UnicodeString1;
-typedef icu::UnicodeString UnicodeString2;
-typedef icu::UnicodeString UnicodeString3;
-typedef icu::UnicodeString _PyString;
-typedef icu::CollationKey CollationKey2;
-typedef icu::CollationKey _CollationKey;
-typedef const UChar *ISO3Code;
-typedef icu::Formattable Formattable2;
-typedef icu::Formattable *FormattableArray3;
-typedef icu::Formattable *FormattableArray4;
-typedef icu::NumberFormat _NumberFormat;
-typedef UConverter _UConverter;
+enum {
+    UObject_ID,
+    Replaceable_ID,
+    MeasureUnit_ID,
+    Measure_ID,
+    StringEnumeration_ID,
+    ForwardCharacterIterator_ID,
+    CharacterIterator_ID,
+    BreakIterator_ID,
+    Format_ID,
+    MeasureFormat_ID,
+    DateFormat_ID,
+    Calendar_ID,
+    Collator_ID,
+};
 
-EXPORT void setICUErrorClass(PyObject *);
+void _init_common(PyObject *m);
 
 class ICUException {
 private:
@@ -145,4 +114,28 @@ EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
 EXPORT UnicodeString *PyObject_AsUnicodeString(PyObject *object);
 EXPORT UDate PyObject_AsUDate(PyObject *object);
 
-#endif
+int abstract_init(PyObject *self, PyObject *args, PyObject *kwds);
+
+#define parseArgs(args, types, rest...) \
+    _parseArgs(((PyTupleObject *)(args))->ob_item, \
+               ((PyTupleObject *)(args))->ob_size, types, ##rest)
+
+#define parseArg(arg, types, rest...) \
+    _parseArgs(&(arg), 1, types, ##rest)
+
+int _parseArgs(PyObject **args, int count, char *types, ...);
+int isUnicodeString(PyObject *arg);
+int isInstance(PyObject *arg, UClassID id, PyTypeObject *type);
+void registerType(PyTypeObject *type, UClassID id);
+
+icu::Formattable *toFormattableArray(PyObject *arg, int *len,
+                                     UClassID id, PyTypeObject *type);
+
+icu::UObject **pl2cpa(PyObject *arg, int *len, UClassID id, PyTypeObject *type);
+PyObject *cpa2pl(icu::UObject **array, int len,
+                 PyObject *(*wrap)(UObject *, int));
+
+PyObject *PyErr_SetArgsError(PyObject *self, char *name, PyObject *args);
+PyObject *PyErr_SetArgsError(PyTypeObject *type, char *name, PyObject *args);
+
+#endif /* _common_h */

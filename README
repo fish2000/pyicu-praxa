@@ -18,12 +18,11 @@
   -------
 
   Welcome to PyICU, a Python extension wrapping IBM's International
-  Components for Unicode C++ library (ICU) generated using SWIG.
+  Components for Unicode C++ library (ICU).
 
   PyICU is a project maintained by the Open Source Applications Foundation.
 
   IBM's ICU homepage is: http://www-306.ibm.com/software/globalization/icu/
-  SWIG's homepage is: http://www.swig.org/
 
 
   Installing PyICU
@@ -48,12 +47,12 @@
   Building PyICU
   --------------
 
-  Before building PyICU, SWIG 1.3.24 and the ICU 3.2 libraries must be built
-  and installed. Refer to each system's instructions for more information.
+  Before building PyICU the ICU 3.4 libraries must be built and
+  installed. Refer to each system's instructions for more information.
 
-  Newer versions of SWIG (1.3.25, 1.3.27) are known not to work with PyICU.
+  As for version 0.5 PyICU no longer uses SWIG.
 
-  PyICU is built with GNU Make, SWIG and a C++ compiler (g++ on Unix,
+  PyICU is built with GNU Make and a C++ compiler (g++ on Unix,
   Microsoft Visual C++ on Windows). In order to use GNU Make on Windows, you
   need to install the Cygwin environment first.
 
@@ -100,7 +99,7 @@
     is an immutable string of 16-bit or 32-bit wide Unicode characters.
 
     Because of these differences, UnicodeString and Python's unicode type
-    are not merged into the same type when crossing the SWIG boundary.
+    are not merged into the same type when crossing the C++ boundary.
     ICU APIs taking UnicodeString arguments have been overloaded to also
     accept Python str or unicode type arguments. In the case of str objects,
     utf-8 encoding is assumed when converting them to UnicodeString
@@ -210,7 +209,7 @@
 
     Python's datetime objects, with or without timezone information, can
     also be used with APIs taking UDate arguments. The datetime objects get
-    converted to UDate in the SWIG layer.
+    converted to UDate when crossing into the C++ layer.
 
     - arrays
 
