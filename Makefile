@@ -167,7 +167,7 @@ ifeq ($(OS),Linux)
 $(OBJS): $(BINDIR)/%.o: %.cpp
 	$(CXX) -c -o $@ $(CCFLAGS) $(PYDBG) -I$(PYTHON_INC) -I$(ICU_INC) $<
 
-$(PYICU_LIB): $(OBJS) PyICU.cpp
+$(PYICU_LIB): $(OBJS) _PyICU.cpp
 	$(CXX) -shared -o $@ $(CCFLAGS) $(PYDBG) -I$(PYTHON_INC) -I$(ICU_INC) _PyICU.cpp $(OBJS) -L$(ICU_LIB) -licui18n -licuuc -licudata
 else
 
