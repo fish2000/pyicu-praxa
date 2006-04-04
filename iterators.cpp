@@ -1286,7 +1286,7 @@ static PyObject *t_collationelementiterator_iter_next(t_collationelementiterator
 {
     int n;
 
-    STATUS_CALL(self->object->next(status));
+    STATUS_CALL(n = self->object->next(status));
 
     if (n == icu::CollationElementIterator::NULLORDER)
     {

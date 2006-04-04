@@ -39,15 +39,18 @@ PYTHON_VER=2.4
 #PREFIX_FRAMEWORKS=/Library/Frameworks
 #PREFIX_PYTHON=$(PREFIX_FRAMEWORKS)/Python.framework/Versions/$(PYTHON_VER)
 #PREFIX_ICU=/usr/local/icu-$(ICU_VER)
+#PYTHON=$(PREFIX_PYTHON)/bin/python
 
 # Linux
 #PREFIX=/usr/local
 #PREFIX_PYTHON=$(PREFIX)
 #PREFIX_ICU=/usr/local/icu-$(ICU_VER)
+#PYTHON=$(PREFIX_PYTHON)/bin/python
 
 # Windows
 #PREFIX_PYTHON=/cygdrive/o/osaf/release/bin
-#PREFIX_ICU=/cygdrive/o/icu-$(ICU_VER)
+#PREFIX_ICU=/cygdrive/o/icu/icu-$(ICU_VER)/icu
+#PYTHON=$(PREFIX_PYTHON)/bin/python.exe
 
 #
 # No edits required below
@@ -138,6 +141,8 @@ endif
 DISTRIB=PyICU-$(VERSION)
 LIBS=$(PYICU_LIB)
 
+.PHONY: distrib install default all clean realclean env test
+
 default: all
 
 env:
@@ -173,11 +178,13 @@ else
 
 ifeq ($(OS),Cygwin)
 
-$(OBJS): $(BINDIR)/%.obj: %.cpp
-	$(CXX) $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) /Tp$< /Fe$@
+MODULES:=$(MODULES) _PyICU
 
-$(PYICU_LIB): $(OBJS) _PyICU.cpp
-	$(CXX) $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) /Tp_PyICU.cpp /Fe$@ /link $(LDFLAGS) $(OBJS) /LIBPATH:`cygpath -aw $(PREFIX_PYTHON)/libs` /LIBPATH:`cygpath -aw $(PREFIX_ICU)/lib` icuuc$(SUFFIX).lib icuin$(SUFFIX).lib icudt.lib
+$(OBJS): $(BINDIR)/%.obj: %.cpp
+	$(CXX) /c $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) /Tp$< /Fo$@
+
+$(PYICU_LIB): $(OBJS)
+	link /DLL /nologo $(LDFLAGS) /INCREMENTAL:NO $(OBJS) /OUT:`cygpath -aw $@` /EXPORT:init_PyICU /LIBPATH:`cygpath -aw $(PREFIX_PYTHON)/libs` /LIBPATH:`cygpath -aw $(PREFIX_ICU)/lib` icuuc$(SUFFIX).lib icuin$(SUFFIX).lib icudt.lib
 
 endif
 endif
@@ -186,6 +193,9 @@ endif
 
 all: env $(BINDIR) $(LIBS)
 	@echo build of $(BINDIR) complete
+
+test:
+	find test -name 'test_*.py' | xargs -n 1 $(PYTHON)
 
 install: all
 	mkdir -p $(PYTHON_SITE)

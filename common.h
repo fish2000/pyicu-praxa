@@ -116,6 +116,18 @@ EXPORT UDate PyObject_AsUDate(PyObject *object);
 
 int abstract_init(PyObject *self, PyObject *args, PyObject *kwds);
 
+#ifdef _MSC_VER
+
+#define parseArgs __parseArgs
+#define parseArg __parseArg
+
+int __parseArgs(PyObject *args, char *types, ...);
+int __parseArg(PyObject *arg, char *types, ...);
+
+int _parseArgs(PyObject **args, int count, char *types, va_list list);
+
+#else
+
 #define parseArgs(args, types, rest...) \
     _parseArgs(((PyTupleObject *)(args))->ob_item, \
                ((PyTupleObject *)(args))->ob_size, types, ##rest)
@@ -124,6 +136,9 @@ int abstract_init(PyObject *self, PyObject *args, PyObject *kwds);
     _parseArgs(&(arg), 1, types, ##rest)
 
 int _parseArgs(PyObject **args, int count, char *types, ...);
+
+#endif
+
 int isUnicodeString(PyObject *arg);
 int isInstance(PyObject *arg, UClassID id, PyTypeObject *type);
 void registerType(PyTypeObject *type, UClassID id);

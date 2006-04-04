@@ -479,6 +479,8 @@ static PyObject *t_replaceable_charAt(t_replaceable *self, PyObject *arg)
             return NULL;
         }
     }
+
+    return PyErr_SetArgsError((PyObject *) self, "charAt", arg);
 }
 
 static PyObject *t_replaceable_char32At(t_replaceable *self, PyObject *arg)
@@ -495,6 +497,8 @@ static PyObject *t_replaceable_char32At(t_replaceable *self, PyObject *arg)
             return NULL;
         }
     }
+
+    return PyErr_SetArgsError((PyObject *) self, "char32At", arg);
 }
 
 static PyObject *t_replaceable_hasMetaData(t_replaceable *self)
@@ -1422,7 +1426,7 @@ static PyObject *t_unicodestring_slice(t_unicodestring *self, int l, int h)
     if (l < 0)
         l += len;
     else if (l > len)
-        l == len;
+        l = len;
 
     if (h < 0)
         h += len;
@@ -1504,7 +1508,7 @@ static int t_unicodestring_ass_slice(t_unicodestring *self, int l, int h,
         if (l < 0)
             l += len;
         else if (l > len)
-            l == len;
+            l = len;
 
         if (h < 0)
             h += len;

@@ -635,6 +635,35 @@ static UBool *toUBoolArray(PyObject *arg, int *len)
     return NULL;
 }
 
+#ifdef _MSC_VER
+
+int __parseArgs(PyObject *args, char *types, ...)
+{
+    int count = ((PyTupleObject *)(args))->ob_size;
+    va_list list;
+
+    va_start(list, types);
+
+    return _parseArgs(((PyTupleObject *)(args))->ob_item, count, types, list);
+}
+
+int __parseArg(PyObject *arg, char *types, ...)
+{
+    va_list list;
+
+    va_start(list, types);
+
+    return _parseArgs(&arg, 1, types, list);
+}
+
+
+int _parseArgs(PyObject **args, int count, char *types, va_list list)
+{
+    if (count != strlen(types))
+        return -1;
+
+#else
+
 int _parseArgs(PyObject **args, int count, char *types, ...)
 {
     va_list list;
@@ -643,6 +672,9 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
         return -1;
 
     va_start(list, types);
+
+#endif
+
     for (int i = 0; i < count; i++) {
         PyObject *arg = args[i];
         
@@ -872,12 +904,13 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
 
           case 'R':           /* array of wrapped ICU objects */
           {
+	      typedef icu::UObject *(*convFn)(PyObject *, int *,
+					      UClassID, PyTypeObject *);
               icu::UObject **array = va_arg(list, icu::UObject **);
               int *len = va_arg(list, int *);
               UClassID id = va_arg(list, UClassID);
               PyTypeObject *type = va_arg(list, PyTypeObject *);
-              icu::UObject *(*fn)(PyObject *, int *, UClassID, PyTypeObject *) =
-                  va_arg(list, icu::UObject *(*)(PyObject *, int *, UClassID, PyTypeObject *));
+	      convFn fn = va_arg(list, convFn);
               *array = fn(arg, len, id, type);
               if (!*array)
                   return -1;

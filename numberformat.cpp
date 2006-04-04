@@ -1733,7 +1733,7 @@ static PyObject *t_rulebasednumberformat_getDefaultRuleSetName(t_rulebasednumber
           return PyUnicode_FromUnicodeString(&_u);
       }
       case 1:
-        if (!parseArgs(args, "U", &index, &u))
+        if (!parseArgs(args, "U", &u))
         {
             u->setTo(self->object->getDefaultRuleSetName());
             Py_RETURN_ARG(args, 0);
