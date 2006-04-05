@@ -138,10 +138,11 @@ endif
 endif
 endif
 
-DISTRIB=PyICU-$(VERSION)
+DISTRIB=distrib/PyICU-$(VERSION)
+DISTRIB_SRC=distrib/PyICU-src-$(VERSION)
 LIBS=$(PYICU_LIB)
 
-.PHONY: distrib install default all clean realclean env test
+.PHONY: distrib distrib-src install default all clean realclean env test
 
 default: all
 
@@ -206,7 +207,7 @@ clean:
 	rm -rf $(BINDIR)
 
 realclean: clean
-	rm -rf $(DISTRIB)
+	rm -rf distrib
 
 distrib: all
 	mkdir -p $(DISTRIB)/python
@@ -216,4 +217,9 @@ distrib: all
 	install README $(DISTRIB)
 	install CHANGES $(DISTRIB)
 	install CREDITS $(DISTRIB)
-	tar -cvzf $(DISTRIB).tar.gz $(DISTRIB)
+	tar -C distrib -cvzf $(DISTRIB).tar.gz $(notdir $(DISTRIB))
+
+distrib-src:
+	mkdir -p $(DISTRIB)
+	svn export . $(DISTRIB_SRC)
+	tar -C distrib -cvzf $(DISTRIB_SRC).tar.gz $(notdir $(DISTRIB_SRC))
