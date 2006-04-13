@@ -440,7 +440,11 @@ static PyObject *t_uobject_repr(t_uobject *self)
     PyObject *name = PyObject_GetAttrString((PyObject *) self->ob_type,
                                             "__name__");
     PyObject *str = self->ob_type->tp_str((PyObject *) self);
+#if PY_VERSION_HEX < 0x02040000
+    PyObject *args = Py_BuildValue("(OO)", name, str);
+#else
     PyObject *args = PyTuple_Pack(2, name, str);
+#endif
     PyObject *format = PyString_FromString("<%s: %s>");
     PyObject *repr = PyString_Format(format, args);
 
@@ -1611,7 +1615,7 @@ static int t_formattable_init(t_formattable *self,
     double d;
     int i;
     icu::Formattable::ISDATE flag;
-    long long l;
+    PY_LONG_LONG l;
     icu::UnicodeString *u;
     char *s;
 
@@ -1715,7 +1719,7 @@ static PyObject *t_formattable_getLong(t_formattable *self)
 static PyObject *t_formattable_getInt64(t_formattable *self)
 {
     UErrorCode status = U_ZERO_ERROR;
-    long long l = self->object->getInt64(status);
+    PY_LONG_LONG l = self->object->getInt64(status);
 
     if (U_FAILURE(status))
         return ICUException(status).reportError();
@@ -1798,7 +1802,7 @@ static PyObject *t_formattable_setLong(t_formattable *self, PyObject *arg)
 
 static PyObject *t_formattable_setInt64(t_formattable *self, PyObject *arg)
 {
-    long long l;
+    PY_LONG_LONG l;
     
     if (!parseArg(arg, "L", &l))
     {

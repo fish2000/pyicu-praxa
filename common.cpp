@@ -807,7 +807,7 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
                 break;
             return -1;
 
-          case 'L':           /* long long */
+          case 'L':           /* PY_LONG_LONG */
             if (PyLong_Check(arg) || PyInt_Check(arg))
                 break;
             return -1;
@@ -817,10 +817,10 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
         }
     }
 
-    for (int i = 0; i < count; i++) {
-        PyObject *arg = args[i];
+    for (int j = 0; j < count; j++) {
+        PyObject *arg = args[j];
         
-        switch (types[i]) {
+        switch (types[j]) {
           case 'c':           /* string */
           {
               char **c = va_arg(list, char **);
@@ -979,9 +979,9 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
               break;
           }
 
-          case 'L':           /* long long */
+          case 'L':           /* PY_LONG_LONG */
           {
-              long long *l = va_arg(list, long long *);
+              PY_LONG_LONG *l = va_arg(list, PY_LONG_LONG *);
               *l = PyLong_AsLongLong(arg);
               break;
           }

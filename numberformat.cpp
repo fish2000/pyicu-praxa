@@ -482,7 +482,7 @@ static PyObject *t_numberformat_format(t_numberformat *self, PyObject *args)
     icu::UnicodeString _u;
     double d;
     int i;
-    long long l;
+    PY_LONG_LONG l;
     icu::FieldPosition *fp;
 
     switch (PyTuple_Size(args)) {
@@ -1654,7 +1654,7 @@ static PyObject *t_rulebasednumberformat_format(t_rulebasednumberformat *self,
     icu::UnicodeString _u, _v;
     double d;
     int i;
-    long long l;
+    PY_LONG_LONG l;
     icu::FieldPosition *fp;
 
     switch (PyTuple_Size(args)) {

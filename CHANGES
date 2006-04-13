@@ -1,6 +1,11 @@
 
 For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 
+Version 0.5 ->
+------------------
+  - integrated patch to support Python 2.3 and MSVC 6
+  - 
+
 Version 0.4 -> 0.5
 ------------------
   - changed OS X linking to resolve all symbols at link time
