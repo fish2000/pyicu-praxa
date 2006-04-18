@@ -29,6 +29,9 @@
 
 #include "bases.h"
 
+static PyObject *utcoffset_NAME;
+static PyObject *toordinal_NAME;
+
 
 typedef struct {
     UConverterCallbackReason reason;
@@ -291,32 +294,17 @@ EXPORT UnicodeString *PyObject_AsUnicodeString(PyObject *object)
        (!strcmp((op)->ob_type->tp_name, "datetime.timedelta"))
 #endif
 
+
 int isDate(PyObject *object)
 {
     if (PyFloat_CheckExact(object))
         return 1;
-
-#if PY_VERSION_HEX > 0x02040000
-    static PyDateTime_CAPI *PyDateTimeAPI = NULL;
-
-    if (PyDateTimeAPI == NULL)
-        PyDateTimeAPI = (PyDateTime_CAPI *)
-            PyCObject_Import("datetime", "datetime_CAPI");
-#endif
 
     return PyDateTime_CheckExact(object);
 }
 
 int isDateExact(PyObject *object)
 {
-#if PY_VERSION_HEX > 0x02040000
-    static PyDateTime_CAPI *PyDateTimeAPI = NULL;
-
-    if (PyDateTimeAPI == NULL)
-        PyDateTimeAPI = (PyDateTime_CAPI *)
-            PyCObject_Import("datetime", "datetime_CAPI");
-#endif
-
     return PyDateTime_CheckExact(object);
 }
 
@@ -326,89 +314,53 @@ EXPORT UDate PyObject_AsUDate(PyObject *object)
         return (UDate) (PyFloat_AsDouble(object) * 1000.0);
     else
     {
-#if PY_VERSION_HEX > 0x02040000
-        static PyDateTime_CAPI *PyDateTimeAPI = NULL;
-
-        if (PyDateTimeAPI == NULL)
-            PyDateTimeAPI = (PyDateTime_CAPI *)
-                PyCObject_Import("datetime", "datetime_CAPI");
-#endif
-        
-        static PyObject *mktime = NULL;
-        if (mktime == NULL)
-        {
-            PyObject *time = PyImport_ImportModule("time");
-
-            mktime = PyObject_GetAttrString(time, "mktime");
-            Py_DECREF(time);
-        }
-
         if (PyDateTime_CheckExact(object))
         {
             PyObject *tzinfo = PyObject_GetAttrString(object, "tzinfo");
-            PyObject *time = NULL;
+            PyObject *utcoffset, *ordinal;
 
             if (tzinfo == Py_None)
             {
-                PyObject *method, *args;
+                PyObject *m = PyImport_ImportModule("PyICU");
+                PyObject *cls = PyObject_GetAttrString(m, "ICUtzinfo");
 
-                method = PyString_FromString("timetuple");
-                args = PyTuple_New(1);
+                tzinfo = PyObject_GetAttrString(cls, "default");
+                Py_DECREF(cls);
+                Py_DECREF(m);
 
-                PyTuple_SET_ITEM(args, 0, PyObject_CallMethodObjArgs(object, method, NULL));
-                Py_DECREF(method);
-
-                time = PyObject_Call(mktime, args, NULL);
-                Py_DECREF(args);
+                utcoffset = PyObject_CallMethodObjArgs(tzinfo, utcoffset_NAME,
+                                                       object, NULL);
                 Py_DECREF(tzinfo);
-
-                if (time != NULL)
-                {
-                    if (PyFloat_CheckExact(time))
-                    {
-                        UDate date = (UDate) (PyFloat_AsDouble(time) * 1000.0);
-                        Py_DECREF(time);
-
-                        return date;
-                    }
-
-                    Py_DECREF(time);
-                }
             }
             else
             {
-                PyObject *method, *utcoffset, *ordinal;
+                utcoffset = PyObject_CallMethodObjArgs(object, utcoffset_NAME,
+                                                       NULL);
                 Py_DECREF(tzinfo);
-
-                method = PyString_FromString("utcoffset");
-                utcoffset = PyObject_CallMethodObjArgs(object, method, NULL);
-                Py_DECREF(method);
-
-                method = PyString_FromString("toordinal");
-                ordinal = PyObject_CallMethodObjArgs(object, method, NULL);
-                Py_DECREF(method);
-
-                if (utcoffset != NULL && PyDelta_CheckExact(utcoffset) &&
-                    ordinal != NULL && PyInt_CheckExact(ordinal))
-                {
-                    double timestamp =
-                        (PyInt_AsLong(ordinal) - 719163) * 86400.0 +
-                        PyDateTime_DATE_GET_HOUR(object) * 3600.0 +
-                        PyDateTime_DATE_GET_MINUTE(object) * 60.0 +
-                        (double) PyDateTime_DATE_GET_SECOND(object) +
-                        PyDateTime_DATE_GET_MICROSECOND(object) / 1e6 -
-                        (((PyDateTime_Delta *) utcoffset)->days * 86400.0 +
-                         (double) ((PyDateTime_Delta *) utcoffset)->seconds);
-
-                    Py_DECREF(utcoffset);
-                    Py_DECREF(ordinal);
-
-                    return (UDate) (timestamp * 1000.0);
-                }
-
-                Py_XDECREF(utcoffset);
-                Py_XDECREF(ordinal);
             }
+
+            ordinal = PyObject_CallMethodObjArgs(object, toordinal_NAME, NULL);
+
+            if (utcoffset != NULL && PyDelta_CheckExact(utcoffset) &&
+                ordinal != NULL && PyInt_CheckExact(ordinal))
+            {
+                double timestamp =
+                    (PyInt_AsLong(ordinal) - 719163) * 86400.0 +
+                    PyDateTime_DATE_GET_HOUR(object) * 3600.0 +
+                    PyDateTime_DATE_GET_MINUTE(object) * 60.0 +
+                    (double) PyDateTime_DATE_GET_SECOND(object) +
+                    PyDateTime_DATE_GET_MICROSECOND(object) / 1e6 -
+                    (((PyDateTime_Delta *) utcoffset)->days * 86400.0 +
+                     (double) ((PyDateTime_Delta *) utcoffset)->seconds);
+
+                Py_DECREF(utcoffset);
+                Py_DECREF(ordinal);
+
+                return (UDate) (timestamp * 1000.0);
+            }
+
+            Py_XDECREF(utcoffset);
+            Py_XDECREF(ordinal);
         }
     }
     
@@ -1032,4 +984,11 @@ void _init_common(PyObject *m)
 {
     types = PyDict_New();
     PyModule_AddObject(m, "__types__", types);
+
+#if PY_VERSION_HEX > 0x02040000
+    PyDateTime_IMPORT;
+#endif
+
+    utcoffset_NAME = PyString_FromString("utcoffset");
+    toordinal_NAME = PyString_FromString("toordinal");
 }

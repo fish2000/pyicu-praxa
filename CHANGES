@@ -4,6 +4,7 @@ For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 Version 0.5 ->
 ------------------
   - integrated patch to support Python 2.3 and MSVC 6
+  - changed naive datetime to UDate conversion to use ICUtzinfo.default
   - 
 
 Version 0.4 -> 0.5
