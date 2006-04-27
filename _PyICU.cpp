@@ -191,6 +191,13 @@ extern "C" {
 
         PyObject *module = PyImport_ImportModule("PyICU");
 
+        if (!module)
+        {
+            if (!PyErr_Occurred())
+                PyErr_SetString(PyExc_ImportError, "PyICU");
+            return;
+        }
+
         PyExc_ICUError = PyObject_GetAttrString(module, "ICUError");
         PyExc_InvalidArgsError = PyObject_GetAttrString(module, "InvalidArgsError");
         Py_DECREF(module);
