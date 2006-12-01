@@ -1347,7 +1347,7 @@ static PyObject *t_unicodestring_richcmp(t_unicodestring *self,
     Py_RETURN_BOOL(b);
 }
 
-static int t_unicodestring_length(t_unicodestring *self)
+static Py_ssize_t t_unicodestring_length(t_unicodestring *self)
 {
     return self->object->length();
 }
@@ -1380,7 +1380,7 @@ static PyObject *t_unicodestring_concat(t_unicodestring *self, PyObject *arg)
     return PyErr_SetArgsError((PyObject *) self, "+", arg);
 }
 
-static PyObject *t_unicodestring_repeat(t_unicodestring *self, int n)
+static PyObject *t_unicodestring_repeat(t_unicodestring *self, Py_ssize_t n)
 {
     if (n <= 0)
         return wrap_UnicodeString(new icu::UnicodeString(), T_OWNED);
@@ -1422,7 +1422,8 @@ static PyObject *t_unicodestring_item(t_unicodestring *self, int n)
     return NULL;
 }
 
-static PyObject *t_unicodestring_slice(t_unicodestring *self, int l, int h)
+static PyObject *t_unicodestring_slice(t_unicodestring *self,
+                                       Py_ssize_t l, Py_ssize_t h)
 {
     icu::UnicodeString *u = self->object;
     int len = u->length();
@@ -1451,7 +1452,8 @@ static PyObject *t_unicodestring_slice(t_unicodestring *self, int l, int h)
     return NULL;
 }
 
-static int t_unicodestring_ass_item(t_unicodestring *self, int n, PyObject *arg)
+static int t_unicodestring_ass_item(t_unicodestring *self,
+                                    Py_ssize_t n, PyObject *arg)
 {
     icu::UnicodeString *u = self->object;
     int len = u->length();
@@ -1498,7 +1500,8 @@ static int t_unicodestring_ass_item(t_unicodestring *self, int n, PyObject *arg)
     return -1;
 }
 
-static int t_unicodestring_ass_slice(t_unicodestring *self, int l, int h,
+static int t_unicodestring_ass_slice(t_unicodestring *self,
+                                     Py_ssize_t l, Py_ssize_t h,
                                      PyObject *arg)
 {
     icu::UnicodeString *v;
@@ -1577,7 +1580,8 @@ static PyObject *t_unicodestring_inplace_concat(t_unicodestring *self,
     return PyErr_SetArgsError((PyObject *) self, "+=", arg);
 }
 
-static PyObject *t_unicodestring_inplace_repeat(t_unicodestring *self, int n)
+static PyObject *t_unicodestring_inplace_repeat(t_unicodestring *self,
+                                                Py_ssize_t n)
 {
     if (n <= 0)
         self->object->remove();
@@ -1593,16 +1597,16 @@ static PyObject *t_unicodestring_inplace_repeat(t_unicodestring *self, int n)
 }
 
 static PySequenceMethods t_unicodestring_as_sequence = {
-    (inquiry) t_unicodestring_length,                   /* sq_length */
+    (lenfunc) t_unicodestring_length,                   /* sq_length */
     (binaryfunc) t_unicodestring_concat,                /* sq_concat */
-    (intargfunc) t_unicodestring_repeat,                /* sq_repeat */
-    (intargfunc) t_unicodestring_item,                  /* sq_item */
-    (intintargfunc) t_unicodestring_slice,              /* sq_slice */
-    (intobjargproc) t_unicodestring_ass_item,           /* sq_ass_item */
-    (intintobjargproc) t_unicodestring_ass_slice,       /* sq_ass_slice */
+    (ssizeargfunc) t_unicodestring_repeat,              /* sq_repeat */
+    (ssizeargfunc) t_unicodestring_item,                /* sq_item */
+    (ssizessizeargfunc) t_unicodestring_slice,          /* sq_slice */
+    (ssizeobjargproc) t_unicodestring_ass_item,         /* sq_ass_item */
+    (ssizessizeobjargproc) t_unicodestring_ass_slice,   /* sq_ass_slice */
     (objobjproc) t_unicodestring_contains,              /* sq_contains */
     (binaryfunc) t_unicodestring_inplace_concat,        /* sq_inplace_concat */
-    (intargfunc) t_unicodestring_inplace_repeat,        /* sq_inplace_repeat */
+    (ssizeargfunc) t_unicodestring_inplace_repeat,      /* sq_inplace_repeat */
 };
 
 

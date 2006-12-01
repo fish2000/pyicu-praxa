@@ -20,8 +20,8 @@
 # You need to verify that the version of python below is correct.
 # 
 
-VERSION=0.5
-ICU_VER=3.4
+VERSION=0.6
+ICU_VER=3.6
 PYTHON_VER=2.4
 
 # 
@@ -38,13 +38,13 @@ PYTHON_VER=2.4
 #PREFIX=/usr/local
 #PREFIX_FRAMEWORKS=/Library/Frameworks
 #PREFIX_PYTHON=$(PREFIX_FRAMEWORKS)/Python.framework/Versions/$(PYTHON_VER)
-#PREFIX_ICU=/usr/local/icu-$(ICU_VER)
+#PREFIX_ICU=$(PREFIX)/icu-$(ICU_VER)
 #PYTHON=$(PREFIX_PYTHON)/bin/python
 
 # Linux
 #PREFIX=/usr/local
 #PREFIX_PYTHON=$(PREFIX)
-#PREFIX_ICU=/usr/local/icu-$(ICU_VER)
+#PREFIX_ICU=$(PREFIX)/icu-$(ICU_VER)
 #PYTHON=$(PREFIX_PYTHON)/bin/python
 
 # Windows
@@ -165,7 +165,7 @@ $(OBJS): $(BINDIR)/%.o: %.cpp
 	$(CXX) -c -o $@ $(CCFLAGS) $(PYDBG) -I$(PYTHON_INC) -I$(ICU_INC) $<
 
 $(PYICU_LIB): $(OBJS) _PyICU.cpp
-	$(CXX) -dynamic -bundle -o $@ $(CCFLAGS) $(PYDBG) -I$(PYTHON_INC) -I$(ICU_INC) _PyICU.cpp $(OBJS) -L$(ICU_LIB) -licui18n -licuuc -licudata -F$(PREFIX_FRAMEWORKS) -framework Python
+	$(CXX) -dynamic -bundle -o $@ -DPYICU_VER="\"$(VERSION)\"" $(CCFLAGS) $(PYDBG) -I$(PYTHON_INC) -I$(ICU_INC) _PyICU.cpp $(OBJS) -L$(ICU_LIB) -licui18n -licuuc -licudata -F$(PREFIX_FRAMEWORKS) -framework Python
 else
 
 ifeq ($(OS),Linux)

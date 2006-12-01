@@ -1,12 +1,13 @@
 
 For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 
-Version 0.5 ->
+Version 0.5 -> 0.6
 ------------------
   - integrated patch to support Python 2.3 and MSVC 6
   - changed naive datetime to UDate conversion to use ICUtzinfo.default
   - fixed bug not checking return value of PyImport_ImportModule
-  - 
+  - PyICU now wraps ICU 3.6
+  - added support for building with Python 2.5
 
 Version 0.4 -> 0.5
 ------------------

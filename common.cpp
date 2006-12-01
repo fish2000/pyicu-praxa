@@ -162,7 +162,7 @@ EXPORT UnicodeString &PyString_AsUnicodeString(PyObject *object,
 
     _STOPReason stop;
     char *src;
-    int len;
+    Py_ssize_t len;
 
     memset(&stop, 0, sizeof(stop));
 

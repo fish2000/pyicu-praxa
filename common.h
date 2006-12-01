@@ -38,6 +38,15 @@
 #define Py_RETURN_FALSE return Py_INCREF(Py_False), Py_False
 #endif
 
+#if PY_VERSION_HEX < 0x02050000
+typedef int Py_ssize_t;
+typedef inquiry lenfunc;
+typedef intargfunc ssizeargfunc;
+typedef intobjargproc ssizeobjargproc;
+typedef intintargfunc ssizessizeargfunc;
+typedef intintobjargproc ssizessizeobjargproc;
+#endif
+
 #include <unicode/utypes.h>
 #include <unicode/unistr.h>
 #include <unicode/ucnv.h>

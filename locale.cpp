@@ -460,8 +460,7 @@ static PyObject *t_locale_getDisplayName(t_locale *self, PyObject *args)
         }
         break;
       case 2:
-        if (!parseArgs(args, "PU", TYPE_CLASSID(Locale),
-                       &locale, &u))
+        if (!parseArgs(args, "PU", TYPE_CLASSID(Locale), &locale, &u))
         {
             self->object->getDisplayName(*locale, *u);
             Py_RETURN_ARG(args, 1);

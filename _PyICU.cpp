@@ -185,9 +185,19 @@ extern "C" {
     void init_PyICU(void)
     {
         PyObject *m = Py_InitModule3("_PyICU", pyicu_funcs, "_PyICU");
+        PyObject *ver;
 
         PyType_Ready(&ConstVariableDescriptorType);
         Py_INCREF(&ConstVariableDescriptorType);
+
+        ver = PyString_FromString(PYICU_VER);
+        PyObject_SetAttrString(m, "VERSION", ver); Py_DECREF(ver);
+
+        ver = PyString_FromString(U_ICU_VERSION);
+        PyObject_SetAttrString(m, "ICU_VERSION", ver); Py_DECREF(ver);
+
+        ver = PyString_FromString(U_UNICODE_VERSION);
+        PyObject_SetAttrString(m, "UNICODE_VERSION", ver); Py_DECREF(ver);
 
         PyObject *module = PyImport_ImportModule("PyICU");
 
