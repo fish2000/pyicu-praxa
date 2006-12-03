@@ -174,7 +174,7 @@ $(OBJS): $(BINDIR)/%.o: %.cpp
 	$(CXX) -c -o $@ $(CCFLAGS) $(PYDBG) -I$(PYTHON_INC) -I$(ICU_INC) $<
 
 $(PYICU_LIB): $(OBJS) _PyICU.cpp
-	$(CXX) -shared -o $@ $(CCFLAGS) $(PYDBG) -I$(PYTHON_INC) -I$(ICU_INC) _PyICU.cpp $(OBJS) -L$(ICU_LIB) -licui18n -licuuc -licudata
+	$(CXX) -shared -o $@ -DPYICU_VER="\"$(VERSION)\"" $(CCFLAGS) $(PYDBG) -I$(PYTHON_INC) -I$(ICU_INC) _PyICU.cpp $(OBJS) -L$(ICU_LIB) -licui18n -licuuc -licudata
 else
 
 ifeq ($(OS),Cygwin)
