@@ -122,7 +122,7 @@ ICU_LIB=`cygpath -aw $(PREFIX_ICU)/lib`
 CC=cl
 CXX=cl
 LD=link
-ifeq ($(word, 1, $(sort $(ICU_VER), 3.6)),3.6)
+ifeq ($(word 1, $(sort $(ICU_VER) 3.6)),3.6)
 WCHAR_T=/Zc:wchar_t
 else
 WCHAR_T=
