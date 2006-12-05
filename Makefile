@@ -122,11 +122,16 @@ ICU_LIB=`cygpath -aw $(PREFIX_ICU)/lib`
 CC=cl
 CXX=cl
 LD=link
+ifeq ($(word, 1, $(sort $(ICU_VER), 3.6)),3.6)
+WCHAR_T=/Zc:wchar_t
+else
+WCHAR_T=
+endif
 ifeq ($(DEBUG),1)
-CCFLAGS=/nologo /GX /Od /Zi /LDd /MDd /D_DEBUG
+CCFLAGS=/nologo /GX /Od /Zi /LDd /MDd /D_DEBUG $(WCHAR_T)
 LDFLAGS=/INCREMENTAL:no /OPT:noref /DEBUG
 else
-CCFLAGS=/nologo /GX /Ox /LD /MD
+CCFLAGS=/nologo /GX /Ox /LD /MD $(WCHAR_T)
 LDFLAGS=/INCREMENTAL:no /OPT:noref
 endif
 OBJS=$(MODULES:%=$(BINDIR)/%.obj)
@@ -182,7 +187,7 @@ ifeq ($(OS),Cygwin)
 MODULES:=$(MODULES) _PyICU
 
 $(OBJS): $(BINDIR)/%.obj: %.cpp
-	$(CXX) /c $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) /Tp$< /Fo$@
+	$(CXX) /c /DPYICU_VER="\"$(VERSION)\"" $(CCFLAGS) /I $(PYTHON_INC) /I $(ICU_INC) $(PYDBG) /Tp$< /Fo$@
 
 $(PYICU_LIB): $(OBJS)
 	link /DLL /nologo $(LDFLAGS) /INCREMENTAL:NO $(OBJS) /OUT:`cygpath -aw $@` /EXPORT:init_PyICU /LIBPATH:`cygpath -aw $(PREFIX_PYTHON)/libs` /LIBPATH:`cygpath -aw $(PREFIX_ICU)/lib` icuuc$(SUFFIX).lib icuin$(SUFFIX).lib icudt.lib
