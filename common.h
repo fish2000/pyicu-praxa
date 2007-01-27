@@ -82,6 +82,23 @@ typedef intintobjargproc ssizessizeobjargproc;
 #include <unicode/coleitr.h>
 #include <unicode/coll.h>
 #include <unicode/tblcoll.h>
+#include <unicode/ucsdet.h>
+
+
+/* lifted from ustrenum.h */
+
+U_NAMESPACE_BEGIN
+  class U_COMMON_API UStringEnumeration : public StringEnumeration {
+      public:
+        UStringEnumeration(UEnumeration* uenum);
+        virtual ~UStringEnumeration();
+        virtual int32_t count(UErrorCode& status) const;
+        virtual const UnicodeString* snext(UErrorCode& status);
+        virtual void reset(UErrorCode& status);
+        virtual UClassID getDynamicClassID() const;
+    };
+U_NAMESPACE_END
+
 
 extern PyObject *PyExc_ICUError;
 extern PyObject *PyExc_InvalidArgsError;
@@ -118,6 +135,7 @@ public:
 };
 
 EXPORT PyObject *PyUnicode_FromUnicodeString(UnicodeString *string);
+EXPORT PyObject *PyUnicode_FromUnicodeString(const UChar *chars, int size);
 
 EXPORT UnicodeString &PyString_AsUnicodeString(PyObject *object,
                                                char *encoding, char *mode,

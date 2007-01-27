@@ -8,6 +8,7 @@ Version 0.5 -> 0.6
   - fixed bug not checking return value of PyImport_ImportModule
   - PyICU now wraps ICU 3.6
   - added support for building with Python 2.5
+  - added support for CharsetDetector and CharsetMatch C ICU APIs
 
 Version 0.4 -> 0.5
 ------------------

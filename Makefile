@@ -22,7 +22,7 @@
 
 VERSION=0.6
 ICU_VER=3.6
-PYTHON_VER=2.4
+PYTHON_VER=2.5
 
 # 
 # You need to uncomment and edit the variables below in the section
@@ -78,7 +78,7 @@ endif
 
 MODULES=common \
         errors bases locale iterators format dateformat numberformat \
-        calendar collator
+        calendar collator charset
 
 ifeq ($(OS),Darwin)
 PYTHON_SITE=$(PREFIX_PYTHON)/lib/python$(PYTHON_VER)/site-packages

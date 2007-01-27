@@ -136,15 +136,42 @@ EXPORT PyObject *PyUnicode_FromUnicodeString(UnicodeString *string)
     else
     {
         int len = string->length();
-        Py_UNICODE *pchars = new Py_UNICODE[len];
-        const UChar *chars = string->getBuffer();
+        PyObject *u = PyUnicode_FromUnicode(NULL, len);
 
-        for (int i = 0; i < len; i++)
-            pchars[i] = chars[i];
+        if (u)
+        {
+            Py_UNICODE *pchars = PyUnicode_AS_UNICODE(u);
+            const UChar *chars = string->getBuffer();
+
+            for (int i = 0; i < len; i++)
+                pchars[i] = chars[i];
+        }        
+
+        return u;
+    }
+}
+
+EXPORT PyObject *PyUnicode_FromUnicodeString(const UChar *chars, int size)
+{
+    if (!chars)
+    {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    else if (sizeof(Py_UNICODE) == sizeof(UChar))
+        return PyUnicode_FromUnicode((const Py_UNICODE *) chars, size);
+    else
+    {
+        PyObject *u = PyUnicode_FromUnicode(NULL, size);
+
+        if (u)
+        {
+            Py_UNICODE *pchars = PyUnicode_AS_UNICODE(u);
+
+            for (int i = 0; i < size; i++)
+                pchars[i] = chars[i];
+        }
         
-        PyObject *u = PyUnicode_FromUnicode((const Py_UNICODE *) pchars, len);
-        delete pchars;
-
         return u;
     }
 }
@@ -370,8 +397,7 @@ EXPORT UDate PyObject_AsUDate(PyObject *object)
 
 int abstract_init(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    PyObject *err =
-        Py_BuildValue("(sO)", "instantiating java class", self->ob_type);
+    PyObject *err = Py_BuildValue("(sO)", "instantiating class", self->ob_type);
 
     PyErr_SetObject(PyExc_NotImplementedError, err);
     Py_DECREF(err);
@@ -632,6 +658,7 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
         
         switch (types[i]) {
           case 'c':           /* string */
+          case 'k':           /* string and size */
           case 'C':           /* string, not to be unpacked */
             if (PyString_Check(arg))
                 break;
@@ -777,6 +804,15 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
           {
               char **c = va_arg(list, char **);
               *c = PyString_AS_STRING(arg);
+              break;
+          }
+
+          case 'k':           /* string and size */
+          {
+              char **c = va_arg(list, char **);
+              int *l = va_arg(list, int *);
+              *c = PyString_AS_STRING(arg);
+              *l = PyString_GET_SIZE(arg);
               break;
           }
 

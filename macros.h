@@ -131,6 +131,75 @@ PyObject *wrap_##name(icuClass *object, int flags)                      \
 }
 
 
+#define DECLARE_STRUCT(name, t_name, icuStruct, init, dealloc)          \
+static PyObject *t_name##_new(PyTypeObject *type,                       \
+                              PyObject *args, PyObject *kwds)           \
+{                                                                       \
+    t_name *self = (t_name *) type->tp_alloc(type, 0);                  \
+    if (self)                                                           \
+    {                                                                   \
+        self->object = NULL;                                            \
+        self->flags = 0;                                                \
+    }                                                                   \
+    return (PyObject *) self;                                           \
+}                                                                       \
+PyTypeObject name##Type = {                                                 \
+    PyObject_HEAD_INIT(NULL)                                                \
+    /* ob_size            */   0,                                           \
+    /* tp_name            */   "PyICU."#name,                               \
+    /* tp_basicsize       */   sizeof(t_name),                              \
+    /* tp_itemsize        */   0,                                           \
+    /* tp_dealloc         */   (destructor)t_name##_dealloc,                \
+    /* tp_print           */   0,                                           \
+    /* tp_getattr         */   0,                                           \
+    /* tp_setattr         */   0,                                           \
+    /* tp_compare         */   0,                                           \
+    /* tp_repr            */   0,                                           \
+    /* tp_as_number       */   0,                                           \
+    /* tp_as_sequence     */   0,                                           \
+    /* tp_as_mapping      */   0,                                           \
+    /* tp_hash            */   0,                                           \
+    /* tp_call            */   0,                                           \
+    /* tp_str             */   0,                                           \
+    /* tp_getattro        */   0,                                           \
+    /* tp_setattro        */   0,                                           \
+    /* tp_as_buffer       */   0,                                           \
+    /* tp_flags           */   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,    \
+    /* tp_doc             */   #t_name" objects",                           \
+    /* tp_traverse        */   0,                                           \
+    /* tp_clear           */   0,                                           \
+    /* tp_richcompare     */   0,                                           \
+    /* tp_weaklistoffset  */   0,                                           \
+    /* tp_iter            */   0,                                           \
+    /* tp_iternext        */   0,                                           \
+    /* tp_methods         */   t_name##_methods,                            \
+    /* tp_members         */   0,                                           \
+    /* tp_getset          */   0,                                           \
+    /* tp_base            */   0,                                           \
+    /* tp_dict            */   0,                                           \
+    /* tp_descr_get       */   0,                                           \
+    /* tp_descr_set       */   0,                                           \
+    /* tp_dictoffset      */   0,                                           \
+    /* tp_init            */   (initproc)init,                              \
+    /* tp_alloc           */   0,                                           \
+    /* tp_new             */   (newfunc)t_name##_new,                       \
+};                                                                          \
+PyObject *wrap_##name(icuStruct *object, int flags)                     \
+{                                                                       \
+    if (object)                                                         \
+    {                                                                   \
+        t_name *self = (t_name *) name##Type.tp_alloc(&name##Type, 0);  \
+        if (self)                                                       \
+        {                                                               \
+            self->object = object;                                      \
+            self->flags = flags;                                        \
+        }                                                               \
+        return (PyObject *) self;                                       \
+    }                                                                   \
+    Py_RETURN_NONE;                                                     \
+}
+
+
 #define DECLARE_CONSTANTS_TYPE(name)                                    \
 PyTypeObject name##Type = {                                             \
     PyObject_HEAD_INIT(NULL)                                            \
@@ -152,6 +221,13 @@ PyTypeObject name##Type = {                                             \
         Py_INCREF(&name##Type);                                      \
         PyModule_AddObject(module, #name, (PyObject *) &name##Type); \
         registerType(&name##Type, (UClassID) name##_ID);             \
+    }
+
+#define INSTALL_STRUCT(name, module)                                 \
+    if (PyType_Ready(&name##Type) == 0)                              \
+    {                                                                \
+        Py_INCREF(&name##Type);                                      \
+        PyModule_AddObject(module, #name, (PyObject *) &name##Type); \
     }
 
 #define REGISTER_TYPE(name, module)                                  \

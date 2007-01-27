@@ -34,6 +34,7 @@
 #include "numberformat.h"
 #include "calendar.h"
 #include "collator.h"
+#include "charset.h"
 
 
 /* const variable descriptor */
@@ -222,5 +223,6 @@ extern "C" {
         _init_numberformat(m);
         _init_calendar(m);
         _init_collator(m);
+        _init_charset(m);
     }
 }
