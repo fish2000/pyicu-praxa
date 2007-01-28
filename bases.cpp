@@ -192,6 +192,16 @@ static PyObject *t_unicodestring_foldCase(t_unicodestring *self,
                                           PyObject *args);
 static PyObject *t_unicodestring_isBogus(t_unicodestring *self);
 static PyObject *t_unicodestring_encode(t_unicodestring *self, PyObject *arg);
+static PyObject *t_unicodestring_idna_toASCII(t_unicodestring *self,
+                                              PyObject *args);
+static PyObject *t_unicodestring_idna_toUnicode(t_unicodestring *self,
+                                                PyObject *args);
+static PyObject *t_unicodestring_idna_IDNtoASCII(t_unicodestring *self,
+                                                 PyObject *args);
+static PyObject *t_unicodestring_idna_IDNtoUnicode(t_unicodestring *self,
+                                                   PyObject *args);
+static PyObject *t_unicodestring_idna_compare(t_unicodestring *self,
+                                              PyObject *args);
 
 static PyMethodDef t_unicodestring_methods[] = {
     DECLARE_METHOD(t_unicodestring, getAvailableStandards, METH_NOARGS | METH_CLASS),
@@ -218,6 +228,11 @@ static PyMethodDef t_unicodestring_methods[] = {
     DECLARE_METHOD(t_unicodestring, foldCase, METH_VARARGS),
     DECLARE_METHOD(t_unicodestring, isBogus, METH_NOARGS),
     DECLARE_METHOD(t_unicodestring, encode, METH_O),
+    DECLARE_METHOD(t_unicodestring, idna_toASCII, METH_VARARGS),
+    DECLARE_METHOD(t_unicodestring, idna_toUnicode, METH_VARARGS),
+    DECLARE_METHOD(t_unicodestring, idna_IDNtoASCII, METH_VARARGS),
+    DECLARE_METHOD(t_unicodestring, idna_IDNtoUnicode, METH_VARARGS),
+    DECLARE_METHOD(t_unicodestring, idna_compare, METH_VARARGS),
     { NULL, NULL, 0, NULL }
 };
 
@@ -1305,6 +1320,38 @@ static PyObject *t_unicodestring_str(t_unicodestring *self)
     return PyUnicode_FromUnicodeString(self->object);
 }
 
+static PyObject *t_unicodestring_repr(t_unicodestring *self)
+{
+    PyObject *name = PyObject_GetAttrString((PyObject *) self->ob_type,
+                                            "__name__");
+    PyObject *str = PyUnicode_FromUnicodeString(self->object);
+
+    if (str)
+    {
+        PyObject *repr = str->ob_type->tp_repr(str);
+        Py_DECREF(str);
+        str = repr;
+    }
+    if (!str)
+        return NULL;
+    
+#if PY_VERSION_HEX < 0x02040000
+    PyObject *args = Py_BuildValue("(OO)", name, str);
+#else
+    PyObject *args = PyTuple_Pack(2, name, str);
+#endif
+    PyObject *format = PyString_FromString("<%s: %s>");
+    PyObject *repr = PyString_Format(format, args);
+
+    Py_DECREF(name);
+    Py_DECREF(str);
+    Py_DECREF(args);
+    Py_DECREF(format);
+
+    return repr;
+}
+
+
 static PyObject *t_unicodestring_encode(t_unicodestring *self, PyObject *arg)
 {
     char *encoding;
@@ -1314,33 +1361,213 @@ static PyObject *t_unicodestring_encode(t_unicodestring *self, PyObject *arg)
         int len = self->object->length();
         UErrorCode status = U_ZERO_ERROR;
         UConverter *conv = ucnv_open(encoding, &status);
+        PyObject *string;
+        char *dest;
 
         if (U_FAILURE(status))
             return ICUException(status).reportError();
 
-        PyObject *string = PyString_FromStringAndSize(NULL, len);
-        if (!string)
+        dest = new char[len * 4];
+        if (!dest)
         {
             ucnv_close(conv);
             PyErr_SetNone(PyExc_MemoryError);
             return NULL;
         }
 
-        len = ucnv_fromUChars(conv, PyString_AS_STRING(string), len,
+        len = ucnv_fromUChars(conv, dest, len * 4,
                               self->object->getBuffer(), len, &status);
         ucnv_close(conv);
 
         if (U_FAILURE(status))
         {
-            Py_DECREF(string);
+            delete dest;
             return ICUException(status).reportError();
         }
+
+        string = PyString_FromStringAndSize(dest, len);
+        delete dest;
 
         return string;
     }
 
     return PyErr_SetArgsError((PyObject *) self, "encode", arg);
 }
+
+static PyObject *t_unicodestring_idna_toASCII(t_unicodestring *self,
+                                              PyObject *args)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    UParseError parseError;
+    int options = UIDNA_DEFAULT;
+    int len = self->object->length();
+    icu::UnicodeString *u;
+    UChar *dest;
+
+    if (!PyArg_ParseTuple(args, "|i", &options))
+        return NULL;
+
+    dest = new UChar[len * 4 + 32];
+    if (!dest)
+    {
+        PyErr_SetNone(PyExc_MemoryError);
+        return NULL;
+    }
+
+    len = uidna_toASCII(self->object->getBuffer(), len,
+                        dest, len * 4 + 32, options, &parseError, &status);
+
+    if (U_FAILURE(status))
+    {
+        delete dest;
+        return ICUException(parseError, status).reportError();
+    }
+
+    u = new icu::UnicodeString(dest, len);
+    delete dest;
+
+    return wrap_UnicodeString(u, T_OWNED);
+}
+
+static PyObject *t_unicodestring_idna_toUnicode(t_unicodestring *self,
+                                                PyObject *args)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    UParseError parseError;
+    int options = UIDNA_DEFAULT;
+    int len = self->object->length();
+    icu::UnicodeString *u;
+    UChar *dest;
+
+    if (!PyArg_ParseTuple(args, "|i", &options))
+        return NULL;
+
+    dest = new UChar[len];
+    if (!dest)
+    {
+        PyErr_SetNone(PyExc_MemoryError);
+        return NULL;
+    }
+
+    len = uidna_toUnicode(self->object->getBuffer(), len,
+                          dest, len, options, &parseError, &status);
+
+    if (U_FAILURE(status))
+    {
+        delete dest;
+        return ICUException(parseError, status).reportError();
+    }
+
+    u = new icu::UnicodeString(dest, len);
+    delete dest;
+
+    return wrap_UnicodeString(u, T_OWNED);
+}
+
+static PyObject *t_unicodestring_idna_IDNtoASCII(t_unicodestring *self,
+                                                 PyObject *args)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    UParseError parseError;
+    int options = UIDNA_DEFAULT;
+    int len = self->object->length();
+    icu::UnicodeString *u;
+    UChar *dest;
+
+    if (!PyArg_ParseTuple(args, "|i", &options))
+        return NULL;
+
+    dest = new UChar[len * 4 + 32];
+    if (!dest)
+    {
+        PyErr_SetNone(PyExc_MemoryError);
+        return NULL;
+    }
+
+    len = uidna_IDNToASCII(self->object->getBuffer(), len,
+                           dest, len * 4 + 32, options, &parseError, &status);
+
+    if (U_FAILURE(status))
+    {
+        delete dest;
+        return ICUException(parseError, status).reportError();
+    }
+
+    u = new icu::UnicodeString(dest, len);
+    delete dest;
+
+    return wrap_UnicodeString(u, T_OWNED);
+}
+
+static PyObject *t_unicodestring_idna_IDNtoUnicode(t_unicodestring *self,
+                                                   PyObject *args)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    UParseError parseError;
+    int options = UIDNA_DEFAULT;
+    int len = self->object->length();
+    icu::UnicodeString *u;
+    UChar *dest;
+
+    if (!PyArg_ParseTuple(args, "|i", &options))
+        return NULL;
+
+    dest = new UChar[len];
+    if (!dest)
+    {
+        PyErr_SetNone(PyExc_MemoryError);
+        return NULL;
+    }
+
+    len = uidna_IDNToUnicode(self->object->getBuffer(), len,
+                             dest, len, options, &parseError, &status);
+
+    if (U_FAILURE(status))
+    {
+        delete dest;
+        return ICUException(parseError, status).reportError();
+    }
+
+    u = new icu::UnicodeString(dest, len);
+    delete dest;
+
+    return wrap_UnicodeString(u, T_OWNED);
+}
+
+static PyObject *t_unicodestring_idna_compare(t_unicodestring *self,
+                                              PyObject *args)
+{
+    int options = UIDNA_DEFAULT;
+    icu::UnicodeString *u;
+    icu::UnicodeString _u;
+    int n;
+
+    switch (PyTuple_Size(args)) {
+      case 1:
+        if (!parseArgs(args, "S", &u, &_u))
+        {
+            STATUS_CALL(n = uidna_compare(self->object->getBuffer(),
+                                          self->object->length(),
+                                          u->getBuffer(), u->length(), options,
+                                          &status));
+            return PyInt_FromLong(n);
+        }
+        break;
+      case 2:
+        if (!parseArgs(args, "Si", &u, &_u, &options))
+        {
+            STATUS_CALL(n = uidna_compare(self->object->getBuffer(),
+                                          self->object->length(),
+                                          u->getBuffer(), u->length(), options,
+                                          &status));
+            return PyInt_FromLong(n);
+        }
+        break;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "idna_compare", args);
+}
+
 
 static PyObject *t_unicodestring_richcmp(t_unicodestring *self,
                                          PyObject *arg, int op)
@@ -2229,6 +2456,7 @@ static PyObject *t_stringenumeration_iter(t_stringenumeration *self)
 void _init_bases(PyObject *m)
 {
     UnicodeStringType.tp_str = (reprfunc) t_unicodestring_str;
+    UnicodeStringType.tp_repr = (reprfunc) t_unicodestring_repr;
     UnicodeStringType.tp_richcompare = (richcmpfunc) t_unicodestring_richcmp;
     UnicodeStringType.tp_as_sequence = &t_unicodestring_as_sequence;
     FormattableType.tp_richcompare = (richcmpfunc) t_formattable_richcmp;
@@ -2253,6 +2481,10 @@ void _init_bases(PyObject *m)
     INSTALL_MODULE_INT(m, U_FOLD_CASE_DEFAULT);
     INSTALL_MODULE_INT(m, U_COMPARE_CODE_POINT_ORDER);
     INSTALL_MODULE_INT(m, U_FOLD_CASE_EXCLUDE_SPECIAL_I);
+
+    INSTALL_MODULE_INT(m, UIDNA_DEFAULT);
+    INSTALL_MODULE_INT(m, UIDNA_ALLOW_UNASSIGNED);
+    INSTALL_MODULE_INT(m, UIDNA_USE_STD3_RULES);
 
     INSTALL_STATIC_INT(Formattable, kIsDate);
     INSTALL_STATIC_INT(Formattable, kDate);

@@ -83,6 +83,7 @@ typedef intintobjargproc ssizessizeobjargproc;
 #include <unicode/coll.h>
 #include <unicode/tblcoll.h>
 #include <unicode/ucsdet.h>
+#include <unicode/uidna.h>
 
 
 /* lifted from ustrenum.h */
