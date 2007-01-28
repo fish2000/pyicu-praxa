@@ -67,8 +67,7 @@ static void t_charsetdetector_dealloc(t_charsetdetector *self)
     {
         ucsdet_close(self->object);
         self->object = NULL;
-        Py_XDECREF(self->text);
-        self->text = NULL;
+        Py_CLEAR(self->text);
     }
 
     self->ob_type->tp_free((PyObject *) self);
@@ -102,7 +101,7 @@ static void t_charsetmatch_dealloc(t_charsetmatch *self)
     if (self->object)
     {
         self->object = NULL;
-        Py_XDECREF(self->detector);
+        Py_CLEAR(self->detector);
     }
 
     self->ob_type->tp_free((PyObject *) self);

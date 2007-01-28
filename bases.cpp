@@ -191,6 +191,7 @@ static PyObject *t_unicodestring_toTitle(t_unicodestring *self, PyObject *args);
 static PyObject *t_unicodestring_foldCase(t_unicodestring *self,
                                           PyObject *args);
 static PyObject *t_unicodestring_isBogus(t_unicodestring *self);
+static PyObject *t_unicodestring_encode(t_unicodestring *self, PyObject *arg);
 
 static PyMethodDef t_unicodestring_methods[] = {
     DECLARE_METHOD(t_unicodestring, getAvailableStandards, METH_NOARGS | METH_CLASS),
@@ -216,6 +217,7 @@ static PyMethodDef t_unicodestring_methods[] = {
     DECLARE_METHOD(t_unicodestring, toTitle, METH_VARARGS),
     DECLARE_METHOD(t_unicodestring, foldCase, METH_VARARGS),
     DECLARE_METHOD(t_unicodestring, isBogus, METH_NOARGS),
+    DECLARE_METHOD(t_unicodestring, encode, METH_O),
     { NULL, NULL, 0, NULL }
 };
 
@@ -1301,6 +1303,43 @@ static PyObject *t_unicodestring_isBogus(t_unicodestring *self)
 static PyObject *t_unicodestring_str(t_unicodestring *self)
 {
     return PyUnicode_FromUnicodeString(self->object);
+}
+
+static PyObject *t_unicodestring_encode(t_unicodestring *self, PyObject *arg)
+{
+    char *encoding;
+
+    if (!parseArg(arg, "c", &encoding))
+    {
+        int len = self->object->length();
+        UErrorCode status = U_ZERO_ERROR;
+        UConverter *conv = ucnv_open(encoding, &status);
+
+        if (U_FAILURE(status))
+            return ICUException(status).reportError();
+
+        PyObject *string = PyString_FromStringAndSize(NULL, len);
+        if (!string)
+        {
+            ucnv_close(conv);
+            PyErr_SetNone(PyExc_MemoryError);
+            return NULL;
+        }
+
+        len = ucnv_fromUChars(conv, PyString_AS_STRING(string), len,
+                              self->object->getBuffer(), len, &status);
+        ucnv_close(conv);
+
+        if (U_FAILURE(status))
+        {
+            Py_DECREF(string);
+            return ICUException(status).reportError();
+        }
+
+        return string;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "encode", arg);
 }
 
 static PyObject *t_unicodestring_richcmp(t_unicodestring *self,
