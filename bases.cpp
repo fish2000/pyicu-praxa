@@ -1882,12 +1882,7 @@ static int t_formattable_init(t_formattable *self,
                               PyObject *args, PyObject *kwds)
 {
     UDate date;
-    double d;
-    int i;
     icu::Formattable::ISDATE flag;
-    PY_LONG_LONG l;
-    icu::UnicodeString *u;
-    char *s;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1895,39 +1890,9 @@ static int t_formattable_init(t_formattable *self,
         self->flags = T_OWNED;
         break;
       case 1:
-        if (!parseArgs(args, "d", &d))
+        self->object = toFormattable(PyTuple_GET_ITEM(args, 0));
+        if (self->object)
         {
-            self->object = new icu::Formattable(d);
-            self->flags = T_OWNED;
-            break;
-        }
-        if (!parseArgs(args, "i", &i))
-        {
-            self->object = new icu::Formattable(i);
-            self->flags = T_OWNED;
-            break;
-        }
-        if (!parseArgs(args, "L", &l))
-        {
-            self->object = new icu::Formattable(l);
-            self->flags = T_OWNED;
-            break;
-        }
-        if (!parseArgs(args, "c", &s))
-        {
-            self->object = new icu::Formattable(s);
-            self->flags = T_OWNED;
-            break;
-        }
-        if (!parseArgs(args, "U", &u))
-        {
-            self->object = new icu::Formattable(*u);
-            self->flags = T_OWNED;
-            break;
-        }
-        if (!parseArgs(args, "E", &date))
-        {
-            self->object = new icu::Formattable(date, icu::Formattable::kIsDate);
             self->flags = T_OWNED;
             break;
         }
@@ -2179,6 +2144,37 @@ static PyObject *t_formattable_str(t_formattable *self)
     }
 
     return PyUnicode_FromUnicodeString(&u);
+}
+
+static PyObject *t_formattable_repr(t_formattable *self)
+{
+    PyObject *name = PyObject_GetAttrString((PyObject *) self->ob_type,
+                                            "__name__");
+    PyObject *str = self->ob_type->tp_str((PyObject *) self);
+
+    if (str)
+    {
+        PyObject *repr = str->ob_type->tp_repr(str);
+        Py_DECREF(str);
+        str = repr;
+    }
+    if (!str)
+        return NULL;
+    
+#if PY_VERSION_HEX < 0x02040000
+    PyObject *args = Py_BuildValue("(OO)", name, str);
+#else
+    PyObject *args = PyTuple_Pack(2, name, str);
+#endif
+    PyObject *format = PyString_FromString("<%s: %s>");
+    PyObject *repr = PyString_Format(format, args);
+
+    Py_DECREF(name);
+    Py_DECREF(str);
+    Py_DECREF(args);
+    Py_DECREF(format);
+
+    return repr;
 }
 
 
@@ -2461,6 +2457,7 @@ void _init_bases(PyObject *m)
     UnicodeStringType.tp_as_sequence = &t_unicodestring_as_sequence;
     FormattableType.tp_richcompare = (richcmpfunc) t_formattable_richcmp;
     FormattableType.tp_str = (reprfunc) t_formattable_str;
+    FormattableType.tp_repr = (reprfunc) t_formattable_repr;
     MeasureUnitType.tp_richcompare = (richcmpfunc) t_measureunit_richcmp;
     MeasureType.tp_richcompare = (richcmpfunc) t_measure_richcmp;
     CurrencyUnitType.tp_str = (reprfunc) t_currencyunit_str;

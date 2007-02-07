@@ -148,6 +148,15 @@ static PyObject *t_messageformat_format(t_messageformat *self, PyObject *args);
 static PyObject *t_messageformat_parse(t_messageformat *self, PyObject *args);
 static PyObject *t_messageformat_formatMessage(PyTypeObject *type,
                                                PyObject *args);
+static PyObject *t_messageformat_mod(t_messageformat *self, PyObject *args);
+
+static PyNumberMethods t_messageformat_as_number = {
+    0,                                 /* nb_add */
+    0,                                 /* nb_subtract */
+    0,                                 /* nb_multiply */
+    0,                                 /* nb_divide */
+    (binaryfunc) t_messageformat_mod,  /* nb_remainder */
+};
 
 static PyMethodDef t_messageformat_methods[] = {
     DECLARE_METHOD(t_messageformat, getLocale, METH_NOARGS),
@@ -890,6 +899,29 @@ static PyObject *t_messageformat_str(t_messageformat *self)
     return PyUnicode_FromUnicodeString(&u);
 }
 
+static PyObject *t_messageformat_mod(t_messageformat *self, PyObject *args)
+{
+    int len;
+    icu::Formattable *f = toFormattableArray(args, &len,
+                                             TYPE_CLASSID(Formattable));
+    icu::UnicodeString _u;
+    icu::FieldPosition _fp;
+
+    if (!f)
+    {
+        PyErr_SetObject(PyExc_TypeError, args);
+        return NULL;
+    }
+    
+    STATUS_CALL(
+        {
+            self->object->format(f, len, _u, _fp, status);
+            delete[] f;
+        });
+
+    return PyUnicode_FromUnicodeString(&_u);
+}
+
 
 void _init_format(PyObject *m)
 {
@@ -897,6 +929,8 @@ void _init_format(PyObject *m)
     ParsePositionType.tp_richcompare = (richcmpfunc) t_parseposition_richcmp;
     FormatType.tp_richcompare = (richcmpfunc) t_format_richcmp;
     MessageFormatType.tp_str = (reprfunc) t_messageformat_str;
+    MessageFormatType.tp_as_number = &t_messageformat_as_number;
+    MessageFormatType.tp_flags |= Py_TPFLAGS_CHECKTYPES;
 
     REGISTER_TYPE(FieldPosition, m);
     REGISTER_TYPE(ParsePosition, m);

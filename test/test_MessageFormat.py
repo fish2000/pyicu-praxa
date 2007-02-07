@@ -46,6 +46,10 @@ class TestMessageFormat(TestCase):
         text = msgFormat.format([f], FieldPosition())
         self.assert_(text == "This is a string: x")
 
+        f = UnicodeString(x)
+        text = msgFormat %f
+        self.assert_(text == "This is a string: x")
+
     def testFormatAppend(self):
 
         x = 'x'

@@ -490,6 +490,37 @@ PyObject *cpa2pl(icu::UObject **array, int len,
     return list;
 }
 
+icu::Formattable *toFormattable(PyObject *arg)
+{
+    UDate date;
+    double d;
+    int i;
+    PY_LONG_LONG l;
+    icu::UnicodeString *u;
+    icu::UnicodeString _u;
+    char *s;
+
+    if (!parseArg(arg, "d", &d))
+        return new icu::Formattable(d);
+
+    if (!parseArg(arg, "i", &i))
+        return new icu::Formattable(i);
+
+    if (!parseArg(arg, "L", &l))
+        return new icu::Formattable(l);
+
+    if (!parseArg(arg, "c", &s))
+        return new icu::Formattable(s);
+
+    if (!parseArg(arg, "S", &u, &_u))
+        return new icu::Formattable(*u);
+
+    if (!parseArg(arg, "E", &date))
+        return new icu::Formattable(date, icu::Formattable::kIsDate);
+
+    return NULL;
+}
+
 icu::Formattable *toFormattableArray(PyObject *arg, int *len,
                                      UClassID id, PyTypeObject *type)
 {
@@ -508,9 +539,20 @@ icu::Formattable *toFormattableArray(PyObject *arg, int *len,
             }
             else
             {
-                Py_DECREF(obj);
-                delete[] array;
-                return NULL;
+                icu::Formattable *f = toFormattable(obj);
+
+                if (f)
+                {
+                    array[i] = *f;
+                    delete f;
+                    Py_DECREF(obj);
+                }
+                else
+                {
+                    Py_DECREF(obj);
+                    delete[] array;
+                    return NULL;
+                }
             }
         }
 

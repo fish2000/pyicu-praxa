@@ -11,6 +11,8 @@ Version 0.5 -> 0.6
   - added support for CharsetDetector and CharsetMatch C ICU APIs
   - added UnicodeString.encode() to access compression and conversion APIs
   - added support for IDNA APIs to UnicodeString
+  - added support for MessageFormat(string) %(objs) style formatting
+  - fixed bug in Formattable constructor not accepting a python unicode string
 
 Version 0.4 -> 0.5
 ------------------

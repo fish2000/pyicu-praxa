@@ -178,6 +178,7 @@ int isUnicodeString(PyObject *arg);
 int isInstance(PyObject *arg, UClassID id, PyTypeObject *type);
 void registerType(PyTypeObject *type, UClassID id);
 
+icu::Formattable *toFormattable(PyObject *arg);
 icu::Formattable *toFormattableArray(PyObject *arg, int *len,
                                      UClassID id, PyTypeObject *type);
 
