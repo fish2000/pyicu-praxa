@@ -13,6 +13,9 @@ Version 0.5 -> 0.6
   - added support for IDNA APIs to UnicodeString
   - added support for MessageFormat(string) %(objs) style formatting
   - fixed bug in Formattable constructor not accepting a python unicode string
+  - added support for BreakIterator::DONE
+  - added support for BreakIterator::getText()
+  - added support for BreakIterator::nextBoundary() to bypass iterator code
 
 Version 0.4 -> 0.5
 ------------------

@@ -161,11 +161,12 @@ public:
     icu::BreakIterator *object;
 };
 
+static PyObject *t_breakiterator_getText(t_breakiterator *self);
 static PyObject *t_breakiterator_setText(t_breakiterator *self, PyObject *arg);
 static PyObject *t_breakiterator_first(t_breakiterator *self);
 static PyObject *t_breakiterator_last(t_breakiterator *self);
 static PyObject *t_breakiterator_previous(t_breakiterator *self);
-static PyObject *t_breakiterator_next(t_breakiterator *self);
+static PyObject *t_breakiterator_nextBoundary(t_breakiterator *self);
 static PyObject *t_breakiterator_current(t_breakiterator *self);
 static PyObject *t_breakiterator_following(t_breakiterator *self,
                                            PyObject *arg);
@@ -192,11 +193,12 @@ static PyObject *t_breakiterator_getDisplayName(PyTypeObject *type,
                                                 PyObject *args);
 
 static PyMethodDef t_breakiterator_methods[] = {
+    DECLARE_METHOD(t_breakiterator, getText, METH_NOARGS),
     DECLARE_METHOD(t_breakiterator, setText, METH_O),
     DECLARE_METHOD(t_breakiterator, first, METH_NOARGS),
     DECLARE_METHOD(t_breakiterator, last, METH_NOARGS),
     DECLARE_METHOD(t_breakiterator, previous, METH_NOARGS),
-    DECLARE_METHOD(t_breakiterator, next, METH_NOARGS),
+    DECLARE_METHOD(t_breakiterator, nextBoundary, METH_NOARGS),
     DECLARE_METHOD(t_breakiterator, current, METH_NOARGS),
     DECLARE_METHOD(t_breakiterator, following, METH_O),
     DECLARE_METHOD(t_breakiterator, preceding, METH_O),
@@ -657,6 +659,12 @@ static PyObject *t_stringcharacteriterator_setText(t_stringcharacteriterator *se
 
 /* BreakIterator */
 
+static PyObject *t_breakiterator_getText(t_breakiterator *self)
+{
+    icu::CharacterIterator *iterator = self->object->getText().clone();
+    return wrap_CharacterIterator(iterator, T_OWNED);
+}
+
 static PyObject *t_breakiterator_setText(t_breakiterator *self, PyObject *arg)
 {
     icu::UnicodeString *u;
@@ -686,7 +694,7 @@ static PyObject *t_breakiterator_previous(t_breakiterator *self)
     return PyInt_FromLong(self->object->previous());
 }
 
-static PyObject *t_breakiterator_next(t_breakiterator *self)
+static PyObject *t_breakiterator_nextBoundary(t_breakiterator *self)
 {
     return PyInt_FromLong(self->object->next());
 }
@@ -1357,6 +1365,7 @@ void _init_iterators(PyObject *m)
     REGISTER_TYPE(CollationElementIterator, m);
 
     INSTALL_STATIC_INT(ForwardCharacterIterator, DONE);
+    INSTALL_STATIC_INT(BreakIterator, DONE);
 
     INSTALL_STATIC_INT(CharacterIterator, kStart);
     INSTALL_STATIC_INT(CharacterIterator, kCurrent);
