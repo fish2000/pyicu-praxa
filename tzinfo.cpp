@@ -87,7 +87,6 @@ static PyGetSetDef t_tzinfo_properties[] = {
     { NULL, NULL, NULL, NULL, NULL }
 };
 
-
 PyTypeObject TZInfoType = {
     PyObject_HEAD_INIT(NULL)
     0,                                  /* ob_size */
@@ -158,6 +157,7 @@ static PyGetSetDef t_floatingtz_properties[] = {
       "tzid property", NULL },
     { NULL, NULL, NULL, NULL, NULL }
 };
+
 PyTypeObject FloatingTZType = {
     PyObject_HEAD_INIT(NULL)
     0,                                  /* ob_size */
@@ -327,7 +327,11 @@ static PyObject *t_tzinfo__resetDefault(PyTypeObject *cls)
 
     if (tz)
     {
+#if PY_VERSION_HEX < 0x02040000
+        PyObject *args = Py_BuildValue("(O)", tz);
+#else
         PyObject *args = PyTuple_Pack(1, tz);
+#endif
         PyObject *tzinfo = PyObject_Call((PyObject *) &TZInfoType, args, NULL);
 
         Py_DECREF(args);
@@ -415,11 +419,15 @@ static PyObject *t_tzinfo_getInstance(PyTypeObject *cls, PyObject *id)
     else
     {
         PyObject *tz = t_timezone_createTimeZone(&TimeZoneType, id);
-        PyObject *args;
+
         if (!tz)
             return NULL;
 
-        args = PyTuple_Pack(1, tz);
+#if PY_VERSION_HEX < 0x02040000
+        PyObject *args = Py_BuildValue("(O)", tz);
+#else
+        PyObject *args = PyTuple_Pack(1, tz);
+#endif
         instance = PyObject_Call((PyObject *) &TZInfoType, args, NULL);
         Py_DECREF(args);
         Py_DECREF(tz);
