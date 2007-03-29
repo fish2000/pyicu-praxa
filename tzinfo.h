@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2007 Open Source Applications Foundation.
+ * Copyright (c) 2007 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,25 +21,11 @@
  * ====================================================================
  */
 
-#ifndef _calendar_h
-#define _calendar_h
+#ifndef _tzinfo_h
+#define _tzinfo_h
 
-class t_timezone : public _wrapper {
-public:
-    icu::TimeZone *object;
-};
+extern PyTypeObject TZInfoType;
 
-extern PyTypeObject CalendarType;
-extern PyTypeObject TimeZoneType;
+void _init_tzinfo(PyObject *m);
 
-
-PyObject *wrap_Calendar(icu::Calendar *, int);
-PyObject *wrap_TimeZone(icu::TimeZone *, int);
-PyObject *wrap_TimeZone(icu::TimeZone *);
-PyObject *wrap_TimeZone(const icu::TimeZone &);
-PyObject *t_timezone_createTimeZone(PyTypeObject *type, PyObject *arg);
-
-void _init_calendar(PyObject *m);
-
-
-#endif /* _calendar_h */
+#endif /* _tzinfo_h */

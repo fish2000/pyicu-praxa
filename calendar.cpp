@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2006 Open Source Applications Foundation.
+ * Copyright (c) 2004-2007 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -36,11 +36,6 @@ DECLARE_CONSTANTS_TYPE(UCalendarAMPMs);
 
 /* TimeZone */
 
-class t_timezone : public _wrapper {
-public:
-    icu::TimeZone *object;
-};
-
 static PyObject *t_timezone_getOffset(t_timezone *self, PyObject *args);
 static PyObject *t_timezone_getRawOffset(t_timezone *self);
 static PyObject *t_timezone_setRawOffset(t_timezone *self, PyObject *arg);
@@ -51,7 +46,6 @@ static PyObject *t_timezone_useDaylightTime(t_timezone *self);
 static PyObject *t_timezone_inDaylightTime(t_timezone *self, PyObject *arg);
 static PyObject *t_timezone_hasSameRules(t_timezone *self, PyObject *arg);
 static PyObject *t_timezone_getGMT(PyTypeObject *type);
-static PyObject *t_timezone_createTimeZone(PyTypeObject *type, PyObject *arg);
 static PyObject *t_timezone_createEnumeration(PyTypeObject *type,
                                               PyObject *args);
 static PyObject *t_timezone_countEquivalentIDs(PyTypeObject *type,
@@ -438,7 +432,7 @@ static PyObject *t_timezone_getGMT(PyTypeObject *type)
     return wrap_TimeZone((icu::TimeZone *) icu::TimeZone::getGMT(), 0);
 }
 
-static PyObject *t_timezone_createTimeZone(PyTypeObject *type, PyObject *arg)
+PyObject *t_timezone_createTimeZone(PyTypeObject *type, PyObject *arg)
 {
     icu::UnicodeString *u;
     icu::UnicodeString _u;

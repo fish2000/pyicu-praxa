@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2006 Open Source Applications Foundation.
+ * Copyright (c) 2004-2007 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -35,6 +35,7 @@
 #include "calendar.h"
 #include "collator.h"
 #include "charset.h"
+#include "tzinfo.h"
 
 
 /* const variable descriptor */
@@ -224,5 +225,6 @@ extern "C" {
         _init_calendar(m);
         _init_collator(m);
         _init_charset(m);
+        _init_tzinfo(m);
     }
 }

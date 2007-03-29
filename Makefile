@@ -78,7 +78,7 @@ endif
 
 MODULES=common \
         errors bases locale iterators format dateformat numberformat \
-        calendar collator charset
+        calendar collator charset tzinfo
 
 ifeq ($(OS),Darwin)
 PYTHON_SITE=$(PREFIX_PYTHON)/lib/python$(PYTHON_VER)/site-packages
