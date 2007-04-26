@@ -438,7 +438,41 @@ PyObject *t_timezone_createTimeZone(PyTypeObject *type, PyObject *arg)
     icu::UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
-        return wrap_TimeZone(icu::TimeZone::createTimeZone(*u));
+    {
+        icu::TimeZone *tz = icu::TimeZone::createTimeZone(_u);
+        const icu::TimeZone *gmt = icu::TimeZone::getGMT();
+        icu::UnicodeString tzid, GMT;
+        
+        /* PyICU bug 8180 and ICU bug 5612:
+         *    https://bugzilla.osafoundation.org/show_bug.cgi?id=8180
+         *    http://bugs.icu-project.org/trac/ticket/5612
+         * Only an Olson ID can be used with createTimeZone().
+         * If GMT is returned, it means the requested id was incorrect.
+         * Matching it with the default timezone increases the likelihood of
+         * returning a sensical timezone with the intended raw offset as the
+         * non-Olson requested id is likely to have come from the OS's default
+         * timezone id in the first place.
+         */
+
+        tz->getID(tzid);
+        gmt->getID(GMT);
+
+        if (tzid == GMT && *u != GMT)
+        {
+            icu::TimeZone *deflt = icu::TimeZone::createDefault();
+
+            deflt->getID(tzid);
+            if (tzid == *u)
+            {
+                delete tz;
+                tz = deflt;
+            }
+            else
+                delete deflt;
+        }
+
+        return wrap_TimeZone(tz);
+    }
 
     return PyErr_SetArgsError(type, "createTimeZone", arg);
 }
