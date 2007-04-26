@@ -439,7 +439,7 @@ PyObject *t_timezone_createTimeZone(PyTypeObject *type, PyObject *arg)
 
     if (!parseArg(arg, "S", &u, &_u))
     {
-        icu::TimeZone *tz = icu::TimeZone::createTimeZone(_u);
+        icu::TimeZone *tz = icu::TimeZone::createTimeZone(*u);
         const icu::TimeZone *gmt = icu::TimeZone::getGMT();
         icu::UnicodeString tzid, GMT;
         
