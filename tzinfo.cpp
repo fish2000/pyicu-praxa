@@ -64,6 +64,7 @@ static t_tzinfo *_default, *_floating;
 static PyTypeObject *datetime_tzinfoType, *datetime_deltaType;
 static PyObject *FLOATING_TZNAME;
 static PyObject *toordinal_NAME;
+static PyObject *weekday_NAME;
 
 
 static PyMethodDef t_tzinfo_methods[] = {
@@ -458,19 +459,39 @@ static double _udate(PyObject *dt)
 
 static PyObject *t_tzinfo_utcoffset(t_tzinfo *self, PyObject *dt)
 {
-    UDate date = _udate(dt);
-    int raw, dst;
-
-    if (date == 0.0 && PyErr_Occurred())
+    PyObject *weekday = PyObject_CallMethodObjArgs(dt, weekday_NAME, NULL);
+    if (!weekday)
         return NULL;
 
-    STATUS_CALL(self->tz->object->getOffset(date, 1, raw, dst, status));
+    // python's MINYEAR is 1
+    int era = icu::GregorianCalendar::AD;
+    int year = PyDateTime_GET_YEAR(dt);
+
+    // python's month is 1-based, 1 is January
+    // ICU's month is 0-based, 0 is January
+    int month = PyDateTime_GET_MONTH(dt) - 1;
+    int day = PyDateTime_GET_DAY(dt);
+
+    // python's weekday is 0-based, 0 is Monday
+    // ICU's dayofweek is 1-based, 1 is Sunday
+    int dayofweek = ((PyInt_AsLong(weekday) + 1) % 7) + 1;
+    Py_DECREF(weekday);
+
+    int millis = (int) (PyDateTime_DATE_GET_HOUR(dt) * 3600.0 +
+                        PyDateTime_DATE_GET_MINUTE(dt) * 60.0 +
+                        PyDateTime_DATE_GET_SECOND(dt) +
+                        PyDateTime_DATE_GET_MICROSECOND(dt) / 1e6) * 1000.0;
+    int offset;
+
+    STATUS_CALL(offset = self->tz->object->getOffset(era, year, month, day,
+                                                     dayofweek, millis,
+                                                     status));
 
     PyObject *args = PyTuple_New(2);
     PyObject *result;
 
     PyTuple_SET_ITEM(args, 0, PyInt_FromLong(0));
-    PyTuple_SET_ITEM(args, 1, PyInt_FromLong((raw + dst) / 1000));
+    PyTuple_SET_ITEM(args, 1, PyInt_FromLong(offset / 1000));
     result = PyObject_Call((PyObject *) datetime_deltaType, args, NULL);
     Py_DECREF(args);
 
@@ -514,47 +535,14 @@ static PyObject *t_tzinfo__getTZID(t_tzinfo *self, void *data)
     return PyObject_Str((PyObject *) self);
 }
 
-
 static PyObject *t_floatingtz_utcoffset(t_tzinfo *self, PyObject *dt)
 {
-    UDate date = _udate(dt);
-    int raw, dst;
-
-    if (date == 0.0 && PyErr_Occurred())
-        return NULL;
-
-    STATUS_CALL(_default->tz->object->getOffset(date, 1, raw, dst, status));
-
-    PyObject *args = PyTuple_New(2);
-    PyObject *result;
-
-    PyTuple_SET_ITEM(args, 0, PyInt_FromLong(0));
-    PyTuple_SET_ITEM(args, 1, PyInt_FromLong((raw + dst) / 1000));
-    result = PyObject_Call((PyObject *) datetime_deltaType, args, NULL);
-    Py_DECREF(args);
-
-    return result;
+    return t_tzinfo_utcoffset(_default, dt);
 }
 
 static PyObject *t_floatingtz_dst(t_tzinfo *self, PyObject *dt)
 {
-    UDate date = _udate(dt);
-    int raw, dst;
-
-    if (date == 0.0 && PyErr_Occurred())
-        return NULL;
-
-    STATUS_CALL(_default->tz->object->getOffset(date, 1, raw, dst, status));
-
-    PyObject *args = PyTuple_New(2);
-    PyObject *result;
-
-    PyTuple_SET_ITEM(args, 0, PyInt_FromLong(0));
-    PyTuple_SET_ITEM(args, 1, PyInt_FromLong(dst / 1000));
-    result = PyObject_Call((PyObject *) datetime_deltaType, args, NULL);
-    Py_DECREF(args);
-
-    return result;
+    return t_tzinfo_dst(_default, dt);
 }
 
 static PyObject *t_floatingtz_tzname(t_tzinfo *self, PyObject *dt)
@@ -613,6 +601,7 @@ void _init_tzinfo(PyObject *m)
 
             FLOATING_TZNAME = PyString_FromString("World/Floating");
             toordinal_NAME = PyString_FromString("toordinal");
+            weekday_NAME = PyString_FromString("weekday");
 
             Py_INCREF(FLOATING_TZNAME);
             PyModule_AddObject(m, "FLOATING_TZNAME", FLOATING_TZNAME);
