@@ -30,11 +30,24 @@
 #include "tzinfo.h"
 #include "macros.h"
 
-
+/* A tzinfo extension that wraps an ICU timezone wrapper.
+ * The tz field is supposed to be immutable.
+ */
 typedef struct {
-    PyDateTime_TZInfo tzinfo;
+    PyDateTime_TZInfo dt_tzinfo;
     t_timezone *tz;
 } t_tzinfo;
+
+/* A tzinfo extension that wraps an ICU tzinfo wrapper.
+ * The tzinfo field can be changed and defaults to the default ICU tzinfo
+ * when not set. When this field changes or the default ICU tzinfo is changed,
+ * times expressed with this pseudo-timezone, named "World/Floating", appear
+ * to float.
+ */
+typedef struct {
+    PyDateTime_TZInfo dt_tzinfo;
+    t_tzinfo *tzinfo;
+} t_floatingtz;
 
 static void t_tzinfo_dealloc(t_tzinfo *self);
 static PyObject *t_tzinfo_new(PyTypeObject *type,
@@ -43,7 +56,7 @@ static int t_tzinfo_init(t_tzinfo *self, PyObject *args, PyObject *kwds);
 static PyObject *t_tzinfo_repr(t_tzinfo *self);
 static PyObject *t_tzinfo_str(t_tzinfo *self);
 static int t_tzinfo_hash(t_tzinfo *self);
-static PyObject *t_tzinfo_richcompare(t_tzinfo *self, PyObject *other, int op);
+static PyObject *t_tzinfo_richcmp(t_tzinfo *self, PyObject *other, int op);
 
 static PyObject *t_tzinfo__resetDefault(PyTypeObject *cls);
 static PyObject *t_tzinfo_getDefault(PyTypeObject *cls);
@@ -114,7 +127,7 @@ PyTypeObject TZInfoType = {
     "",                                 /* tp_doc */
     0,                                  /* tp_traverse */
     0,                                  /* tp_clear */
-    (richcmpfunc) t_tzinfo_richcompare, /* tp_richcompare */
+    (richcmpfunc) t_tzinfo_richcmp,     /* tp_richcompare */
     0,                                  /* tp_weaklistoffset */
     0,                                  /* tp_iter */
     0,                                  /* tp_iternext */
@@ -132,17 +145,27 @@ PyTypeObject TZInfoType = {
     0,                                  /* tp_free */
 };
 
-static int t_floatingtz_init(t_tzinfo *self, PyObject *args, PyObject *kwds);
-static PyObject *t_floatingtz_repr(t_tzinfo *self);
-static PyObject *t_floatingtz_str(t_tzinfo *self);
-static int t_floatingtz_hash(t_tzinfo *self);
 
-static PyObject *t_floatingtz_utcoffset(t_tzinfo *self, PyObject *dt);
-static PyObject *t_floatingtz_dst(t_tzinfo *self, PyObject *dt);
-static PyObject *t_floatingtz_tzname(t_tzinfo *self, PyObject *dt);
+static void t_floatingtz_dealloc(t_floatingtz *self);
+static int t_floatingtz_init(t_floatingtz *self,
+                             PyObject *args, PyObject *kwds);
+static PyObject *t_floatingtz_repr(t_floatingtz *self);
+static PyObject *t_floatingtz_str(t_floatingtz *self);
+static PyObject *t_floatingtz_richcmp(t_floatingtz *self,
+                                      PyObject *other, int op);
+static int t_floatingtz_hash(t_floatingtz *self);
 
-static PyObject *t_floatingtz__getTimezone(t_tzinfo *self, void *data);
-static PyObject *t_floatingtz__getTZID(t_tzinfo *self, void *data);
+static PyObject *t_floatingtz_utcoffset(t_floatingtz *self, PyObject *dt);
+static PyObject *t_floatingtz_dst(t_floatingtz *self, PyObject *dt);
+static PyObject *t_floatingtz_tzname(t_floatingtz *self, PyObject *dt);
+
+static PyObject *t_floatingtz__getTimezone(t_floatingtz *self, void *data);
+static PyObject *t_floatingtz__getTZID(t_floatingtz *self, void *data);
+
+static PyMemberDef t_floatingtz_members[] = {
+    { "tzinfo", T_OBJECT, offsetof(t_floatingtz, tzinfo), 0, "" },
+    { NULL, 0, 0, 0, NULL }
+};
 
 static PyMethodDef t_floatingtz_methods[] = {
     { "utcoffset", (PyCFunction) t_floatingtz_utcoffset, METH_O, "" },
@@ -163,9 +186,9 @@ PyTypeObject FloatingTZType = {
     PyObject_HEAD_INIT(NULL)
     0,                                  /* ob_size */
     "PyICU.FloatingTZ",                 /* tp_name */
-    sizeof(t_tzinfo),                   /* tp_basicsize */
+    sizeof(t_floatingtz),               /* tp_basicsize */
     0,                                  /* tp_itemsize */
-    0,                                  /* tp_dealloc */
+    (destructor) t_floatingtz_dealloc,  /* tp_dealloc */
     0,                                  /* tp_print */
     0,                                  /* tp_getattr */
     0,                                  /* tp_setattr */
@@ -185,12 +208,12 @@ PyTypeObject FloatingTZType = {
     "",                                 /* tp_doc */
     0,                                  /* tp_traverse */
     0,                                  /* tp_clear */
-    0,                                  /* tp_richcompare */
+    (richcmpfunc) t_floatingtz_richcmp, /* tp_richcompare */
     0,                                  /* tp_weaklistoffset */
     0,                                  /* tp_iter */
     0,                                  /* tp_iternext */
     t_floatingtz_methods,               /* tp_methods */
-    0,                                  /* tp_members */
+    t_floatingtz_members,               /* tp_members */
     t_floatingtz_properties,            /* tp_getset */
     0,                                  /* tp_base */
     0,                                  /* tp_dict */
@@ -207,7 +230,13 @@ PyTypeObject FloatingTZType = {
 static void t_tzinfo_dealloc(t_tzinfo *self)
 {
     Py_CLEAR(self->tz);
-    self->tzinfo.ob_type->tp_free((PyObject *) self);
+    self->dt_tzinfo.ob_type->tp_free((PyObject *) self);
+}
+
+static void t_floatingtz_dealloc(t_floatingtz *self)
+{
+    Py_CLEAR(self->tzinfo);
+    self->dt_tzinfo.ob_type->tp_free((PyObject *) self);
 }
 
 static PyObject *t_tzinfo_new(PyTypeObject *type,
@@ -241,8 +270,23 @@ static int t_tzinfo_init(t_tzinfo *self, PyObject *args, PyObject *kwds)
     return 0;
 }
 
-static int t_floatingtz_init(t_tzinfo *self, PyObject *args, PyObject *kwds)
+static int t_floatingtz_init(t_floatingtz *self, PyObject *args, PyObject *kwds)
 {
+    PyObject *tzinfo = NULL;
+
+    if (!PyArg_ParseTuple(args, "|O", &tzinfo))
+        return -1;
+
+    if (tzinfo && !PyObject_TypeCheck(tzinfo, &TZInfoType))
+    {
+        PyErr_SetObject(PyExc_TypeError, tzinfo);
+        return -1;
+    }
+
+    Py_XINCREF(tzinfo);
+    Py_XDECREF((PyObject *) self->tzinfo);
+    self->tzinfo = (t_tzinfo *) tzinfo;
+
     return 0;
 }
 
@@ -269,10 +313,11 @@ static PyObject *t_tzinfo_str(t_tzinfo *self)
     return PyObject_Str((PyObject *) self->tz);
 }
 
-static PyObject *t_floatingtz_repr(t_tzinfo *self)
+static PyObject *t_floatingtz_repr(t_floatingtz *self)
 {
+    t_tzinfo *tzinfo = self->tzinfo ? self->tzinfo : _default;
     PyObject *format = PyString_FromString("<FloatingTZ: %s>");
-    PyObject *str = PyObject_Str((PyObject *) _default->tz);
+    PyObject *str = PyObject_Str((PyObject *) tzinfo->tz);
 #if PY_VERSION_HEX < 0x02040000
     PyObject *args = Py_BuildValue("(O)", str);
 #else
@@ -287,7 +332,7 @@ static PyObject *t_floatingtz_repr(t_tzinfo *self)
     return repr;
 }
 
-static PyObject *t_floatingtz_str(t_tzinfo *self)
+static PyObject *t_floatingtz_str(t_floatingtz *self)
 {
     Py_INCREF(FLOATING_TZNAME);
     return FLOATING_TZNAME;
@@ -302,12 +347,12 @@ static int t_tzinfo_hash(t_tzinfo *self)
     return hash;
 }
 
-static int t_floatingtz_hash(t_tzinfo *self)
+static int t_floatingtz_hash(t_floatingtz *self)
 {
     return PyObject_Hash(FLOATING_TZNAME);
 }
 
-static PyObject *t_tzinfo_richcompare(t_tzinfo *self, PyObject *other, int op)
+static PyObject *t_tzinfo_richcmp(t_tzinfo *self, PyObject *other, int op)
 {
     if (!PyObject_TypeCheck(other, &TZInfoType))
         Py_RETURN_FALSE;
@@ -320,6 +365,20 @@ static PyObject *t_tzinfo_richcompare(t_tzinfo *self, PyObject *other, int op)
     Py_DECREF(s2);
 
     return result;
+}
+
+static PyObject *t_floatingtz_richcmp(t_floatingtz *self,
+                                      PyObject *other, int op)
+{
+    if (!PyObject_TypeCheck(other, &FloatingTZType))
+        Py_RETURN_FALSE;
+
+    t_tzinfo *tzi1 = self->tzinfo;
+    t_tzinfo *tzi2 = ((t_floatingtz *) other)->tzinfo;
+
+    return PyObject_RichCompare((PyObject *) (tzi1 ? tzi1 : _default),
+                                (PyObject *) (tzi2 ? tzi2 : _default),
+                                op);
 }
 
 static PyObject *t_tzinfo__resetDefault(PyTypeObject *cls)
@@ -535,29 +594,31 @@ static PyObject *t_tzinfo__getTZID(t_tzinfo *self, void *data)
     return PyObject_Str((PyObject *) self);
 }
 
-static PyObject *t_floatingtz_utcoffset(t_tzinfo *self, PyObject *dt)
+static PyObject *t_floatingtz_utcoffset(t_floatingtz *self, PyObject *dt)
 {
-    return t_tzinfo_utcoffset(_default, dt);
+    return t_tzinfo_utcoffset(self->tzinfo ? self->tzinfo : _default, dt);
 }
 
-static PyObject *t_floatingtz_dst(t_tzinfo *self, PyObject *dt)
+static PyObject *t_floatingtz_dst(t_floatingtz *self, PyObject *dt)
 {
-    return t_tzinfo_dst(_default, dt);
+    return t_tzinfo_dst(self->tzinfo ? self->tzinfo : _default, dt);
 }
 
-static PyObject *t_floatingtz_tzname(t_tzinfo *self, PyObject *dt)
+static PyObject *t_floatingtz_tzname(t_floatingtz *self, PyObject *dt)
 {
     Py_INCREF(FLOATING_TZNAME);
     return FLOATING_TZNAME;
 }
 
-static PyObject *t_floatingtz__getTimezone(t_tzinfo *self, void *data)
+static PyObject *t_floatingtz__getTimezone(t_floatingtz *self, void *data)
 {
-    Py_INCREF(_default->tz);
-    return (PyObject *) _default->tz;
+    t_tzinfo *tzinfo = self->tzinfo ? self->tzinfo : _default;
+
+    Py_INCREF(tzinfo->tz);
+    return (PyObject *) tzinfo->tz;
 }
 
-static PyObject *t_floatingtz__getTZID(t_tzinfo *self, void *data)
+static PyObject *t_floatingtz__getTZID(t_floatingtz *self, void *data)
 {
     Py_INCREF(FLOATING_TZNAME);
     return FLOATING_TZNAME;
@@ -586,7 +647,7 @@ void _init_tzinfo(PyObject *m)
 
     _instances = PyDict_New();
     TZInfoType.tp_base = datetime_tzinfoType;
-    FloatingTZType.tp_base = &TZInfoType;
+    FloatingTZType.tp_base = datetime_tzinfoType;
 
     if (PyType_Ready(&TZInfoType) >= 0 &&
         PyType_Ready(&FloatingTZType) >= 0)

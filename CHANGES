@@ -6,6 +6,7 @@ Version 0.6 ->
   - ICUtzinfo and FloatingTZ types now written in C for faster performance
   - fixed bug 8180
   - fixed bug 9229
+  - reworked FloatingTZ to optionally wrap a specific tzinfo instead of default
   - 
 
 Version 0.5 -> 0.6
