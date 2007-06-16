@@ -147,6 +147,8 @@ PyTypeObject TZInfoType = {
 
 
 static void t_floatingtz_dealloc(t_floatingtz *self);
+static PyObject *t_floatingtz_new(PyTypeObject *type,
+                                  PyObject *args, PyObject *kwds);
 static int t_floatingtz_init(t_floatingtz *self,
                              PyObject *args, PyObject *kwds);
 static PyObject *t_floatingtz_repr(t_floatingtz *self);
@@ -222,7 +224,7 @@ PyTypeObject FloatingTZType = {
     0,                                  /* tp_dictoffset */
     (initproc) t_floatingtz_init,       /* tp_init */
     0,                                  /* tp_alloc */
-    0,                                  /* tp_new */
+    (newfunc) t_floatingtz_new,         /* tp_new */
     0,                                  /* tp_free */
 };
 
@@ -248,6 +250,17 @@ static PyObject *t_tzinfo_new(PyTypeObject *type,
         tzinfo->tz = NULL;
 
     return (PyObject *) tzinfo;
+}
+
+static PyObject *t_floatingtz_new(PyTypeObject *type,
+                                  PyObject *args, PyObject *kwds)
+{
+    t_floatingtz *floatingtz = (t_floatingtz *) type->tp_alloc(type, 0);
+
+    if (floatingtz)
+        floatingtz->tzinfo = NULL;
+
+    return (PyObject *) floatingtz;
 }
 
 static int t_tzinfo_init(t_tzinfo *self, PyObject *args, PyObject *kwds)
@@ -354,31 +367,57 @@ static int t_floatingtz_hash(t_floatingtz *self)
 
 static PyObject *t_tzinfo_richcmp(t_tzinfo *self, PyObject *other, int op)
 {
-    if (!PyObject_TypeCheck(other, &TZInfoType))
-        Py_RETURN_FALSE;
+    if (PyObject_TypeCheck(other, &TZInfoType))
+    {
+        PyObject *s1 = PyObject_Str((PyObject *) self->tz);
+        PyObject *s2 = PyObject_Str((PyObject *) ((t_tzinfo *) other)->tz);
+        PyObject *result = PyObject_RichCompare(s1, s2, op);
 
-    PyObject *s1 = PyObject_Str((PyObject *) self->tz);
-    PyObject *s2 = PyObject_Str((PyObject *) ((t_tzinfo *) other)->tz);
-    PyObject *result = PyObject_RichCompare(s1, s2, op);
+        Py_DECREF(s1);
+        Py_DECREF(s2);
 
-    Py_DECREF(s1);
-    Py_DECREF(s2);
+        return result;
+    }
 
-    return result;
+    if (PyObject_TypeCheck(other, &FloatingTZType))
+    {
+        PyObject *s1 = PyObject_Str((PyObject *) self->tz);
+        PyObject *result = PyObject_RichCompare(s1, FLOATING_TZNAME, op);
+
+        Py_DECREF(s1);
+
+        return result;
+    }
+
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
 }
 
 static PyObject *t_floatingtz_richcmp(t_floatingtz *self,
                                       PyObject *other, int op)
 {
-    if (!PyObject_TypeCheck(other, &FloatingTZType))
-        Py_RETURN_FALSE;
+    if (PyObject_TypeCheck(other, &FloatingTZType))
+    {
+        t_tzinfo *tzi1 = self->tzinfo;
+        t_tzinfo *tzi2 = ((t_floatingtz *) other)->tzinfo;
 
-    t_tzinfo *tzi1 = self->tzinfo;
-    t_tzinfo *tzi2 = ((t_floatingtz *) other)->tzinfo;
+        return PyObject_RichCompare((PyObject *) (tzi1 ? tzi1 : _default),
+                                    (PyObject *) (tzi2 ? tzi2 : _default),
+                                    op);
+    }
 
-    return PyObject_RichCompare((PyObject *) (tzi1 ? tzi1 : _default),
-                                (PyObject *) (tzi2 ? tzi2 : _default),
-                                op);
+    if (PyObject_TypeCheck(other, &TZInfoType))
+    {
+        PyObject *s2 = PyObject_Str((PyObject *) ((t_tzinfo *) other)->tz);
+        PyObject *result = PyObject_RichCompare(FLOATING_TZNAME, s2, op);
+
+        Py_DECREF(s2);
+
+        return result;
+    }
+
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
 }
 
 static PyObject *t_tzinfo__resetDefault(PyTypeObject *cls)
