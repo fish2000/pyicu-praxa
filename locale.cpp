@@ -651,7 +651,7 @@ static PyObject *t_locale_getAvailableLocales(PyTypeObject *type)
     PyObject *dict = PyDict_New();
 
     for (int32_t i = 0; i < count; i++) {
-        Locale *locale = (Locale *) locales + i;
+        icu::Locale *locale = (icu::Locale *) locales + i;
         PyObject *obj = wrap_Locale(locale, 0);
         PyDict_SetItemString(dict, locale->getName(), obj);
 	Py_DECREF(obj);

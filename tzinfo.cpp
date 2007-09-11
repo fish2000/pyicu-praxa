@@ -575,10 +575,10 @@ static PyObject *t_tzinfo_utcoffset(t_tzinfo *self, PyObject *dt)
     int dayofweek = ((PyInt_AsLong(weekday) + 1) % 7) + 1;
     Py_DECREF(weekday);
 
-    int millis = (int) (PyDateTime_DATE_GET_HOUR(dt) * 3600.0 +
-                        PyDateTime_DATE_GET_MINUTE(dt) * 60.0 +
-                        PyDateTime_DATE_GET_SECOND(dt) +
-                        PyDateTime_DATE_GET_MICROSECOND(dt) / 1e6) * 1000.0;
+    int millis = (int) ((PyDateTime_DATE_GET_HOUR(dt) * 3600.0 +
+                         PyDateTime_DATE_GET_MINUTE(dt) * 60.0 +
+                         PyDateTime_DATE_GET_SECOND(dt) +
+                         PyDateTime_DATE_GET_MICROSECOND(dt) / 1e6) * 1000.0);
     int offset;
 
     STATUS_CALL(offset = self->tz->object->getOffset(era, year, month, day,

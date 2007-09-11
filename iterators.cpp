@@ -308,6 +308,7 @@ static PyObject *t_collationelementiterator_isIgnorable(PyTypeObject *type, PyOb
 static PyMethodDef t_collationelementiterator_methods[] = {
     DECLARE_METHOD(t_collationelementiterator, setText, METH_O),
     DECLARE_METHOD(t_collationelementiterator, next, METH_VARARGS),
+    DECLARE_METHOD(t_collationelementiterator, previous, METH_VARARGS),
     DECLARE_METHOD(t_collationelementiterator, reset, METH_NOARGS),
     DECLARE_METHOD(t_collationelementiterator, getOffset, METH_NOARGS),
     DECLARE_METHOD(t_collationelementiterator, setOffset, METH_O),
@@ -866,7 +867,7 @@ static PyObject *t_breakiterator_getAvailableLocales(PyTypeObject *type)
     PyObject *dict = PyDict_New();
 
     for (int32_t i = 0; i < count; i++) {
-        Locale *locale = (Locale *) locales + i;
+        icu::Locale *locale = (icu::Locale *) locales + i;
         PyObject *obj = wrap_Locale(locale, 0);
         PyDict_SetItemString(dict, locale->getName(), obj);
 	Py_DECREF(obj);

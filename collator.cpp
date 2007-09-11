@@ -387,7 +387,7 @@ static PyObject *t_collator_getAvailableLocales(PyTypeObject *type)
     PyObject *dict = PyDict_New();
 
     for (int32_t i = 0; i < count; i++) {
-        Locale *locale = (Locale *) locales + i;
+        icu::Locale *locale = (icu::Locale *) locales + i;
         PyObject *obj = wrap_Locale(locale, 0);
         PyDict_SetItemString(dict, locale->getName(), obj);
 	Py_DECREF(obj);
@@ -407,8 +407,10 @@ static PyObject *t_collator_getFunctionalEquivalent(PyTypeObject *type,
                    &keyword, &locale))
     {
         icu::Locale result(*locale);
-        STATUS_CALL(Collator::getFunctionalEquivalent(keyword, result,
-                                                      isAvailable, status));
+        STATUS_CALL(icu::Collator::getFunctionalEquivalent(keyword,
+                                                           result,
+                                                           isAvailable,
+                                                           status));
         return Py_BuildValue("(OO)", wrap_Locale(result),
                              isAvailable ? Py_True : Py_False);
     }
@@ -494,7 +496,7 @@ static PyObject *t_rulebasedcollator_getRules(t_rulebasedcollator *self,
 
 static PyObject *t_rulebasedcollator_str(t_rulebasedcollator *self)
 {
-    UnicodeString u = self->object->getRules();
+    icu::UnicodeString u = self->object->getRules();
     return PyUnicode_FromUnicodeString(&u);
 }
 

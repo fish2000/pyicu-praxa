@@ -665,19 +665,19 @@ PyObject *wrap_Format(icu::Format *format)
 {
     UClassID id = format->getDynamicClassID();
 
-    if (id == SimpleDateFormat::getStaticClassID())
+    if (id == icu::SimpleDateFormat::getStaticClassID())
         return wrap_SimpleDateFormat((icu::SimpleDateFormat *) format, T_OWNED);
 
-    if (id == MessageFormat::getStaticClassID())
+    if (id == icu::MessageFormat::getStaticClassID())
         return wrap_MessageFormat((icu::MessageFormat *) format, T_OWNED);
 
-    if (id == ChoiceFormat::getStaticClassID())
+    if (id == icu::ChoiceFormat::getStaticClassID())
         return wrap_ChoiceFormat((icu::ChoiceFormat *) format, T_OWNED);
 
-    if (id == DecimalFormat::getStaticClassID())
+    if (id == icu::DecimalFormat::getStaticClassID())
         return wrap_DecimalFormat((icu::DecimalFormat *) format, T_OWNED);
 
-    if (id == RuleBasedNumberFormat::getStaticClassID())
+    if (id == icu::RuleBasedNumberFormat::getStaticClassID())
         return wrap_RuleBasedNumberFormat((icu::RuleBasedNumberFormat *) format, T_OWNED);
 
     return wrap_Format(format, T_OWNED);
@@ -823,7 +823,6 @@ static PyObject *t_messageformat_parse(t_messageformat *self, PyObject *args)
     icu::UnicodeString *u;
     icu::UnicodeString _u;
     icu::ParsePosition *pp;
-    PyObject *list;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -893,7 +892,7 @@ static PyObject *t_messageformat_formatMessage(PyTypeObject *type,
 
 static PyObject *t_messageformat_str(t_messageformat *self)
 {
-    UnicodeString u; 
+    icu::UnicodeString u; 
 
     self->object->toPattern(u);
     return PyUnicode_FromUnicodeString(&u);

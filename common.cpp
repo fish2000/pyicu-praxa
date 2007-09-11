@@ -46,7 +46,7 @@ U_STABLE void U_EXPORT2 _stopDecode(const void *context,
                                     UErrorCode *err)
 {
     _STOPReason *stop = (_STOPReason *) context;
-    int len = length < sizeof(stop->chars)-1 ? length : sizeof(stop->chars)-1;
+    int len = length < (int)sizeof(stop->chars)-1 ? length : sizeof(stop->chars)-1;
 
     stop->reason = reason;
     if (chars && len)
@@ -87,8 +87,8 @@ EXPORT ICUException::ICUException(UErrorCode status, char *format, ...)
 EXPORT ICUException::ICUException(UParseError &pe, UErrorCode status)
 {
     PyObject *messages = PyObject_GetAttrString(PyExc_ICUError, "messages");
-    UnicodeString pre((const UChar *) pe.preContext, U_PARSE_CONTEXT_LEN);
-    UnicodeString post((const UChar *) pe.postContext, U_PARSE_CONTEXT_LEN);
+    icu::UnicodeString pre((const UChar *) pe.preContext, U_PARSE_CONTEXT_LEN);
+    icu::UnicodeString post((const UChar *) pe.postContext, U_PARSE_CONTEXT_LEN);
     PyObject *tuple = PyTuple_New(5);
 
     ICUException::code = PyInt_FromLong((long) status);
@@ -123,7 +123,7 @@ EXPORT PyObject *ICUException::reportError()
 }
 
 
-EXPORT PyObject *PyUnicode_FromUnicodeString(UnicodeString *string)
+EXPORT PyObject *PyUnicode_FromUnicodeString(icu::UnicodeString *string)
 {
     if (!string)
     {
@@ -176,13 +176,13 @@ EXPORT PyObject *PyUnicode_FromUnicodeString(const UChar *chars, int size)
     }
 }
 
-EXPORT UnicodeString &PyString_AsUnicodeString(PyObject *object,
-                                               char *encoding, char *mode,
-                                               UnicodeString &string)
+EXPORT icu::UnicodeString &PyString_AsUnicodeString(PyObject *object,
+                                                    char *encoding, char *mode,
+                                                    icu::UnicodeString &string)
 {
     UErrorCode status = U_ZERO_ERROR;
     UConverter *conv = ucnv_open(encoding, &status);
-    UnicodeString result;
+    icu::UnicodeString result;
 
     if (U_FAILURE(status))
         throw ICUException(status);
@@ -201,7 +201,7 @@ EXPORT UnicodeString &PyString_AsUnicodeString(PyObject *object,
     }
 
     PyString_AsStringAndSize(object, &src, &len);
-    result = UnicodeString((const char *) src, (int32_t) len, conv, status);
+    result = icu::UnicodeString((const char *) src, (int32_t) len, conv, status);
 
     if (U_FAILURE(status))
     {
@@ -239,9 +239,9 @@ EXPORT UnicodeString &PyString_AsUnicodeString(PyObject *object,
     return string;
 }
 
-EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
-                                               char *encoding, char *mode,
-                                               UnicodeString &string)
+EXPORT icu::UnicodeString &PyObject_AsUnicodeString(PyObject *object,
+                                                    char *encoding, char *mode,
+                                                    icu::UnicodeString &string)
 {
     if (PyUnicode_CheckExact(object))
     {
@@ -280,19 +280,19 @@ EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
     return string;
 }
 
-EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
-                                               UnicodeString &string)
+EXPORT icu::UnicodeString &PyObject_AsUnicodeString(PyObject *object,
+                                                    icu::UnicodeString &string)
 {
     return PyObject_AsUnicodeString(object, "utf-8", "strict", string);
 }
 
-EXPORT UnicodeString *PyObject_AsUnicodeString(PyObject *object)
+EXPORT icu::UnicodeString *PyObject_AsUnicodeString(PyObject *object)
 {
     if (object == Py_None)
         return NULL;
     else
     {
-        UnicodeString string;
+        icu::UnicodeString string;
 
         try {
             PyObject_AsUnicodeString(object, string);
@@ -300,7 +300,7 @@ EXPORT UnicodeString *PyObject_AsUnicodeString(PyObject *object)
             throw e;
         }
 
-        return new UnicodeString(string);
+        return new icu::UnicodeString(string);
     }
 }
 
@@ -480,7 +480,7 @@ icu::UObject **pl2cpa(PyObject *arg, int *len, UClassID id, PyTypeObject *type)
 }
 
 PyObject *cpa2pl(icu::UObject **array, int len,
-                PyObject *(*wrap)(UObject *, int))
+                PyObject *(*wrap)(icu::UObject *, int))
 {
     PyObject *list = PyList_New(len);
 
@@ -688,7 +688,7 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
 {
     va_list list;
 
-    if (count != strlen(types))
+    if (count != (int)strlen(types))
         return -1;
 
     va_start(list, types);

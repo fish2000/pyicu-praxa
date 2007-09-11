@@ -135,18 +135,18 @@ public:
     EXPORT PyObject *reportError();
 };
 
-EXPORT PyObject *PyUnicode_FromUnicodeString(UnicodeString *string);
+EXPORT PyObject *PyUnicode_FromUnicodeString(icu::UnicodeString *string);
 EXPORT PyObject *PyUnicode_FromUnicodeString(const UChar *chars, int size);
 
-EXPORT UnicodeString &PyString_AsUnicodeString(PyObject *object,
-                                               char *encoding, char *mode,
-                                               UnicodeString &string);
-EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
-                                               char *encoding, char *mode,
-                                               UnicodeString &string);
-EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
-                                               UnicodeString &string);
-EXPORT UnicodeString *PyObject_AsUnicodeString(PyObject *object);
+EXPORT icu::UnicodeString &PyString_AsUnicodeString(PyObject *object,
+                                                    char *encoding, char *mode,
+                                                    icu::UnicodeString &string);
+EXPORT icu::UnicodeString &PyObject_AsUnicodeString(PyObject *object,
+                                                    char *encoding, char *mode,
+                                                    icu::UnicodeString &string);
+EXPORT icu::UnicodeString &PyObject_AsUnicodeString(PyObject *object,
+                                                    icu::UnicodeString &string);
+EXPORT icu::UnicodeString *PyObject_AsUnicodeString(PyObject *object);
 EXPORT UDate PyObject_AsUDate(PyObject *object);
 
 int abstract_init(PyObject *self, PyObject *args, PyObject *kwds);
@@ -184,7 +184,7 @@ icu::Formattable *toFormattableArray(PyObject *arg, int *len,
 
 icu::UObject **pl2cpa(PyObject *arg, int *len, UClassID id, PyTypeObject *type);
 PyObject *cpa2pl(icu::UObject **array, int len,
-                 PyObject *(*wrap)(UObject *, int));
+                 PyObject *(*wrap)(icu::UObject *, int));
 
 PyObject *PyErr_SetArgsError(PyObject *self, char *name, PyObject *args);
 PyObject *PyErr_SetArgsError(PyTypeObject *type, char *name, PyObject *args);

@@ -445,7 +445,7 @@ static PyObject *t_uobject_str(t_uobject *self)
     if (self->object)
     {
         char buf[32];
-        sprintf(buf, "0x%x", self->object->getDynamicClassID());
+        sprintf(buf, "0x%x", (unsigned int)self->object->getDynamicClassID());
         return PyString_FromString(buf);
     }
 
@@ -780,7 +780,7 @@ static PyObject *t_unicodestring_compare(t_unicodestring *self, PyObject *args)
 {
     icu::UnicodeString *u;
     icu::UnicodeString _u;
-    int i, start, len;
+    int start, len;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -836,7 +836,7 @@ static PyObject *t_unicodestring_compareCodePointOrder(t_unicodestring *self,
 {
     icu::UnicodeString *u;
     icu::UnicodeString _u;
-    int i, start, len;
+    int start, len;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -892,7 +892,7 @@ static PyObject *t_unicodestring_caseCompare(t_unicodestring *self,
 {
     icu::UnicodeString *u;
     icu::UnicodeString _u;
-    int i, start, len, options;
+    int start, len, options;
 
     switch (PyTuple_Size(args)) {
       case 2:
@@ -2275,13 +2275,13 @@ static int t_currencyunit_init(t_currencyunit *self,
 
 static PyObject *t_currencyunit_getISOCurrency(t_currencyunit *self)
 {
-    UnicodeString u(self->object->getISOCurrency());
+    icu::UnicodeString u(self->object->getISOCurrency());
     return PyUnicode_FromUnicodeString(&u);
 }
 
 static PyObject *t_currencyunit_str(t_currencyunit *self)
 {
-    UnicodeString u(self->object->getISOCurrency());
+    icu::UnicodeString u(self->object->getISOCurrency());
     return PyUnicode_FromUnicodeString(&u);
 }
 
@@ -2344,10 +2344,10 @@ static PyObject *t_currencyamount_getCurrency(t_currencyamount *self)
 
 static PyObject *t_currencyamount_str(t_currencyamount *self)
 {
-    UnicodeString u(self->object->getISOCurrency());
+    icu::UnicodeString u(self->object->getISOCurrency());
     PyObject *currency = PyUnicode_FromUnicodeString(&u);
 
-    Formattable number = self->object->getNumber();
+    icu::Formattable number = self->object->getNumber();
     PyObject *amount = PyFloat_FromDouble(number.getDouble());
 
     PyObject *format = PyString_FromString("%s %0.2f");
@@ -2421,14 +2421,14 @@ static PyObject *t_stringenumeration_unext(t_stringenumeration *self)
         return NULL;
     }
 
-    UnicodeString u(str);
+    icu::UnicodeString u(str);
     return PyUnicode_FromUnicodeString(&u);
 }
 
 static PyObject *t_stringenumeration_snext(t_stringenumeration *self)
 {
     UErrorCode status = U_ZERO_ERROR;
-    const UnicodeString *str = self->object->snext(status);
+    const icu::UnicodeString *str = self->object->snext(status);
 
     if (U_FAILURE(status))
         return ICUException(status).reportError();
@@ -2439,7 +2439,7 @@ static PyObject *t_stringenumeration_snext(t_stringenumeration *self)
         return NULL;
     }
 
-    return wrap_UnicodeString(new UnicodeString(*str), T_OWNED);
+    return wrap_UnicodeString(new icu::UnicodeString(*str), T_OWNED);
 }                
 
 static PyObject *t_stringenumeration_iter(t_stringenumeration *self)

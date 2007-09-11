@@ -552,7 +552,7 @@ static PyObject *t_timezone_setDefault(PyTypeObject *type, PyObject *arg)
 
 static PyObject *t_timezone_str(t_timezone *self)
 {
-    UnicodeString u;
+    icu::UnicodeString u;
 
     self->object->getID(u);
     return PyUnicode_FromUnicodeString(&u);
@@ -1303,7 +1303,7 @@ static PyObject *t_calendar_getAvailableLocales(PyTypeObject *type)
     PyObject *dict = PyDict_New();
 
     for (int32_t i = 0; i < count; i++) {
-        Locale *locale = (Locale *) locales + i;
+        icu::Locale *locale = (icu::Locale *) locales + i;
         PyObject *obj = wrap_Locale(locale, 0);
         PyDict_SetItemString(dict, locale->getName(), obj);
 	Py_DECREF(obj);
@@ -1321,15 +1321,14 @@ static PyObject *t_calendar_getNow(PyTypeObject *type)
 static PyObject *t_calendar_str(t_calendar *self)
 {
     UDate date;
-    Locale locale;
-    UnicodeString u;
+    icu::Locale locale;
+    icu::UnicodeString u;
 
     STATUS_CALL(date = self->object->getTime(status));
     STATUS_CALL(locale = self->object->getLocale(ULOC_VALID_LOCALE, status));
 
-    DateFormat *df = DateFormat::createDateTimeInstance(DateFormat::kDefault,
-                                                        DateFormat::kDefault,
-                                                        locale);
+    icu::DateFormat *df = icu::DateFormat::createDateTimeInstance(
+        icu::DateFormat::kDefault, icu::DateFormat::kDefault, locale);
     df->format(date, u);
     delete df;
 

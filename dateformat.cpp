@@ -187,7 +187,6 @@ PyObject *wrap_DateFormat(icu::DateFormat *format)
 static int t_dateformatsymbols_init(t_dateformatsymbols *self,
                                     PyObject *args, PyObject *kwds)
 {
-    icu::UnicodeString *u;
     icu::UnicodeString _u;
     icu::Locale *locale;
     icu::DateFormatSymbols *dfs;
@@ -258,7 +257,7 @@ static PyObject *fromUnicodeStringArray(const icu::UnicodeString *strings,
 static PyObject *t_dateformatsymbols_getEras(t_dateformatsymbols *self)
 {
     int len;
-    const UnicodeString *eras = self->object->getEras(len);
+    const icu::UnicodeString *eras = self->object->getEras(len);
 
     return fromUnicodeStringArray(eras, len, 0);
 }
@@ -322,7 +321,7 @@ static PyObject *t_dateformatsymbols_setMonths(t_dateformatsymbols *self,
 static PyObject *t_dateformatsymbols_getShortMonths(t_dateformatsymbols *self)
 {
     int len;
-    const UnicodeString *months = self->object->getShortMonths(len);
+    const icu::UnicodeString *months = self->object->getShortMonths(len);
 
     return fromUnicodeStringArray(months, len, 0);
 }
@@ -386,7 +385,7 @@ static PyObject *t_dateformatsymbols_setWeekdays(t_dateformatsymbols *self,
 static PyObject *t_dateformatsymbols_getShortWeekdays(t_dateformatsymbols *self)
 {
     int len;
-    const UnicodeString *months = self->object->getShortWeekdays(len);
+    const icu::UnicodeString *months = self->object->getShortWeekdays(len);
 
     return fromUnicodeStringArray(months, len, 0);
 }
@@ -410,7 +409,7 @@ static PyObject *t_dateformatsymbols_setShortWeekdays(t_dateformatsymbols *self,
 static PyObject *t_dateformatsymbols_getAmPmStrings(t_dateformatsymbols *self)
 {
     int len;
-    const UnicodeString *strings = self->object->getAmPmStrings(len);
+    const icu::UnicodeString *strings = self->object->getAmPmStrings(len);
 
     return fromUnicodeStringArray(strings, len, 0);
 }
@@ -769,7 +768,7 @@ static PyObject *t_dateformat_getAvailableLocales(PyTypeObject *type)
     PyObject *dict = PyDict_New();
 
     for (int32_t i = 0; i < count; i++) {
-        Locale *locale = (Locale *) locales + i;
+        icu::Locale *locale = (icu::Locale *) locales + i;
         PyObject *obj = wrap_Locale(locale, 0);
         PyDict_SetItemString(dict, locale->getName(), obj);
 	Py_DECREF(obj);
@@ -935,7 +934,7 @@ static PyObject *t_simpledateformat_set2DigitYearStart(t_simpledateformat *self,
 
 static PyObject *t_simpledateformat_getDateFormatSymbols(t_simpledateformat *self)
 {
-    return wrap_DateFormatSymbols(new DateFormatSymbols(*self->object->getDateFormatSymbols()), T_OWNED);
+    return wrap_DateFormatSymbols(new icu::DateFormatSymbols(*self->object->getDateFormatSymbols()), T_OWNED);
 }
 
 static PyObject *t_simpledateformat_setDateFormatSymbols(t_simpledateformat *self, PyObject *arg)
@@ -953,7 +952,7 @@ static PyObject *t_simpledateformat_setDateFormatSymbols(t_simpledateformat *sel
 
 static PyObject *t_simpledateformat_str(t_simpledateformat *self)
 {
-    UnicodeString u; 
+    icu::UnicodeString u; 
 
     self->object->toPattern(u);
     return PyUnicode_FromUnicodeString(&u);

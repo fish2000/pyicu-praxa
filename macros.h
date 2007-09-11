@@ -256,11 +256,13 @@ PyTypeObject name##Type = {                                             \
     PyDict_SetItemString(type##Type.tp_dict, #name,                     \
                          make_descriptor(PyInt_FromLong(name)))
 
-#define Py_RETURN_BOOL(b) \
-    if (b)                \
-        Py_RETURN_TRUE;   \
-    else                  \
-        Py_RETURN_FALSE;
+#define Py_RETURN_BOOL(b)                       \
+    {                                           \
+        if (b)                                  \
+            Py_RETURN_TRUE;                     \
+        else                                    \
+            Py_RETURN_FALSE;                    \
+    }
 
 #define Py_RETURN_ARG(args, n)                          \
     {                                                   \

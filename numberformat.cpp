@@ -351,7 +351,6 @@ static int t_decimalformatsymbols_init(t_decimalformatsymbols *self,
 {
     icu::Locale *locale;
     icu::DecimalFormatSymbols *dfs;
-    char *type;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -895,7 +894,7 @@ static PyObject *t_numberformat_getAvailableLocales(PyTypeObject *type)
     PyObject *dict = PyDict_New();
 
     for (int32_t i = 0; i < count; i++) {
-        Locale *locale = (Locale *) locales + i;
+        icu::Locale *locale = (icu::Locale *) locales + i;
         PyObject *obj = wrap_Locale(locale, 0);
         PyDict_SetItemString(dict, locale->getName(), obj);
 	Py_DECREF(obj);
@@ -1483,7 +1482,7 @@ static PyObject *t_decimalformat_setSignificantDigitsUsed(t_decimalformat *self,
 
 static PyObject *t_decimalformat_str(t_decimalformat *self)
 {
-    UnicodeString u; 
+    icu::UnicodeString u; 
 
     self->object->toPattern(u);
     return PyUnicode_FromUnicodeString(&u);
@@ -1760,7 +1759,7 @@ static PyObject *t_rulebasednumberformat_setDefaultRuleSet(t_rulebasednumberform
 
 static PyObject *t_rulebasednumberformat_str(t_rulebasednumberformat *self)
 {
-    UnicodeString u = self->object->getRules();
+    icu::UnicodeString u = self->object->getRules();
     return PyUnicode_FromUnicodeString(&u);
 }
 
@@ -1973,9 +1972,9 @@ static PyObject *t_choiceformat_getClosures(t_choiceformat *self)
 static PyObject *t_choiceformat_getFormats(t_choiceformat *self)
 {
     int len;
-    const UnicodeString *formats = self->object->getFormats(len);
+    const icu::UnicodeString *formats = self->object->getFormats(len);
     
-    return fromUnicodeStringArray((UnicodeString *) formats, len, 0);
+    return fromUnicodeStringArray((icu::UnicodeString *) formats, len, 0);
 }
 
 static PyObject *t_choiceformat_format(t_choiceformat *self, PyObject *args)
@@ -2025,7 +2024,7 @@ static PyObject *t_choiceformat_format(t_choiceformat *self, PyObject *args)
 
 static PyObject *t_choiceformat_str(t_choiceformat *self)
 {
-    UnicodeString u; self->object->toPattern(u);
+    icu::UnicodeString u; self->object->toPattern(u);
     return PyUnicode_FromUnicodeString(&u);
 }
 
