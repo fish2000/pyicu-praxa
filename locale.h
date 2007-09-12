@@ -26,8 +26,8 @@
 
 extern PyTypeObject LocaleType;
 
-PyObject *wrap_Locale(icu::Locale *locale, int flags);
-PyObject *wrap_Locale(const icu::Locale &locale);
+PyObject *wrap_Locale(Locale *locale, int flags);
+PyObject *wrap_Locale(const Locale &locale);
 
 void _init_locale(PyObject *m);
 

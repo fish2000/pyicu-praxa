@@ -35,7 +35,7 @@
 
 class t_fieldposition : public _wrapper {
 public:
-    icu::FieldPosition *object;
+    FieldPosition *object;
 };
 
 static int t_fieldposition_init(t_fieldposition *self,
@@ -59,14 +59,14 @@ static PyMethodDef t_fieldposition_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(FieldPosition, t_fieldposition, UObject, icu::FieldPosition,
+DECLARE_TYPE(FieldPosition, t_fieldposition, UObject, FieldPosition,
              t_fieldposition_init);
 
 /* ParsePosition */
 
 class t_parseposition : public _wrapper {
 public:
-    icu::ParsePosition *object;
+    ParsePosition *object;
 };
 
 static int t_parseposition_init(t_parseposition *self,
@@ -85,7 +85,7 @@ static PyMethodDef t_parseposition_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(ParsePosition, t_parseposition, UObject, icu::ParsePosition,
+DECLARE_TYPE(ParsePosition, t_parseposition, UObject, ParsePosition,
              t_parseposition_init);
 
 /* Format */
@@ -103,13 +103,13 @@ static PyMethodDef t_format_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Format, t_format, UObject, icu::Format, abstract_init);
+DECLARE_TYPE(Format, t_format, UObject, Format, abstract_init);
 
 /* MeasureFormat */
 
 class t_measureformat : public _wrapper {
 public:
-    icu::MeasureFormat *object;
+    MeasureFormat *object;
 };
 
 static PyObject *t_measureformat_createCurrencyFormat(PyTypeObject *type,
@@ -120,14 +120,14 @@ static PyMethodDef t_measureformat_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(MeasureFormat, t_measureformat, Format, icu::MeasureFormat,
+DECLARE_TYPE(MeasureFormat, t_measureformat, Format, MeasureFormat,
              abstract_init);
 
 /* MessageFormat */
 
 class t_messageformat : public _wrapper {
 public:
-    icu::MessageFormat *object;
+    MessageFormat *object;
 };
 
 static int t_messageformat_init(t_messageformat *self,
@@ -172,7 +172,7 @@ static PyMethodDef t_messageformat_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(MessageFormat, t_messageformat, Format, icu::MessageFormat,
+DECLARE_TYPE(MessageFormat, t_messageformat, Format, MessageFormat,
              t_messageformat_init);
 
 
@@ -185,13 +185,13 @@ static int t_fieldposition_init(t_fieldposition *self,
 
     switch (PyTuple_Size(args)) {
       case 0:
-        self->object = new icu::FieldPosition();
+        self->object = new FieldPosition();
         self->flags = T_OWNED;
         break;
       case 1:
         if (!parseArgs(args, "i", &i))
         {
-            self->object = new icu::FieldPosition(i);
+            self->object = new FieldPosition(i);
             self->flags = T_OWNED;
             break;
         }
@@ -267,7 +267,7 @@ static PyObject *t_fieldposition_setEndIndex(t_fieldposition *self,
 static PyObject *t_fieldposition_richcmp(t_fieldposition *self, PyObject *arg, int op)
 {
     int b = 0;
-    icu::FieldPosition *i;
+    FieldPosition *i;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(FieldPosition), &i))
     {
@@ -299,13 +299,13 @@ static int t_parseposition_init(t_parseposition *self,
 
     switch (PyTuple_Size(args)) {
       case 0:
-        self->object = new icu::ParsePosition();
+        self->object = new ParsePosition();
         self->flags = T_OWNED;
         break;
       case 1:
         if (!parseArgs(args, "i", &i))
         {
-            self->object = new icu::ParsePosition(i);
+            self->object = new ParsePosition(i);
             self->flags = T_OWNED;
             break;
         }
@@ -362,7 +362,7 @@ static PyObject *t_parseposition_setErrorIndex(t_parseposition *self,
 static PyObject *t_parseposition_richcmp(t_parseposition *self, PyObject *arg, int op)
 {
     int b = 0;
-    icu::ParsePosition *i;
+    ParsePosition *i;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(ParsePosition), &i))
     {
@@ -390,10 +390,10 @@ static PyObject *t_parseposition_richcmp(t_parseposition *self, PyObject *arg, i
 
 PyObject *t_format_format(t_format *self, PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
-    icu::Formattable *obj;
-    icu::FieldPosition *fp;
+    UnicodeString *u;
+    UnicodeString _u;
+    Formattable *obj;
+    FieldPosition *fp;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -436,10 +436,10 @@ PyObject *t_format_format(t_format *self, PyObject *args)
 
 static PyObject *t_format_parseObject(t_format *self, PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
-    icu::Formattable obj;
-    icu::ParsePosition *pp;
+    UnicodeString *u;
+    UnicodeString _u;
+    Formattable obj;
+    ParsePosition *pp;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -468,7 +468,7 @@ static PyObject *t_format_parseObject(t_format *self, PyObject *args)
 static PyObject *t_format_getLocale(t_format *self, PyObject *args)
 {
     ULocDataLocaleType type;
-    icu::Locale locale;
+    Locale locale;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -511,7 +511,7 @@ static PyObject *t_format_getLocaleID(t_format *self, PyObject *args)
 static PyObject *t_format_richcmp(t_format *self, PyObject *arg, int op)
 {
     int b = 0;
-    icu::Format *i;
+    Format *i;
 
     if (!parseArg(arg, "P", TYPE_ID(Format), &i))
     {
@@ -539,17 +539,17 @@ static PyObject *t_format_richcmp(t_format *self, PyObject *arg, int op)
 static PyObject *t_measureformat_createCurrencyFormat(PyTypeObject *type,
                                                       PyObject *args)
 {
-    icu::MeasureFormat *format;
-    icu::Locale *locale;
+    MeasureFormat *format;
+    Locale *locale;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        STATUS_CALL(format = icu::MeasureFormat::createCurrencyFormat(status));
+        STATUS_CALL(format = MeasureFormat::createCurrencyFormat(status));
         return wrap_MeasureFormat(format, T_OWNED);
       case 1:
         if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
-            STATUS_CALL(format = icu::MeasureFormat::createCurrencyFormat(*locale, status));
+            STATUS_CALL(format = MeasureFormat::createCurrencyFormat(*locale, status));
             return wrap_MeasureFormat(format, T_OWNED);
         }
         break;
@@ -564,17 +564,17 @@ static PyObject *t_measureformat_createCurrencyFormat(PyTypeObject *type,
 static int t_messageformat_init(t_messageformat *self,
                                 PyObject *args, PyObject *kwds)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
-    icu::Locale *locale;
+    UnicodeString *u;
+    UnicodeString _u;
+    Locale *locale;
 
     switch (PyTuple_Size(args)) {
       case 1:
         if (!parseArgs(args, "S", &u, &_u))
         {
-            icu::MessageFormat *format;
+            MessageFormat *format;
 
-            INT_STATUS_CALL(format = new icu::MessageFormat(*u, status));
+            INT_STATUS_CALL(format = new MessageFormat(*u, status));
             self->object = format;
             self->flags = T_OWNED;
             break;
@@ -585,9 +585,9 @@ static int t_messageformat_init(t_messageformat *self,
         if (!parseArgs(args, "SP", TYPE_CLASSID(Locale),
                        &u, &_u, &locale))
         {
-            icu::MessageFormat *format;
+            MessageFormat *format;
 
-            INT_STATUS_PARSER_CALL(format = new icu::MessageFormat(*u, *locale, parseError, status));
+            INT_STATUS_PARSER_CALL(format = new MessageFormat(*u, *locale, parseError, status));
             self->object = format;
             self->flags = T_OWNED;
             break;
@@ -613,7 +613,7 @@ static PyObject *t_messageformat_getLocale(t_messageformat *self)
 static PyObject *t_messageformat_setLocale(t_messageformat *self,
                                            PyObject *arg)
 {
-    icu::Locale *locale;
+    Locale *locale;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
     {
@@ -627,8 +627,8 @@ static PyObject *t_messageformat_setLocale(t_messageformat *self,
 static PyObject *t_messageformat_applyPattern(t_messageformat *self,
                                               PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -642,8 +642,8 @@ static PyObject *t_messageformat_applyPattern(t_messageformat *self,
 static PyObject *t_messageformat_toPattern(t_messageformat *self,
                                            PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -661,24 +661,24 @@ static PyObject *t_messageformat_toPattern(t_messageformat *self,
     return PyErr_SetArgsError((PyObject *) self, "toPattern", args);
 }
 
-PyObject *wrap_Format(icu::Format *format)
+PyObject *wrap_Format(Format *format)
 {
     UClassID id = format->getDynamicClassID();
 
-    if (id == icu::SimpleDateFormat::getStaticClassID())
-        return wrap_SimpleDateFormat((icu::SimpleDateFormat *) format, T_OWNED);
+    if (id == SimpleDateFormat::getStaticClassID())
+        return wrap_SimpleDateFormat((SimpleDateFormat *) format, T_OWNED);
 
-    if (id == icu::MessageFormat::getStaticClassID())
-        return wrap_MessageFormat((icu::MessageFormat *) format, T_OWNED);
+    if (id == MessageFormat::getStaticClassID())
+        return wrap_MessageFormat((MessageFormat *) format, T_OWNED);
 
-    if (id == icu::ChoiceFormat::getStaticClassID())
-        return wrap_ChoiceFormat((icu::ChoiceFormat *) format, T_OWNED);
+    if (id == ChoiceFormat::getStaticClassID())
+        return wrap_ChoiceFormat((ChoiceFormat *) format, T_OWNED);
 
-    if (id == icu::DecimalFormat::getStaticClassID())
-        return wrap_DecimalFormat((icu::DecimalFormat *) format, T_OWNED);
+    if (id == DecimalFormat::getStaticClassID())
+        return wrap_DecimalFormat((DecimalFormat *) format, T_OWNED);
 
-    if (id == icu::RuleBasedNumberFormat::getStaticClassID())
-        return wrap_RuleBasedNumberFormat((icu::RuleBasedNumberFormat *) format, T_OWNED);
+    if (id == RuleBasedNumberFormat::getStaticClassID())
+        return wrap_RuleBasedNumberFormat((RuleBasedNumberFormat *) format, T_OWNED);
 
     return wrap_Format(format, T_OWNED);
 }
@@ -686,7 +686,7 @@ PyObject *wrap_Format(icu::Format *format)
 static PyObject *t_messageformat_getFormats(t_messageformat *self)
 {
     int count;
-    const icu::Format **formats = self->object->getFormats(count);
+    const Format **formats = self->object->getFormats(count);
     PyObject *list = PyList_New(count);
 
     for (int i = 0; i < count; i++) {
@@ -700,7 +700,7 @@ static PyObject *t_messageformat_getFormats(t_messageformat *self)
 static PyObject *t_messageformat_setFormats(t_messageformat *self,
                                             PyObject *arg)
 {
-    const icu::Format **formats;
+    const Format **formats;
     int len;
 
     if (!parseArg(arg, "Q", TYPE_ID(Format), &formats, &len, TYPE_ID(Format)))
@@ -716,7 +716,7 @@ static PyObject *t_messageformat_setFormats(t_messageformat *self,
 static PyObject *t_messageformat_setFormat(t_messageformat *self,
                                            PyObject *args)
 {
-    icu::Format *format;
+    Format *format;
     int i;
 
     if (!parseArgs(args, "iP", TYPE_ID(Format), &i, &format))
@@ -730,12 +730,12 @@ static PyObject *t_messageformat_setFormat(t_messageformat *self,
 
 static PyObject *t_messageformat_format(t_messageformat *self, PyObject *args)
 {
-    icu::Formattable *f;
+    Formattable *f;
     int len;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
-    icu::FieldPosition *fp;
-    icu::FieldPosition _fp;
+    UnicodeString *u;
+    UnicodeString _u;
+    FieldPosition *fp;
+    FieldPosition _fp;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -802,7 +802,7 @@ static PyObject *t_messageformat_format(t_messageformat *self, PyObject *args)
     return t_format_format((t_format *) self, args);
 }
 
-static PyObject *fromFormattableArray(icu::Formattable *formattables,
+static PyObject *fromFormattableArray(Formattable *formattables,
                                       int len, int dispose)
 {
     PyObject *list = PyList_New(len);
@@ -818,11 +818,11 @@ static PyObject *fromFormattableArray(icu::Formattable *formattables,
 
 static PyObject *t_messageformat_parse(t_messageformat *self, PyObject *args)
 {
-    icu::Formattable *f;
+    Formattable *f;
     int len;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
-    icu::ParsePosition *pp;
+    UnicodeString *u;
+    UnicodeString _u;
+    ParsePosition *pp;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -851,10 +851,10 @@ static PyObject *t_messageformat_parse(t_messageformat *self, PyObject *args)
 static PyObject *t_messageformat_formatMessage(PyTypeObject *type,
                                                PyObject *args)
 {
-    icu::Formattable *f;
+    Formattable *f;
     int len;
-    icu::UnicodeString *u, *v;
-    icu::UnicodeString _u, _v;
+    UnicodeString *u, *v;
+    UnicodeString _u, _v;
 
     switch (PyTuple_Size(args)) {
       case 2:
@@ -864,7 +864,7 @@ static PyObject *t_messageformat_formatMessage(PyTypeObject *type,
         {
             STATUS_CALL(
                 {
-                    icu::MessageFormat::format(*u, f, len, _v, status);
+                    MessageFormat::format(*u, f, len, _v, status);
                     delete[] f;
                 });
 
@@ -878,7 +878,7 @@ static PyObject *t_messageformat_formatMessage(PyTypeObject *type,
         {
             STATUS_CALL(
                 {
-                    icu::MessageFormat::format(*u, f, len, *v, status);
+                    MessageFormat::format(*u, f, len, *v, status);
                     delete[] f;
                 });
 
@@ -892,7 +892,7 @@ static PyObject *t_messageformat_formatMessage(PyTypeObject *type,
 
 static PyObject *t_messageformat_str(t_messageformat *self)
 {
-    icu::UnicodeString u; 
+    UnicodeString u;
 
     self->object->toPattern(u);
     return PyUnicode_FromUnicodeString(&u);
@@ -901,10 +901,9 @@ static PyObject *t_messageformat_str(t_messageformat *self)
 static PyObject *t_messageformat_mod(t_messageformat *self, PyObject *args)
 {
     int len;
-    icu::Formattable *f = toFormattableArray(args, &len,
-                                             TYPE_CLASSID(Formattable));
-    icu::UnicodeString _u;
-    icu::FieldPosition _fp;
+    Formattable *f = toFormattableArray(args, &len, TYPE_CLASSID(Formattable));
+    UnicodeString _u;
+    FieldPosition _fp;
 
     if (!f)
     {

@@ -26,7 +26,7 @@
 
 class t_format : public _wrapper {
 public:
-    icu::Format *object;
+    Format *object;
 };
 
 extern PyTypeObject FormatType;
@@ -34,7 +34,7 @@ extern PyTypeObject FieldPositionType;
 extern PyTypeObject ParsePositionType;
 
 PyObject *t_format_format(t_format *self, PyObject *args);
-PyObject *wrap_Format(icu::Format *format);
+PyObject *wrap_Format(Format *format);
 
 void _init_format(PyObject *m);
 

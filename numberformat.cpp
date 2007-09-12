@@ -34,7 +34,7 @@
 
 class t_decimalformatsymbols : public _wrapper {
 public:
-    icu::DecimalFormatSymbols *object;
+    DecimalFormatSymbols *object;
 };
 
 static int t_decimalformatsymbols_init(t_decimalformatsymbols *self,
@@ -54,13 +54,13 @@ static PyMethodDef t_decimalformatsymbols_methods[] = {
 };
 
 DECLARE_TYPE(DecimalFormatSymbols, t_decimalformatsymbols, UObject,
-             icu::DecimalFormatSymbols, t_decimalformatsymbols_init);
+             DecimalFormatSymbols, t_decimalformatsymbols_init);
 
 /* NumberFormat */
 
 class t_numberformat : public _wrapper {
 public:
-    icu::NumberFormat *object;
+    NumberFormat *object;
 };
 
 static PyObject *t_numberformat_format(t_numberformat *self, PyObject *args);
@@ -124,7 +124,7 @@ static PyMethodDef t_numberformat_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(NumberFormat, t_numberformat, Format, icu::NumberFormat,
+DECLARE_TYPE(NumberFormat, t_numberformat, Format, NumberFormat,
              abstract_init);
 
 
@@ -132,7 +132,7 @@ DECLARE_TYPE(NumberFormat, t_numberformat, Format, icu::NumberFormat,
 
 class t_decimalformat : public _wrapper {
 public:
-    icu::DecimalFormat *object;
+    DecimalFormat *object;
 };
 
 static int t_decimalformat_init(t_decimalformat *self,
@@ -252,14 +252,14 @@ static PyMethodDef t_decimalformat_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(DecimalFormat, t_decimalformat, NumberFormat, icu::DecimalFormat,
+DECLARE_TYPE(DecimalFormat, t_decimalformat, NumberFormat, DecimalFormat,
              t_decimalformat_init);
 
 /* RuleBasedNumberFormat */
 
 class t_rulebasednumberformat : public _wrapper {
 public:
-    icu::RuleBasedNumberFormat *object;
+    RuleBasedNumberFormat *object;
 };
 
 static int t_rulebasednumberformat_init(t_rulebasednumberformat *self,
@@ -292,18 +292,18 @@ static PyMethodDef t_rulebasednumberformat_methods[] = {
 };
 
 DECLARE_TYPE(RuleBasedNumberFormat, t_rulebasednumberformat, NumberFormat,
-             icu::RuleBasedNumberFormat, t_rulebasednumberformat_init);
+             RuleBasedNumberFormat, t_rulebasednumberformat_init);
 
-PyObject *wrap_NumberFormat(icu::NumberFormat *format)
+PyObject *wrap_NumberFormat(NumberFormat *format)
 {
     if (format->getDynamicClassID() ==
-        icu::DecimalFormat::getStaticClassID())
-        return wrap_DecimalFormat((icu::DecimalFormat *) format,
+        DecimalFormat::getStaticClassID())
+        return wrap_DecimalFormat((DecimalFormat *) format,
                                   T_OWNED);
 
     if (format->getDynamicClassID() ==
-        icu::RuleBasedNumberFormat::getStaticClassID())
-        return wrap_RuleBasedNumberFormat((icu::RuleBasedNumberFormat *) format,
+        RuleBasedNumberFormat::getStaticClassID())
+        return wrap_RuleBasedNumberFormat((RuleBasedNumberFormat *) format,
                                           T_OWNED);
 
     return wrap_NumberFormat(format, T_OWNED);
@@ -313,7 +313,7 @@ PyObject *wrap_NumberFormat(icu::NumberFormat *format)
 
 class t_choiceformat : public _wrapper {
 public:
-    icu::ChoiceFormat *object;
+    ChoiceFormat *object;
 };
 
 static int t_choiceformat_init(t_choiceformat *self,
@@ -340,7 +340,7 @@ static PyMethodDef t_choiceformat_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(ChoiceFormat, t_choiceformat, NumberFormat, icu::ChoiceFormat,
+DECLARE_TYPE(ChoiceFormat, t_choiceformat, NumberFormat, ChoiceFormat,
              t_choiceformat_init);
 
 
@@ -349,20 +349,19 @@ DECLARE_TYPE(ChoiceFormat, t_choiceformat, NumberFormat, icu::ChoiceFormat,
 static int t_decimalformatsymbols_init(t_decimalformatsymbols *self,
                                        PyObject *args, PyObject *kwds)
 {
-    icu::Locale *locale;
-    icu::DecimalFormatSymbols *dfs;
+    Locale *locale;
+    DecimalFormatSymbols *dfs;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        INT_STATUS_CALL(dfs = new icu::DecimalFormatSymbols(status));
+        INT_STATUS_CALL(dfs = new DecimalFormatSymbols(status));
         self->object = dfs;
         self->flags = T_OWNED;
         break;
       case 1:
         if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
-            INT_STATUS_CALL(dfs = new icu::DecimalFormatSymbols(*locale,
-                                                                status));
+            INT_STATUS_CALL(dfs = new DecimalFormatSymbols(*locale, status));
             self->object = dfs;
             self->flags = T_OWNED;
             break;
@@ -383,14 +382,14 @@ static int t_decimalformatsymbols_init(t_decimalformatsymbols *self,
 static PyObject *t_decimalformatsymbols_getSymbol(t_decimalformatsymbols *self,
                                                   PyObject *args)
 {
-    icu::DecimalFormatSymbols::ENumberFormatSymbol symbol;
-    icu::UnicodeString *u;
+    DecimalFormatSymbols::ENumberFormatSymbol symbol;
+    UnicodeString *u;
 
     switch (PyTuple_Size(args)) {
       case 1:
         if (!parseArgs(args, "i", &symbol))
         {
-            icu::UnicodeString u = self->object->getSymbol(symbol);
+            UnicodeString u = self->object->getSymbol(symbol);
             return PyUnicode_FromUnicodeString(&u);
         }
       case 2:
@@ -408,9 +407,9 @@ static PyObject *t_decimalformatsymbols_getSymbol(t_decimalformatsymbols *self,
 static PyObject *t_decimalformatsymbols_setSymbol(t_decimalformatsymbols *self,
                                                   PyObject *args)
 {
-    icu::DecimalFormatSymbols::ENumberFormatSymbol symbol;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    DecimalFormatSymbols::ENumberFormatSymbol symbol;
+    UnicodeString *u;
+    UnicodeString _u;
     
     if (!parseArgs(args, "iS", &symbol, &u, &_u))
     {
@@ -425,7 +424,7 @@ static PyObject *t_decimalformatsymbols_getLocale(t_decimalformatsymbols *self,
                                                   PyObject *args)
 {
     ULocDataLocaleType type;
-    icu::Locale locale;
+    Locale locale;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -448,7 +447,7 @@ static PyObject *t_decimalformatsymbols_richcmp(t_decimalformatsymbols *self,
                                                 PyObject *arg, int op)
 {
     int b = 0;
-    icu::DecimalFormatSymbols *dfs;
+    DecimalFormatSymbols *dfs;
 
     if (!parseArg(arg, "P",
                   TYPE_CLASSID(DecimalFormatSymbols), &dfs))
@@ -477,12 +476,12 @@ static PyObject *t_decimalformatsymbols_richcmp(t_decimalformatsymbols *self,
 
 static PyObject *t_numberformat_format(t_numberformat *self, PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     double d;
     int i;
     PY_LONG_LONG l;
-    icu::FieldPosition *fp;
+    FieldPosition *fp;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -549,16 +548,16 @@ static PyObject *t_numberformat_format(t_numberformat *self, PyObject *args)
 
 static PyObject *t_numberformat_parse(t_numberformat *self, PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
-    icu::Formattable *f;
-    icu::ParsePosition *pp;
+    UnicodeString *u;
+    UnicodeString _u;
+    Formattable *f;
+    ParsePosition *pp;
 
     switch (PyTuple_Size(args)) {
       case 1:
         if (!parseArgs(args, "S", &u, &_u))
         {
-            icu::Formattable result;
+            Formattable result;
             STATUS_CALL(self->object->parse(*u, result, status));
             return wrap_Formattable(result);
         }
@@ -573,7 +572,7 @@ static PyObject *t_numberformat_parse(t_numberformat *self, PyObject *args)
         if (!parseArgs(args, "SP", TYPE_CLASSID(ParsePosition),
                        &u, &_u, &pp))
         {
-            icu::Formattable result;
+            Formattable result;
             pp->setErrorIndex(-1);
             self->object->parse(*u, result, *pp);
             if (pp->getErrorIndex() != -1)
@@ -602,17 +601,17 @@ static PyObject *t_numberformat_parse(t_numberformat *self, PyObject *args)
 static PyObject *t_numberformat_parseCurrency(t_numberformat *self,
                                               PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
-    icu::Formattable *f;
-    icu::ParsePosition *pp;
-    icu::ParsePosition _pp;
+    UnicodeString *u;
+    UnicodeString _u;
+    Formattable *f;
+    ParsePosition *pp;
+    ParsePosition _pp;
 
     switch (PyTuple_Size(args)) {
       case 1:
         if (!parseArgs(args, "S", &u, &_u))
         {
-            icu::Formattable result;
+            Formattable result;
             _pp.setErrorIndex(-1);
             self->object->parseCurrency(*u, result, _pp);
             if (_pp.getErrorIndex() != -1)
@@ -633,7 +632,7 @@ static PyObject *t_numberformat_parseCurrency(t_numberformat *self,
         if (!parseArgs(args, "SP", TYPE_CLASSID(ParsePosition),
                        &u, &_u, &pp))
         {
-            icu::Formattable result;
+            Formattable result;
             pp->setErrorIndex(-1);
             self->object->parseCurrency(*u, result, *pp);
             if (pp->getErrorIndex() != -1)
@@ -781,15 +780,15 @@ static PyObject *t_numberformat_setMinimumFractionDigits(t_numberformat *self,
 
 static PyObject *t_numberformat_getCurrency(t_numberformat *self)
 {
-    icu::UnicodeString u(self->object->getCurrency());
+    UnicodeString u(self->object->getCurrency());
     return PyUnicode_FromUnicodeString(&u);
 }
 
 static PyObject *t_numberformat_setCurrency(t_numberformat *self,
                                             PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -803,17 +802,17 @@ static PyObject *t_numberformat_setCurrency(t_numberformat *self,
 static PyObject *t_numberformat_createInstance(PyTypeObject *type,
                                                PyObject *args)
 {
-    icu::NumberFormat *format;
-    icu::Locale *locale;
+    NumberFormat *format;
+    Locale *locale;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        STATUS_CALL(format = icu::NumberFormat::createInstance(status));
+        STATUS_CALL(format = NumberFormat::createInstance(status));
         return wrap_NumberFormat(format);
       case 1:
         if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
-            STATUS_CALL(format = icu::NumberFormat::createInstance(*locale, status));
+            STATUS_CALL(format = NumberFormat::createInstance(*locale, status));
             return wrap_NumberFormat(format);
         }
         break;
@@ -825,17 +824,17 @@ static PyObject *t_numberformat_createInstance(PyTypeObject *type,
 static PyObject *t_numberformat_createCurrencyInstance(PyTypeObject *type,
                                                        PyObject *args)
 {
-    icu::NumberFormat *format;
-    icu::Locale *locale;
+    NumberFormat *format;
+    Locale *locale;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        STATUS_CALL(format = icu::NumberFormat::createCurrencyInstance(status));
+        STATUS_CALL(format = NumberFormat::createCurrencyInstance(status));
         return wrap_NumberFormat(format);
       case 1:
         if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
-            STATUS_CALL(format = icu::NumberFormat::createCurrencyInstance(*locale, status));
+            STATUS_CALL(format = NumberFormat::createCurrencyInstance(*locale, status));
             return wrap_NumberFormat(format);
         }
         break;
@@ -846,17 +845,17 @@ static PyObject *t_numberformat_createCurrencyInstance(PyTypeObject *type,
 static PyObject *t_numberformat_createPercentInstance(PyTypeObject *type,
                                                       PyObject *args)
 {
-    icu::NumberFormat *format;
-    icu::Locale *locale;
+    NumberFormat *format;
+    Locale *locale;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        STATUS_CALL(format = icu::NumberFormat::createPercentInstance(status));
+        STATUS_CALL(format = NumberFormat::createPercentInstance(status));
         return wrap_NumberFormat(format);
       case 1:
         if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
-            STATUS_CALL(format = icu::NumberFormat::createPercentInstance(*locale, status));
+            STATUS_CALL(format = NumberFormat::createPercentInstance(*locale, status));
             return wrap_NumberFormat(format);
         }
         break;
@@ -868,17 +867,17 @@ static PyObject *t_numberformat_createPercentInstance(PyTypeObject *type,
 static PyObject *t_numberformat_createScientificInstance(PyTypeObject *type,
                                                          PyObject *args)
 {
-    icu::NumberFormat *format;
-    icu::Locale *locale;
+    NumberFormat *format;
+    Locale *locale;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        STATUS_CALL(format = icu::NumberFormat::createScientificInstance(status));
+        STATUS_CALL(format = NumberFormat::createScientificInstance(status));
         return wrap_NumberFormat(format);
       case 1:
         if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
-            STATUS_CALL(format = icu::NumberFormat::createScientificInstance(*locale, status));
+            STATUS_CALL(format = NumberFormat::createScientificInstance(*locale, status));
             return wrap_NumberFormat(format);
         }
         break;
@@ -890,11 +889,11 @@ static PyObject *t_numberformat_createScientificInstance(PyTypeObject *type,
 static PyObject *t_numberformat_getAvailableLocales(PyTypeObject *type)
 {
     int count;
-    const icu::Locale *locales = icu::NumberFormat::getAvailableLocales(count);
+    const Locale *locales = NumberFormat::getAvailableLocales(count);
     PyObject *dict = PyDict_New();
 
     for (int32_t i = 0; i < count; i++) {
-        icu::Locale *locale = (icu::Locale *) locales + i;
+        Locale *locale = (Locale *) locales + i;
         PyObject *obj = wrap_Locale(locale, 0);
         PyDict_SetItemString(dict, locale->getName(), obj);
 	Py_DECREF(obj);
@@ -909,21 +908,21 @@ static PyObject *t_numberformat_getAvailableLocales(PyTypeObject *type)
 static int t_decimalformat_init(t_decimalformat *self,
                                 PyObject *args, PyObject *kwds)
 {
-    icu::DecimalFormat *format;
-    icu::DecimalFormatSymbols *dfs;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    DecimalFormat *format;
+    DecimalFormatSymbols *dfs;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        INT_STATUS_CALL(format = new icu::DecimalFormat(status));
+        INT_STATUS_CALL(format = new DecimalFormat(status));
         self->object = format;
         self->flags = T_OWNED;
         break;
       case 1:
         if (!parseArgs(args, "S", &u, &_u))
         {
-            INT_STATUS_CALL(format = new icu::DecimalFormat(*u, status));
+            INT_STATUS_CALL(format = new DecimalFormat(*u, status));
             self->object = format;
             self->flags = T_OWNED;
             break;
@@ -935,7 +934,7 @@ static int t_decimalformat_init(t_decimalformat *self,
                        TYPE_CLASSID(DecimalFormatSymbols),
                        &u, &_u, &dfs))
         {
-            INT_STATUS_CALL(format = new icu::DecimalFormat(*u, *dfs, status));
+            INT_STATUS_CALL(format = new DecimalFormat(*u, *dfs, status));
             self->object = format;
             self->flags = T_OWNED;
             break;
@@ -956,8 +955,8 @@ static int t_decimalformat_init(t_decimalformat *self,
 static PyObject *t_decimalformat_getPositivePrefix(t_decimalformat *self,
                                                    PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -978,8 +977,8 @@ static PyObject *t_decimalformat_getPositivePrefix(t_decimalformat *self,
 static PyObject *t_decimalformat_setPositivePrefix(t_decimalformat *self,
                                                    PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -993,8 +992,8 @@ static PyObject *t_decimalformat_setPositivePrefix(t_decimalformat *self,
 static PyObject *t_decimalformat_getNegativePrefix(t_decimalformat *self,
                                                    PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1015,8 +1014,8 @@ static PyObject *t_decimalformat_getNegativePrefix(t_decimalformat *self,
 static PyObject *t_decimalformat_setNegativePrefix(t_decimalformat *self,
                                                    PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -1030,8 +1029,8 @@ static PyObject *t_decimalformat_setNegativePrefix(t_decimalformat *self,
 static PyObject *t_decimalformat_getPositiveSuffix(t_decimalformat *self,
                                                    PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1052,8 +1051,8 @@ static PyObject *t_decimalformat_getPositiveSuffix(t_decimalformat *self,
 static PyObject *t_decimalformat_setPositiveSuffix(t_decimalformat *self,
                                                    PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -1067,8 +1066,8 @@ static PyObject *t_decimalformat_setPositiveSuffix(t_decimalformat *self,
 static PyObject *t_decimalformat_getNegativeSuffix(t_decimalformat *self,
                                                    PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1089,8 +1088,8 @@ static PyObject *t_decimalformat_getNegativeSuffix(t_decimalformat *self,
 static PyObject *t_decimalformat_setNegativeSuffix(t_decimalformat *self,
                                                    PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -1141,14 +1140,14 @@ static PyObject *t_decimalformat_setRoundingIncrement(t_decimalformat *self,
 
 static PyObject *t_decimalformat_getRoundingMode(t_decimalformat *self)
 {
-    icu::DecimalFormat::ERoundingMode mode = self->object->getRoundingMode();
+    DecimalFormat::ERoundingMode mode = self->object->getRoundingMode();
     return PyInt_FromLong(mode);
 }
 
 static PyObject *t_decimalformat_setRoundingMode(t_decimalformat *self,
                                                  PyObject *arg)
 {
-    icu::DecimalFormat::ERoundingMode mode;
+    DecimalFormat::ERoundingMode mode;
 
     if (!parseArg(arg, "i", &mode))
     {
@@ -1181,12 +1180,12 @@ static PyObject *t_decimalformat_setFormatWidth(t_decimalformat *self,
 static PyObject *t_decimalformat_getPadCharacterString(t_decimalformat *self,
                                                        PyObject *args)
 {
-    icu::UnicodeString *u;
+    UnicodeString *u;
 
     switch (PyTuple_Size(args)) {
       case 0:
       {
-          icu::UnicodeString u = self->object->getPadCharacterString();
+          UnicodeString u = self->object->getPadCharacterString();
           return PyUnicode_FromUnicodeString(&u);
       }
       case 1:
@@ -1204,8 +1203,8 @@ static PyObject *t_decimalformat_getPadCharacterString(t_decimalformat *self,
 static PyObject *t_decimalformat_setPadCharacter(t_decimalformat *self,
                                                  PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -1224,7 +1223,7 @@ static PyObject *t_decimalformat_getPadPosition(t_decimalformat *self)
 static PyObject *t_decimalformat_setPadPosition(t_decimalformat *self,
                                                 PyObject *arg)
 {
-    icu::DecimalFormat::EPadPosition pos;
+    DecimalFormat::EPadPosition pos;
 
     if (!parseArg(arg, "i", &pos))
     {
@@ -1353,8 +1352,8 @@ static PyObject *t_decimalformat_setSecondaryGroupingSize(t_decimalformat *self,
 static PyObject *t_decimalformat_toPattern(t_decimalformat *self,
                                            PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1375,8 +1374,8 @@ static PyObject *t_decimalformat_toPattern(t_decimalformat *self,
 static PyObject *t_decimalformat_toLocalizedPattern(t_decimalformat *self,
                                                     PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1397,8 +1396,8 @@ static PyObject *t_decimalformat_toLocalizedPattern(t_decimalformat *self,
 static PyObject *t_decimalformat_applyPattern(t_decimalformat *self,
                                               PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -1412,8 +1411,8 @@ static PyObject *t_decimalformat_applyPattern(t_decimalformat *self,
 static PyObject *t_decimalformat_applyLocalizedPattern(t_decimalformat *self,
                                                        PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -1482,7 +1481,7 @@ static PyObject *t_decimalformat_setSignificantDigitsUsed(t_decimalformat *self,
 
 static PyObject *t_decimalformat_str(t_decimalformat *self)
 {
-    icu::UnicodeString u; 
+    UnicodeString u;
 
     self->object->toPattern(u);
     return PyUnicode_FromUnicodeString(&u);
@@ -1494,16 +1493,16 @@ static PyObject *t_decimalformat_str(t_decimalformat *self)
 static int t_rulebasednumberformat_init(t_rulebasednumberformat *self,
                                         PyObject *args, PyObject *kwds)
 {
-    icu::UnicodeString *u, *v;
-    icu::UnicodeString _u, _v;
-    icu::Locale *locale;
-    icu::RuleBasedNumberFormat *rbf;
+    UnicodeString *u, *v;
+    UnicodeString _u, _v;
+    Locale *locale;
+    RuleBasedNumberFormat *rbf;
 
     switch (PyTuple_Size(args)) {
       case 1:
         if (!parseArgs(args, "S", &u, &_u))
         {
-            INT_STATUS_PARSER_CALL(rbf = new icu::RuleBasedNumberFormat(*u, parseError, status));
+            INT_STATUS_PARSER_CALL(rbf = new RuleBasedNumberFormat(*u, parseError, status));
             self->object = rbf;
             self->flags = T_OWNED;
             break;
@@ -1513,7 +1512,7 @@ static int t_rulebasednumberformat_init(t_rulebasednumberformat *self,
       case 2:
         if (!parseArgs(args, "SS", &u, &_u, &v, &_v))
         {
-            INT_STATUS_PARSER_CALL(rbf = new icu::RuleBasedNumberFormat(*u, *v, parseError, status));
+            INT_STATUS_PARSER_CALL(rbf = new RuleBasedNumberFormat(*u, *v, parseError, status));
             self->object = rbf;
             self->flags = T_OWNED;
             break;
@@ -1521,7 +1520,7 @@ static int t_rulebasednumberformat_init(t_rulebasednumberformat *self,
         if (!parseArgs(args, "SP", TYPE_CLASSID(Locale),
                        &u, &_u, &locale))
         {
-            INT_STATUS_PARSER_CALL(rbf = new icu::RuleBasedNumberFormat(*u, *locale, parseError, status));
+            INT_STATUS_PARSER_CALL(rbf = new RuleBasedNumberFormat(*u, *locale, parseError, status));
             self->object = rbf;
             self->flags = T_OWNED;
             break;
@@ -1532,7 +1531,7 @@ static int t_rulebasednumberformat_init(t_rulebasednumberformat *self,
         if (!parseArgs(args, "SSP", TYPE_CLASSID(Locale),
                        &u, &_u, &v, &_v, &locale))
         {
-            INT_STATUS_PARSER_CALL(rbf = new icu::RuleBasedNumberFormat(*u, *v, *locale, parseError, status));
+            INT_STATUS_PARSER_CALL(rbf = new RuleBasedNumberFormat(*u, *v, *locale, parseError, status));
             self->object = rbf;
             self->flags = T_OWNED;
             break;
@@ -1553,12 +1552,12 @@ static int t_rulebasednumberformat_init(t_rulebasednumberformat *self,
 static PyObject *t_rulebasednumberformat_getRules(t_rulebasednumberformat *self,
                                                   PyObject *args)
 {
-    icu::UnicodeString *u;
+    UnicodeString *u;
 
     switch (PyTuple_Size(args)) {
       case 0:
       {
-          icu::UnicodeString u = self->object->getRules();
+          UnicodeString u = self->object->getRules();
           return PyUnicode_FromUnicodeString(&u);
       }
       case 1:
@@ -1581,13 +1580,13 @@ static PyObject *t_rulebasednumberformat_getNumberOfRuleSetNames(t_rulebasednumb
 static PyObject *t_rulebasednumberformat_getRuleSetName(t_rulebasednumberformat *self, PyObject *args)
 {
     int index;
-    icu::UnicodeString *u;
+    UnicodeString *u;
 
     switch (PyTuple_Size(args)) {
       case 1:
         if (!parseArgs(args, "i", &index))
         {
-            icu::UnicodeString u = self->object->getRuleSetName(index);
+            UnicodeString u = self->object->getRuleSetName(index);
             return PyUnicode_FromUnicodeString(&u);
         }
       case 2:
@@ -1610,21 +1609,21 @@ static PyObject *t_rulebasednumberformat_getNumberOfRuleSetDisplayNameLocales(t_
 static PyObject *t_rulebasednumberformat_getRuleSetDisplayName(t_rulebasednumberformat *self, PyObject *args)
 {
     int index;
-    icu::Locale *locale;
-    icu::UnicodeString *u;
+    Locale *locale;
+    UnicodeString *u;
 
     switch (PyTuple_Size(args)) {
       case 1:
         if (!parseArgs(args, "i", &index))
         {
-            icu::UnicodeString u = self->object->getRuleSetDisplayName(index);
+            UnicodeString u = self->object->getRuleSetDisplayName(index);
             return PyUnicode_FromUnicodeString(&u);
         }
       case 2:
         if (!parseArgs(args, "iP", TYPE_CLASSID(Locale),
                        &index, &locale))
         {
-            icu::UnicodeString u = self->object->getRuleSetDisplayName(index, *locale);
+            UnicodeString u = self->object->getRuleSetDisplayName(index, *locale);
             return PyUnicode_FromUnicodeString(&u);
         }
         if (!parseArgs(args, "iU", &index, &u))
@@ -1649,12 +1648,12 @@ static PyObject *t_rulebasednumberformat_getRuleSetDisplayName(t_rulebasednumber
 static PyObject *t_rulebasednumberformat_format(t_rulebasednumberformat *self,
                                                 PyObject *args)
 {
-    icu::UnicodeString *u, *v;
-    icu::UnicodeString _u, _v;
+    UnicodeString *u, *v;
+    UnicodeString _u, _v;
     double d;
     int i;
     PY_LONG_LONG l;
-    icu::FieldPosition *fp;
+    FieldPosition *fp;
 
     switch (PyTuple_Size(args)) {
       case 3:
@@ -1723,12 +1722,12 @@ static PyObject *t_rulebasednumberformat_setLenient(t_rulebasednumberformat *sel
 
 static PyObject *t_rulebasednumberformat_getDefaultRuleSetName(t_rulebasednumberformat *self, PyObject *args)
 {
-    icu::UnicodeString *u;
+    UnicodeString *u;
 
     switch (PyTuple_Size(args)) {
       case 0:
       {
-          icu::UnicodeString _u = self->object->getDefaultRuleSetName();
+          UnicodeString _u = self->object->getDefaultRuleSetName();
           return PyUnicode_FromUnicodeString(&_u);
       }
       case 1:
@@ -1745,8 +1744,8 @@ static PyObject *t_rulebasednumberformat_getDefaultRuleSetName(t_rulebasednumber
 
 static PyObject *t_rulebasednumberformat_setDefaultRuleSet(t_rulebasednumberformat *self, PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -1759,7 +1758,7 @@ static PyObject *t_rulebasednumberformat_setDefaultRuleSet(t_rulebasednumberform
 
 static PyObject *t_rulebasednumberformat_str(t_rulebasednumberformat *self)
 {
-    icu::UnicodeString u = self->object->getRules();
+    UnicodeString u = self->object->getRules();
     return PyUnicode_FromUnicodeString(&u);
 }
 
@@ -1769,21 +1768,21 @@ static PyObject *t_rulebasednumberformat_str(t_rulebasednumberformat *self)
 static int t_choiceformat_init(t_choiceformat *self,
                                PyObject *args, PyObject *kwds)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
-    icu::ChoiceFormat *cf;
+    UnicodeString *u;
+    UnicodeString _u;
+    ChoiceFormat *cf;
     double *limits;
     int limitCount;
     UBool *closures;
     int closureCount;
-    icu::UnicodeString *formats;
+    UnicodeString *formats;
     int formatCount;
 
     switch (PyTuple_Size(args)) {
       case 1:
         if (!parseArgs(args, "S", &u, &_u))
         {
-            INT_STATUS_CALL(cf = new icu::ChoiceFormat(*u, status));
+            INT_STATUS_CALL(cf = new ChoiceFormat(*u, status));
             self->object = cf;
             self->flags = T_OWNED;
             break;
@@ -1794,7 +1793,7 @@ static int t_choiceformat_init(t_choiceformat *self,
         if (!parseArgs(args, "FT",
                        &limits, &limitCount, &formats, &formatCount))
         {
-            cf = new icu::ChoiceFormat(limits, formats, limitCount);
+            cf = new ChoiceFormat(limits, formats, limitCount);
             delete[] limits;
             delete[] formats;
                 
@@ -1808,7 +1807,7 @@ static int t_choiceformat_init(t_choiceformat *self,
                        &closures, &closureCount,
                        &formats, &formatCount))
         {
-            cf = new icu::ChoiceFormat(limits, closures, formats, limitCount);
+            cf = new ChoiceFormat(limits, closures, formats, limitCount);
             delete[] limits;
             delete[] closures;
             delete[] formats;
@@ -1834,8 +1833,8 @@ static int t_choiceformat_init(t_choiceformat *self,
 static PyObject *t_choiceformat_toPattern(t_choiceformat *self,
                                           PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1856,8 +1855,8 @@ static PyObject *t_choiceformat_toPattern(t_choiceformat *self,
 static PyObject *t_choiceformat_applyPattern(t_choiceformat *self,
                                              PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -1875,7 +1874,7 @@ static PyObject *t_choiceformat_setChoices(t_choiceformat *self,
     int limitCount;
     UBool *closures;
     int closureCount;
-    icu::UnicodeString *formats;
+    UnicodeString *formats;
     int formatCount;
 
     switch (PyTuple_Size(args)) {
@@ -1939,7 +1938,7 @@ static PyObject *fromUBoolArray(UBool *array, int len, int dispose)
     return list;
 }
 
-static PyObject *fromUnicodeStringArray(icu::UnicodeString *array,
+static PyObject *fromUnicodeStringArray(UnicodeString *array,
                                         int len, int dispose)
 {
     PyObject *list = PyList_New(len);
@@ -1972,18 +1971,18 @@ static PyObject *t_choiceformat_getClosures(t_choiceformat *self)
 static PyObject *t_choiceformat_getFormats(t_choiceformat *self)
 {
     int len;
-    const icu::UnicodeString *formats = self->object->getFormats(len);
+    const UnicodeString *formats = self->object->getFormats(len);
     
-    return fromUnicodeStringArray((icu::UnicodeString *) formats, len, 0);
+    return fromUnicodeStringArray((UnicodeString *) formats, len, 0);
 }
 
 static PyObject *t_choiceformat_format(t_choiceformat *self, PyObject *args)
 {
-    icu::Formattable *f;
+    Formattable *f;
     int len;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
-    icu::FieldPosition *fp;
+    UnicodeString *u;
+    UnicodeString _u;
+    FieldPosition *fp;
 
     switch (PyTuple_Size(args)) {
       case 2:
@@ -2024,7 +2023,7 @@ static PyObject *t_choiceformat_format(t_choiceformat *self, PyObject *args)
 
 static PyObject *t_choiceformat_str(t_choiceformat *self)
 {
-    icu::UnicodeString u; self->object->toPattern(u);
+    UnicodeString u; self->object->toPattern(u);
     return PyUnicode_FromUnicodeString(&u);
 }
 

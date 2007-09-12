@@ -24,7 +24,7 @@
 #ifndef _dateformat_h
 #define _dateformat_h
 
-PyObject *wrap_SimpleDateFormat(icu::SimpleDateFormat *, int);
+PyObject *wrap_SimpleDateFormat(SimpleDateFormat *, int);
 void _init_dateformat(PyObject *m);
 
 

@@ -26,17 +26,17 @@
 
 class t_timezone : public _wrapper {
 public:
-    icu::TimeZone *object;
+    TimeZone *object;
 };
 
 extern PyTypeObject CalendarType;
 extern PyTypeObject TimeZoneType;
 
 
-PyObject *wrap_Calendar(icu::Calendar *, int);
-PyObject *wrap_TimeZone(icu::TimeZone *, int);
-PyObject *wrap_TimeZone(icu::TimeZone *);
-PyObject *wrap_TimeZone(const icu::TimeZone &);
+PyObject *wrap_Calendar(Calendar *, int);
+PyObject *wrap_TimeZone(TimeZone *, int);
+PyObject *wrap_TimeZone(TimeZone *);
+PyObject *wrap_TimeZone(const TimeZone &);
 PyObject *t_timezone_createTimeZone(PyTypeObject *type, PyObject *arg);
 
 void _init_calendar(PyObject *m);

@@ -26,10 +26,10 @@
 
 extern PyTypeObject NumberFormatType;
 
-PyObject *wrap_NumberFormat(icu::NumberFormat *, int);
-PyObject *wrap_DecimalFormat(icu::DecimalFormat *, int);
-PyObject *wrap_RuleBasedNumberFormat(icu::RuleBasedNumberFormat *, int);
-PyObject *wrap_ChoiceFormat(icu::ChoiceFormat *, int);
+PyObject *wrap_NumberFormat(NumberFormat *, int);
+PyObject *wrap_DecimalFormat(DecimalFormat *, int);
+PyObject *wrap_RuleBasedNumberFormat(RuleBasedNumberFormat *, int);
+PyObject *wrap_ChoiceFormat(ChoiceFormat *, int);
 
 void _init_numberformat(PyObject *m);
 

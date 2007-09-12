@@ -34,7 +34,7 @@
 
 class t_forwardcharacteriterator : public _wrapper {
 public:
-    icu::ForwardCharacterIterator *object;
+    ForwardCharacterIterator *object;
 };
 
 static PyObject *t_forwardcharacteriterator_nextPostInc(t_forwardcharacteriterator *self);
@@ -49,13 +49,13 @@ static PyMethodDef t_forwardcharacteriterator_methods[] = {
 };
 
 DECLARE_TYPE(ForwardCharacterIterator, t_forwardcharacteriterator, UObject,
-             icu::ForwardCharacterIterator, abstract_init);
+             ForwardCharacterIterator, abstract_init);
 
 /* CharacterIterator */
 
 class t_characteriterator : public _wrapper {
 public:
-    icu::CharacterIterator *object;
+    CharacterIterator *object;
 };
 
 static PyObject *t_characteriterator_first(t_characteriterator *self);
@@ -114,13 +114,13 @@ static PyMethodDef t_characteriterator_methods[] = {
 };
 
 DECLARE_TYPE(CharacterIterator, t_characteriterator, ForwardCharacterIterator,
-             icu::CharacterIterator, abstract_init);
+             CharacterIterator, abstract_init);
 
 /* UCharCharacterIterator */
 
 class t_ucharcharacteriterator : public _wrapper {
 public:
-    icu::UCharCharacterIterator *object;
+    UCharCharacterIterator *object;
 };
 
 static int t_ucharcharacteriterator_init(t_ucharcharacteriterator *self,
@@ -131,14 +131,14 @@ static PyMethodDef t_ucharcharacteriterator_methods[] = {
 };
 
 DECLARE_TYPE(UCharCharacterIterator, t_ucharcharacteriterator,
-             CharacterIterator, icu::UCharCharacterIterator,
+             CharacterIterator, UCharCharacterIterator,
              t_ucharcharacteriterator_init);
 
 /* StringCharacterIterator */
 
 class t_stringcharacteriterator : public _wrapper {
 public:
-    icu::StringCharacterIterator *object;
+    StringCharacterIterator *object;
 };
 
 static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
@@ -151,14 +151,14 @@ static PyMethodDef t_stringcharacteriterator_methods[] = {
 };
 
 DECLARE_TYPE(StringCharacterIterator, t_stringcharacteriterator,
-             UCharCharacterIterator, icu::StringCharacterIterator,
+             UCharCharacterIterator, StringCharacterIterator,
              t_stringcharacteriterator_init);
 
 /* BreakIterator */
 
 class t_breakiterator : public _wrapper {
 public:
-    icu::BreakIterator *object;
+    BreakIterator *object;
 };
 
 static PyObject *t_breakiterator_getText(t_breakiterator *self);
@@ -215,14 +215,14 @@ static PyMethodDef t_breakiterator_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(BreakIterator, t_breakiterator, UObject, icu::BreakIterator,
+DECLARE_TYPE(BreakIterator, t_breakiterator, UObject, BreakIterator,
              abstract_init);
 
 /* RuleBasedBreakIterator */
 
 class t_rulebasedbreakiterator : public _wrapper {
 public:
-    icu::RuleBasedBreakIterator *object;
+    RuleBasedBreakIterator *object;
 };
 
 static int t_rulebasedbreakiterator_init(t_rulebasedbreakiterator *self,
@@ -237,14 +237,14 @@ static PyMethodDef t_rulebasedbreakiterator_methods[] = {
 };
 
 DECLARE_TYPE(RuleBasedBreakIterator, t_rulebasedbreakiterator,
-             BreakIterator, icu::RuleBasedBreakIterator,
+             BreakIterator, RuleBasedBreakIterator,
              t_rulebasedbreakiterator_init);
 
 /* DictionaryBasedBreakIterator */
 
 class t_dictionarybasedbreakiterator : public _wrapper {
 public:
-    icu::DictionaryBasedBreakIterator *object;
+    DictionaryBasedBreakIterator *object;
 };
 
 static int t_dictionarybasedbreakiterator_init(t_dictionarybasedbreakiterator *self, PyObject *args, PyObject *kwds);
@@ -254,14 +254,14 @@ static PyMethodDef t_dictionarybasedbreakiterator_methods[] = {
 };
 
 DECLARE_TYPE(DictionaryBasedBreakIterator, t_dictionarybasedbreakiterator,
-             RuleBasedBreakIterator, icu::DictionaryBasedBreakIterator,
+             RuleBasedBreakIterator, DictionaryBasedBreakIterator,
              t_dictionarybasedbreakiterator_init);
 
 /* CanonicalIterator */
 
 class t_canonicaliterator : public _wrapper {
 public:
-    icu::CanonicalIterator *object;
+    CanonicalIterator *object;
 };
 
 static int t_canonicaliterator_init(t_canonicaliterator *self,
@@ -283,13 +283,13 @@ static PyMethodDef t_canonicaliterator_methods[] = {
 };
 
 DECLARE_TYPE(CanonicalIterator, t_canonicaliterator, UObject,
-             icu::CanonicalIterator, t_canonicaliterator_init);
+             CanonicalIterator, t_canonicaliterator_init);
 
 /* CollationElementIterator */
 
 class t_collationelementiterator : public _wrapper {
 public:
-    icu::CollationElementIterator *object;
+    CollationElementIterator *object;
 };
 
 static PyObject *t_collationelementiterator_reset(t_collationelementiterator *self);
@@ -322,7 +322,7 @@ static PyMethodDef t_collationelementiterator_methods[] = {
 };
 
 DECLARE_TYPE(CollationElementIterator, t_collationelementiterator, UObject,
-             icu::CollationElementIterator, abstract_init);
+             CollationElementIterator, abstract_init);
 
 
 /* ForwardCharacterIterator */
@@ -331,7 +331,7 @@ static PyObject *t_forwardcharacteriterator_nextPostInc(t_forwardcharacteriterat
 {
     UChar c = self->object->nextPostInc();
 
-    if (c == icu::ForwardCharacterIterator::DONE)
+    if (c == ForwardCharacterIterator::DONE)
     {
         PyErr_SetNone(PyExc_StopIteration);
         return NULL;
@@ -344,7 +344,7 @@ static PyObject *t_forwardcharacteriterator_next32PostInc(t_forwardcharacteriter
 {
     UChar32 c = self->object->next32PostInc();
 
-    if (c == icu::ForwardCharacterIterator::DONE)
+    if (c == ForwardCharacterIterator::DONE)
     {
         PyErr_SetNone(PyExc_StopIteration);
         return NULL;
@@ -367,7 +367,7 @@ static PyObject *t_forwardcharacteriterator_iter(t_forwardcharacteriterator *sel
 static PyObject *t_forwardcharacteriterator_richcmp(t_forwardcharacteriterator *self, PyObject *arg, int op)
 {
     int b = 0;
-    icu::ForwardCharacterIterator *i;
+    ForwardCharacterIterator *i;
 
     if (!parseArg(arg, "P", TYPE_ID(ForwardCharacterIterator), &i))
     {
@@ -515,7 +515,7 @@ static PyObject *t_characteriterator_move(t_characteriterator *self,
                                           PyObject *args)
 {
     int delta;
-    icu::CharacterIterator::EOrigin origin;
+    CharacterIterator::EOrigin origin;
 
     if (!parseArgs(args, "ii", &delta, &origin))
         return PyInt_FromLong((long) self->object->move(delta, origin));
@@ -526,8 +526,8 @@ static PyObject *t_characteriterator_move(t_characteriterator *self,
 static PyObject *t_characteriterator_getText(t_characteriterator *self,
                                              PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -551,15 +551,15 @@ static PyObject *t_characteriterator_getText(t_characteriterator *self,
 static int t_ucharcharacteriterator_init(t_ucharcharacteriterator *self,
                                          PyObject *args, PyObject *kwds)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int len, start, end, pos;
 
     switch (PyTuple_Size(args)) {
       case 2:
         if (!parseArgs(args, "Si", &u, &_u, &len))
         {
-            self->object = new icu::UCharCharacterIterator(u->getTerminatedBuffer(), len);
+            self->object = new UCharCharacterIterator(u->getTerminatedBuffer(), len);
             self->flags = T_OWNED;
             break;
         }
@@ -568,7 +568,7 @@ static int t_ucharcharacteriterator_init(t_ucharcharacteriterator *self,
       case 3:
         if (!parseArgs(args, "Sii", &u, &_u, &len, &pos))
         {
-            self->object = new icu::UCharCharacterIterator(u->getTerminatedBuffer(), len, pos);
+            self->object = new UCharCharacterIterator(u->getTerminatedBuffer(), len, pos);
             self->flags = T_OWNED;
             break;
         }
@@ -577,7 +577,7 @@ static int t_ucharcharacteriterator_init(t_ucharcharacteriterator *self,
       case 5:
         if (!parseArgs(args, "Siiii", &u, &_u, &len, &start, &end, &pos))
         {
-            self->object = new icu::UCharCharacterIterator(u->getTerminatedBuffer(), len, start, end, pos);
+            self->object = new UCharCharacterIterator(u->getTerminatedBuffer(), len, start, end, pos);
             self->flags = T_OWNED;
             break;
         }
@@ -600,15 +600,15 @@ static int t_ucharcharacteriterator_init(t_ucharcharacteriterator *self,
 static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
                                           PyObject *args, PyObject *kwds)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int start, end, pos;
 
     switch (PyTuple_Size(args)) {
       case 1:
         if (!parseArgs(args, "S", &u, &_u))
         {
-            self->object = new icu::StringCharacterIterator(*u);
+            self->object = new StringCharacterIterator(*u);
             self->flags = T_OWNED;
             break;
         }
@@ -617,7 +617,7 @@ static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
       case 2:
         if (!parseArgs(args, "Si", &u, &_u, &pos))
         {
-            self->object = new icu::StringCharacterIterator(*u, pos);
+            self->object = new StringCharacterIterator(*u, pos);
             self->flags = T_OWNED;
             break;
         }
@@ -626,7 +626,7 @@ static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
       case 4:
         if (!parseArgs(args, "Siii", &u, &_u, &start, &end, &pos))
         {
-            self->object = new icu::StringCharacterIterator(*u, start, end, pos);
+            self->object = new StringCharacterIterator(*u, start, end, pos);
             self->flags = T_OWNED;
             break;
         }
@@ -645,8 +645,8 @@ static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
 
 static PyObject *t_stringcharacteriterator_setText(t_stringcharacteriterator *self, PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -662,14 +662,14 @@ static PyObject *t_stringcharacteriterator_setText(t_stringcharacteriterator *se
 
 static PyObject *t_breakiterator_getText(t_breakiterator *self)
 {
-    icu::CharacterIterator *iterator = self->object->getText().clone();
+    CharacterIterator *iterator = self->object->getText().clone();
     return wrap_CharacterIterator(iterator, T_OWNED);
 }
 
 static PyObject *t_breakiterator_setText(t_breakiterator *self, PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -745,7 +745,7 @@ static PyObject *t_breakiterator_getLocale(t_breakiterator *self,
                                            PyObject *args)
 {
     ULocDataLocaleType type;
-    icu::Locale locale;
+    Locale locale;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -788,12 +788,12 @@ static PyObject *t_breakiterator_getLocaleID(t_breakiterator *self,
 static PyObject *t_breakiterator_createWordInstance(PyTypeObject *type,
                                                     PyObject *arg)
 {
-    icu::Locale *locale;
-    icu::BreakIterator *iterator;
+    Locale *locale;
+    BreakIterator *iterator;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
     {
-        STATUS_CALL(iterator = icu::BreakIterator::createWordInstance(*locale, status));
+        STATUS_CALL(iterator = BreakIterator::createWordInstance(*locale, status));
         return wrap_BreakIterator(iterator, T_OWNED);
     }
 
@@ -803,12 +803,12 @@ static PyObject *t_breakiterator_createWordInstance(PyTypeObject *type,
 static PyObject *t_breakiterator_createLineInstance(PyTypeObject *type,
                                                     PyObject *arg)
 {
-    icu::Locale *locale;
-    icu::BreakIterator *iterator;
+    Locale *locale;
+    BreakIterator *iterator;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
     {
-        STATUS_CALL(iterator = icu::BreakIterator::createLineInstance(*locale, status));
+        STATUS_CALL(iterator = BreakIterator::createLineInstance(*locale, status));
         return wrap_BreakIterator(iterator, T_OWNED);
     }
 
@@ -818,12 +818,12 @@ static PyObject *t_breakiterator_createLineInstance(PyTypeObject *type,
 static PyObject *t_breakiterator_createCharacterInstance(PyTypeObject *type,
                                                          PyObject *arg)
 {
-    icu::Locale *locale;
-    icu::BreakIterator *iterator;
+    Locale *locale;
+    BreakIterator *iterator;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
     {
-        STATUS_CALL(iterator = icu::BreakIterator::createCharacterInstance(*locale, status));
+        STATUS_CALL(iterator = BreakIterator::createCharacterInstance(*locale, status));
         return wrap_BreakIterator(iterator, T_OWNED);
     }
 
@@ -833,12 +833,12 @@ static PyObject *t_breakiterator_createCharacterInstance(PyTypeObject *type,
 static PyObject *t_breakiterator_createSentenceInstance(PyTypeObject *type,
                                                         PyObject *arg)
 {
-    icu::Locale *locale;
-    icu::BreakIterator *iterator;
+    Locale *locale;
+    BreakIterator *iterator;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
     {
-        STATUS_CALL(iterator = icu::BreakIterator::createSentenceInstance(*locale, status));
+        STATUS_CALL(iterator = BreakIterator::createSentenceInstance(*locale, status));
         return wrap_BreakIterator(iterator, T_OWNED);
     }
 
@@ -848,12 +848,12 @@ static PyObject *t_breakiterator_createSentenceInstance(PyTypeObject *type,
 static PyObject *t_breakiterator_createTitleInstance(PyTypeObject *type,
                                                      PyObject *arg)
 {
-    icu::Locale *locale;
-    icu::BreakIterator *iterator;
+    Locale *locale;
+    BreakIterator *iterator;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
     {
-        STATUS_CALL(iterator = icu::BreakIterator::createTitleInstance(*locale, status));
+        STATUS_CALL(iterator = BreakIterator::createTitleInstance(*locale, status));
         return wrap_BreakIterator(iterator, T_OWNED);
     }
 
@@ -863,11 +863,11 @@ static PyObject *t_breakiterator_createTitleInstance(PyTypeObject *type,
 static PyObject *t_breakiterator_getAvailableLocales(PyTypeObject *type)
 {
     int count;
-    const icu::Locale *locales = icu::BreakIterator::getAvailableLocales(count);
+    const Locale *locales = BreakIterator::getAvailableLocales(count);
     PyObject *dict = PyDict_New();
 
     for (int32_t i = 0; i < count; i++) {
-        icu::Locale *locale = (icu::Locale *) locales + i;
+        Locale *locale = (Locale *) locales + i;
         PyObject *obj = wrap_Locale(locale, 0);
         PyDict_SetItemString(dict, locale->getName(), obj);
 	Py_DECREF(obj);
@@ -879,9 +879,9 @@ static PyObject *t_breakiterator_getAvailableLocales(PyTypeObject *type)
 static PyObject *t_breakiterator_getDisplayName(PyTypeObject *type,
                                                 PyObject *args)
 {
-    icu::Locale *locale, *display;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    Locale *locale, *display;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -889,7 +889,7 @@ static PyObject *t_breakiterator_getDisplayName(PyTypeObject *type,
                        TYPE_CLASSID(Locale),
                        &locale))
         {
-            icu::BreakIterator::getDisplayName(*locale, _u);
+            BreakIterator::getDisplayName(*locale, _u);
             return PyUnicode_FromUnicodeString(&_u);
         }
         break;
@@ -898,7 +898,7 @@ static PyObject *t_breakiterator_getDisplayName(PyTypeObject *type,
                        TYPE_CLASSID(Locale),
                        &locale, &u))
         {
-            icu::BreakIterator::getDisplayName(*locale, *u);
+            BreakIterator::getDisplayName(*locale, *u);
             Py_RETURN_ARG(args, 1);
         }
         break;
@@ -907,7 +907,7 @@ static PyObject *t_breakiterator_getDisplayName(PyTypeObject *type,
                        TYPE_CLASSID(Locale),
                        &locale, &display))
         {
-            icu::BreakIterator::getDisplayName(*locale, *display, _u);
+            BreakIterator::getDisplayName(*locale, *display, _u);
             return PyUnicode_FromUnicodeString(&_u);
         }
         break;
@@ -917,7 +917,7 @@ static PyObject *t_breakiterator_getDisplayName(PyTypeObject *type,
                        TYPE_CLASSID(Locale),
                        &locale, &display, &u))
         {
-            icu::BreakIterator::getDisplayName(*locale, *display, *u);
+            BreakIterator::getDisplayName(*locale, *display, *u);
             Py_RETURN_ARG(args, 2);
         }
         break;
@@ -935,7 +935,7 @@ static PyObject *t_breakiterator_iter_next(t_breakiterator *self)
 {
     int n = self->object->next();
 
-    if (n == icu::BreakIterator::DONE)
+    if (n == BreakIterator::DONE)
     {
         PyErr_SetNone(PyExc_StopIteration);
         return NULL;
@@ -950,7 +950,7 @@ static PyObject *t_breakiterator_richcmp(t_breakiterator *self,
                                          PyObject *arg, int op)
 {
     int b = 0;
-    icu::BreakIterator *i;
+    BreakIterator *i;
 
     if (!parseArg(arg, "P", TYPE_ID(BreakIterator), &i))
     {
@@ -979,20 +979,20 @@ static PyObject *t_breakiterator_richcmp(t_breakiterator *self,
 static int t_rulebasedbreakiterator_init(t_rulebasedbreakiterator *self,
                                          PyObject *args, PyObject *kwds)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        self->object = new icu::RuleBasedBreakIterator();
+        self->object = new RuleBasedBreakIterator();
         self->flags = T_OWNED;
         break;
       case 1:
         if (!parseArgs(args, "S", &u, &_u))
         {
-            icu::RuleBasedBreakIterator *iterator;
+            RuleBasedBreakIterator *iterator;
 
-            INT_STATUS_PARSER_CALL(iterator = new icu::RuleBasedBreakIterator(*u, parseError, status));
+            INT_STATUS_PARSER_CALL(iterator = new RuleBasedBreakIterator(*u, parseError, status));
             self->object = iterator;
             self->flags = T_OWNED;
             break;
@@ -1012,8 +1012,8 @@ static int t_rulebasedbreakiterator_init(t_rulebasedbreakiterator *self,
 
 static PyObject *t_rulebasedbreakiterator_getRules(t_rulebasedbreakiterator *self, PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1043,7 +1043,7 @@ static int t_dictionarybasedbreakiterator_init(t_dictionarybasedbreakiterator *s
 {
     switch (PyTuple_Size(args)) {
       case 0:
-        self->object = new icu::DictionaryBasedBreakIterator();
+        self->object = new DictionaryBasedBreakIterator();
         self->flags = T_OWNED;
         break;
       default:
@@ -1063,14 +1063,14 @@ static int t_dictionarybasedbreakiterator_init(t_dictionarybasedbreakiterator *s
 static int t_canonicaliterator_init(t_canonicaliterator *self,
                                     PyObject *args, PyObject *kwds)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArgs(args, "S", &u, &_u))
     {
-        icu::CanonicalIterator *iterator;
+        CanonicalIterator *iterator;
 
-        INT_STATUS_CALL(iterator = new icu::CanonicalIterator(*u, status));
+        INT_STATUS_CALL(iterator = new CanonicalIterator(*u, status));
         self->object = iterator;
         self->flags = T_OWNED;
 
@@ -1084,8 +1084,8 @@ static int t_canonicaliterator_init(t_canonicaliterator *self,
 static PyObject *t_canonicaliterator_getSource(t_canonicaliterator *self,
                                                PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1106,8 +1106,8 @@ static PyObject *t_canonicaliterator_getSource(t_canonicaliterator *self,
 static PyObject *t_canonicaliterator_setSource(t_canonicaliterator *self,
                                                PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -1127,8 +1127,8 @@ static PyObject *t_canonicaliterator_reset(t_canonicaliterator *self)
 static PyObject *t_canonicaliterator_next(t_canonicaliterator *self,
                                           PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1156,7 +1156,7 @@ static PyObject *t_canonicaliterator_iter(t_canonicaliterator *self)
 
 static PyObject *t_canonicaliterator_iter_next(t_canonicaliterator *self)
 {
-    icu::UnicodeString u = self->object->next();
+    UnicodeString u = self->object->next();
 
     if (u.isBogus())
     {
@@ -1192,8 +1192,8 @@ static PyObject *t_collationelementiterator_previous(t_collationelementiterator 
 
 static PyObject *t_collationelementiterator_setText(t_collationelementiterator *self, PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -1247,7 +1247,7 @@ static PyObject *t_collationelementiterator_primaryOrder(PyTypeObject *type, PyO
     int i;
 
     if (!parseArg(arg, "i", &i))
-        return PyInt_FromLong(icu::CollationElementIterator::primaryOrder(i));
+        return PyInt_FromLong(CollationElementIterator::primaryOrder(i));
 
     return PyErr_SetArgsError(type, "primaryOrder", arg);
 }
@@ -1257,7 +1257,7 @@ static PyObject *t_collationelementiterator_secondaryOrder(PyTypeObject *type, P
     int i;
 
     if (!parseArg(arg, "i", &i))
-        return PyInt_FromLong(icu::CollationElementIterator::secondaryOrder(i));
+        return PyInt_FromLong(CollationElementIterator::secondaryOrder(i));
 
     return PyErr_SetArgsError(type, "secondaryOrder", arg);
 }
@@ -1267,7 +1267,7 @@ static PyObject *t_collationelementiterator_tertiaryOrder(PyTypeObject *type, Py
     int i;
 
     if (!parseArg(arg, "i", &i))
-        return PyInt_FromLong(icu::CollationElementIterator::tertiaryOrder(i));
+        return PyInt_FromLong(CollationElementIterator::tertiaryOrder(i));
 
     return PyErr_SetArgsError(type, "tertiaryOrder", arg);
 }
@@ -1278,7 +1278,7 @@ static PyObject *t_collationelementiterator_isIgnorable(PyTypeObject *type, PyOb
 
     if (!parseArg(arg, "i", &i))
     {
-        i = icu::CollationElementIterator::isIgnorable(i);
+        i = CollationElementIterator::isIgnorable(i);
         Py_RETURN_BOOL(i);
     }
 
@@ -1297,7 +1297,7 @@ static PyObject *t_collationelementiterator_iter_next(t_collationelementiterator
 
     STATUS_CALL(n = self->object->next(status));
 
-    if (n == icu::CollationElementIterator::NULLORDER)
+    if (n == CollationElementIterator::NULLORDER)
     {
         PyErr_SetNone(PyExc_StopIteration);
         return NULL;
@@ -1309,7 +1309,7 @@ static PyObject *t_collationelementiterator_iter_next(t_collationelementiterator
 static PyObject *t_collationelementiterator_richcmp(t_collationelementiterator *self, PyObject *arg, int op)
 {
     int b = 0;
-    icu::CollationElementIterator *i;
+    CollationElementIterator *i;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(CollationElementIterator),
                   &i))

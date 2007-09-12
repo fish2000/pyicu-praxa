@@ -272,8 +272,7 @@ static PyObject *t_charsetdetector_getAllDetectableCharsets(t_charsetdetector *s
     STATUS_CALL(_charsets = ucsdet_getAllDetectableCharsets(self->object,
                                                             &status));
 
-    return wrap_StringEnumeration(new icu::UStringEnumeration(_charsets),
-                                  T_OWNED);
+    return wrap_StringEnumeration(new UStringEnumeration(_charsets), T_OWNED);
 }
 
 

@@ -210,7 +210,7 @@ PyTypeObject name##Type = {                                             \
 };
 
 #define TYPE_CLASSID(name)                      \
-    icu::name::getStaticClassID(), &name##Type
+    name::getStaticClassID(), &name##Type
 
 #define TYPE_ID(name)                           \
     name##_ID, &name##Type
@@ -235,7 +235,7 @@ PyTypeObject name##Type = {                                             \
     {                                                                \
         Py_INCREF(&name##Type);                                      \
         PyModule_AddObject(module, #name, (PyObject *) &name##Type); \
-        registerType(&name##Type, icu::name::getStaticClassID());    \
+        registerType(&name##Type, name::getStaticClassID());    \
     }
 
 #define INSTALL_CONSTANTS_TYPE(name, module)                         \
@@ -250,7 +250,7 @@ PyTypeObject name##Type = {                                             \
 
 #define INSTALL_STATIC_INT(type, name)                                      \
     PyDict_SetItemString(type##Type.tp_dict, #name,                         \
-                         make_descriptor(PyInt_FromLong(icu::type::name)))
+                         make_descriptor(PyInt_FromLong(type::name)))
 
 #define INSTALL_ENUM(type, name)                                        \
     PyDict_SetItemString(type##Type.tp_dict, #name,                     \

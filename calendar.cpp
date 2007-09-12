@@ -74,13 +74,13 @@ static PyMethodDef t_timezone_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(TimeZone, t_timezone, UObject, icu::TimeZone, abstract_init);
+DECLARE_TYPE(TimeZone, t_timezone, UObject, TimeZone, abstract_init);
 
 /* SimpleTimeZone */
 
 class t_simpletimezone : public _wrapper {
 public:
-    icu::SimpleTimeZone *object;
+    SimpleTimeZone *object;
 };
 
 static int t_simpletimezone_init(t_simpletimezone *self,
@@ -107,7 +107,7 @@ static PyMethodDef t_simpletimezone_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(SimpleTimeZone, t_simpletimezone, TimeZone, icu::SimpleTimeZone,
+DECLARE_TYPE(SimpleTimeZone, t_simpletimezone, TimeZone, SimpleTimeZone,
              t_simpletimezone_init);
 
 
@@ -115,7 +115,7 @@ DECLARE_TYPE(SimpleTimeZone, t_simpletimezone, TimeZone, icu::SimpleTimeZone,
 
 class t_calendar : public _wrapper {
 public:
-    icu::Calendar *object;
+    Calendar *object;
 };
 
 static PyObject *t_calendar_getTime(t_calendar *self);
@@ -197,13 +197,13 @@ static PyMethodDef t_calendar_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Calendar, t_calendar, UObject, icu::Calendar, abstract_init);
+DECLARE_TYPE(Calendar, t_calendar, UObject, Calendar, abstract_init);
 
 /* GregorianCalendar */
 
 class t_gregoriancalendar : public _wrapper {
 public:
-    icu::GregorianCalendar *object;
+    GregorianCalendar *object;
 };
 
 static int t_gregoriancalendar_init(t_gregoriancalendar *self,
@@ -220,23 +220,23 @@ static PyMethodDef t_gregoriancalendar_methods[] = {
 };
 
 DECLARE_TYPE(GregorianCalendar, t_gregoriancalendar, Calendar,
-             icu::GregorianCalendar, t_gregoriancalendar_init);
+             GregorianCalendar, t_gregoriancalendar_init);
 
 
 /* TimeZone */
 
-PyObject *wrap_TimeZone(icu::TimeZone *tz)
+PyObject *wrap_TimeZone(TimeZone *tz)
 {
-    if (tz->getDynamicClassID() == icu::SimpleTimeZone::getStaticClassID())
-        return wrap_SimpleTimeZone((icu::SimpleTimeZone *) tz, T_OWNED);
+    if (tz->getDynamicClassID() == SimpleTimeZone::getStaticClassID())
+        return wrap_SimpleTimeZone((SimpleTimeZone *) tz, T_OWNED);
 
     return wrap_TimeZone(tz, T_OWNED);
 }
 
-PyObject *wrap_TimeZone(const icu::TimeZone &tz)
+PyObject *wrap_TimeZone(const TimeZone &tz)
 {
-    if (tz.getDynamicClassID() == icu::SimpleTimeZone::getStaticClassID())
-        return wrap_SimpleTimeZone((icu::SimpleTimeZone *) tz.clone(), T_OWNED);
+    if (tz.getDynamicClassID() == SimpleTimeZone::getStaticClassID())
+        return wrap_SimpleTimeZone((SimpleTimeZone *) tz.clone(), T_OWNED);
 
     return wrap_TimeZone(tz.clone(), T_OWNED);
 }
@@ -297,8 +297,8 @@ static PyObject *t_timezone_setRawOffset(t_timezone *self, PyObject *arg)
 
 static PyObject *t_timezone_getID(t_timezone *self, PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -318,8 +318,8 @@ static PyObject *t_timezone_getID(t_timezone *self, PyObject *args)
 
 static PyObject *t_timezone_setID(t_timezone *self, PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -332,11 +332,11 @@ static PyObject *t_timezone_setID(t_timezone *self, PyObject *arg)
 
 static PyObject *t_timezone_getDisplayName(t_timezone *self, PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int daylight;
-    icu::Locale *locale;
-    icu::TimeZone::EDisplayType type;
+    Locale *locale;
+    TimeZone::EDisplayType type;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -415,7 +415,7 @@ static PyObject *t_timezone_inDaylightTime(t_timezone *self, PyObject *arg)
 
 static PyObject *t_timezone_hasSameRules(t_timezone *self, PyObject *arg)
 {
-    icu::TimeZone *tz;
+    TimeZone *tz;
     UBool b;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(TimeZone), &tz))
@@ -429,19 +429,19 @@ static PyObject *t_timezone_hasSameRules(t_timezone *self, PyObject *arg)
 
 static PyObject *t_timezone_getGMT(PyTypeObject *type)
 {
-    return wrap_TimeZone((icu::TimeZone *) icu::TimeZone::getGMT(), 0);
+    return wrap_TimeZone((TimeZone *) TimeZone::getGMT(), 0);
 }
 
 PyObject *t_timezone_createTimeZone(PyTypeObject *type, PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
-        icu::TimeZone *tz = icu::TimeZone::createTimeZone(*u);
-        const icu::TimeZone *gmt = icu::TimeZone::getGMT();
-        icu::UnicodeString tzid, GMT;
+        TimeZone *tz = TimeZone::createTimeZone(*u);
+        const TimeZone *gmt = TimeZone::getGMT();
+        UnicodeString tzid, GMT;
         
         /* PyICU bug 8180 and ICU bug 5612:
          *    https://bugzilla.osafoundation.org/show_bug.cgi?id=8180
@@ -459,7 +459,7 @@ PyObject *t_timezone_createTimeZone(PyTypeObject *type, PyObject *arg)
 
         if (tzid == GMT && *u != GMT)
         {
-            icu::TimeZone *deflt = icu::TimeZone::createDefault();
+            TimeZone *deflt = TimeZone::createDefault();
 
             deflt->getID(tzid);
             if (tzid == *u)
@@ -485,12 +485,12 @@ static PyObject *t_timezone_createEnumeration(PyTypeObject *type,
 
     switch (PyTuple_Size(args)) {
       case 0:
-        return wrap_StringEnumeration(icu::TimeZone::createEnumeration(), T_OWNED);
+        return wrap_StringEnumeration(TimeZone::createEnumeration(), T_OWNED);
       case 1:
         if (!parseArgs(args, "i", &offset))
-            return wrap_StringEnumeration(icu::TimeZone::createEnumeration(offset), T_OWNED);
+            return wrap_StringEnumeration(TimeZone::createEnumeration(offset), T_OWNED);
         if (!parseArgs(args, "c", &country))
-            return wrap_StringEnumeration(icu::TimeZone::createEnumeration(country), T_OWNED);
+            return wrap_StringEnumeration(TimeZone::createEnumeration(country), T_OWNED);
         break;
     }
 
@@ -500,24 +500,24 @@ static PyObject *t_timezone_createEnumeration(PyTypeObject *type,
 static PyObject *t_timezone_countEquivalentIDs(PyTypeObject *type,
                                                PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
-        return PyInt_FromLong(icu::TimeZone::countEquivalentIDs(*u));
+        return PyInt_FromLong(TimeZone::countEquivalentIDs(*u));
 
     return PyErr_SetArgsError(type, "countEquivalentIDs", arg);
 }
 
 static PyObject *t_timezone_getEquivalentID(PyTypeObject *type, PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int index;
 
     if (!parseArgs(args, "Si", &u, &_u, &index))
     {
-        icu::UnicodeString v = icu::TimeZone::getEquivalentID(*u, index);
+        UnicodeString v = TimeZone::getEquivalentID(*u, index);
         return PyUnicode_FromUnicodeString(&v);
     }
 
@@ -526,16 +526,16 @@ static PyObject *t_timezone_getEquivalentID(PyTypeObject *type, PyObject *args)
 
 static PyObject *t_timezone_createDefault(PyTypeObject *type)
 {
-    return wrap_TimeZone(icu::TimeZone::createDefault());
+    return wrap_TimeZone(TimeZone::createDefault());
 }
 
 static PyObject *t_timezone_setDefault(PyTypeObject *type, PyObject *arg)
 {
-    icu::TimeZone *tz;
+    TimeZone *tz;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(TimeZone), &tz))
     {
-        icu::TimeZone::setDefault(*tz);
+        TimeZone::setDefault(*tz);
 
         PyObject *m = PyImport_ImportModule("PyICU");
         PyObject *cls = PyObject_GetAttrString(m, "ICUtzinfo");
@@ -552,7 +552,7 @@ static PyObject *t_timezone_setDefault(PyTypeObject *type, PyObject *arg)
 
 static PyObject *t_timezone_str(t_timezone *self)
 {
-    icu::UnicodeString u;
+    UnicodeString u;
 
     self->object->getID(u);
     return PyUnicode_FromUnicodeString(&u);
@@ -561,7 +561,7 @@ static PyObject *t_timezone_str(t_timezone *self)
 static PyObject *t_timezone_richcmp(t_timezone *self, PyObject *arg, int op)
 {
     int b = 0;
-    icu::TimeZone *tz;
+    TimeZone *tz;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(TimeZone), &tz))
     {
@@ -590,19 +590,19 @@ static PyObject *t_timezone_richcmp(t_timezone *self, PyObject *arg, int op)
 static int t_simpletimezone_init(t_simpletimezone *self,
                                  PyObject *args, PyObject *kwds)
 {
-    icu::SimpleTimeZone *tz;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    SimpleTimeZone *tz;
+    UnicodeString *u;
+    UnicodeString _u;
     int rawOffsetGMT, savingsStartMonth, savingsStartDayOfWeekInMonth;
     int savingsStartDayOfWeek, savingsStartTime, savingsEndMonth, savingsDST;
     int savingsEndDayOfWeekInMonth, savingsEndDayOfWeek, savingsEndTime;
-    icu::SimpleTimeZone::TimeMode startMode, endMode;
+    SimpleTimeZone::TimeMode startMode, endMode;
 
     switch (PyTuple_Size(args)) {
       case 2:
         if (!parseArgs(args, "iS", &rawOffsetGMT, &u, &_u))
         {
-            tz = new icu::SimpleTimeZone(rawOffsetGMT, *u);
+            tz = new SimpleTimeZone(rawOffsetGMT, *u);
             self->object = tz;
             self->flags = T_OWNED;
             break;
@@ -614,7 +614,7 @@ static int t_simpletimezone_init(t_simpletimezone *self,
                        &savingsEndMonth, &savingsEndDayOfWeekInMonth,
                        &savingsEndDayOfWeek, &savingsEndTime))
         {
-            INT_STATUS_CALL(tz = new icu::SimpleTimeZone(rawOffsetGMT, *u, savingsStartMonth, savingsStartDayOfWeekInMonth, savingsStartDayOfWeek, savingsStartTime, savingsEndMonth, savingsEndDayOfWeekInMonth, savingsEndDayOfWeek, savingsEndTime, status));
+            INT_STATUS_CALL(tz = new SimpleTimeZone(rawOffsetGMT, *u, savingsStartMonth, savingsStartDayOfWeekInMonth, savingsStartDayOfWeek, savingsStartTime, savingsEndMonth, savingsEndDayOfWeekInMonth, savingsEndDayOfWeek, savingsEndTime, status));
             self->object = tz;
             self->flags = T_OWNED;
             break;
@@ -628,7 +628,7 @@ static int t_simpletimezone_init(t_simpletimezone *self,
                        &savingsEndMonth, &savingsEndDayOfWeekInMonth,
                        &savingsEndDayOfWeek, &savingsEndTime, &savingsDST))
         {
-            INT_STATUS_CALL(tz = new icu::SimpleTimeZone(rawOffsetGMT, *u, savingsStartMonth, savingsStartDayOfWeekInMonth, savingsStartDayOfWeek, savingsStartTime, savingsEndMonth, savingsEndDayOfWeekInMonth, savingsEndDayOfWeek, savingsEndTime, savingsDST, status));
+            INT_STATUS_CALL(tz = new SimpleTimeZone(rawOffsetGMT, *u, savingsStartMonth, savingsStartDayOfWeekInMonth, savingsStartDayOfWeek, savingsStartTime, savingsEndMonth, savingsEndDayOfWeekInMonth, savingsEndDayOfWeek, savingsEndTime, savingsDST, status));
             self->object = tz;
             self->flags = T_OWNED;
             break;
@@ -643,7 +643,7 @@ static int t_simpletimezone_init(t_simpletimezone *self,
                        &savingsEndDayOfWeek, &savingsEndTime, &endMode,
                        &savingsDST))
         {
-            INT_STATUS_CALL(tz = new icu::SimpleTimeZone(rawOffsetGMT, *u, savingsStartMonth, savingsStartDayOfWeekInMonth, savingsStartDayOfWeek, savingsStartTime, startMode, savingsEndMonth, savingsEndDayOfWeekInMonth, savingsEndDayOfWeek, savingsEndTime, endMode, savingsDST, status));
+            INT_STATUS_CALL(tz = new SimpleTimeZone(rawOffsetGMT, *u, savingsStartMonth, savingsStartDayOfWeekInMonth, savingsStartDayOfWeek, savingsStartTime, startMode, savingsEndMonth, savingsEndDayOfWeekInMonth, savingsEndDayOfWeek, savingsEndTime, endMode, savingsDST, status));
             self->object = tz;
             self->flags = T_OWNED;
             break;
@@ -678,7 +678,7 @@ static PyObject *t_simpletimezone_setStartYear(t_simpletimezone *self,
 static PyObject *t_simpletimezone_setStartRule(t_simpletimezone *self,
                                                PyObject *args)
 {
-    icu::SimpleTimeZone::TimeMode mode;
+    SimpleTimeZone::TimeMode mode;
     int month, dayOfMonth, dayOfWeek, dayOfWeekInMonth, time;
     int after;
 
@@ -735,7 +735,7 @@ static PyObject *t_simpletimezone_setStartRule(t_simpletimezone *self,
 static PyObject *t_simpletimezone_setEndRule(t_simpletimezone *self,
                                              PyObject *args)
 {
-    icu::SimpleTimeZone::TimeMode mode;
+    SimpleTimeZone::TimeMode mode;
     int month, dayOfMonth, dayOfWeek, dayOfWeekInMonth, time;
     int after;
 
@@ -826,12 +826,11 @@ static PyObject *t_simpletimezone_setDSTSavings(t_simpletimezone *self,
 
 /* Calendar */
 
-PyObject *wrap_Calendar(icu::Calendar *calendar)
+PyObject *wrap_Calendar(Calendar *calendar)
 {
     if (calendar->getDynamicClassID() ==
-        icu::GregorianCalendar::getStaticClassID())
-        return wrap_GregorianCalendar((icu::GregorianCalendar *) calendar,
-                                      T_OWNED);
+        GregorianCalendar::getStaticClassID())
+        return wrap_GregorianCalendar((GregorianCalendar *) calendar, T_OWNED);
 
     return wrap_Calendar(calendar, T_OWNED);
 }
@@ -858,7 +857,7 @@ static PyObject *t_calendar_setTime(t_calendar *self, PyObject *arg)
 
 static PyObject *t_calendar_isEquivalentTo(t_calendar *self, PyObject *arg)
 {
-    icu::Calendar *calendar;
+    Calendar *calendar;
     int b;
 
     if (!parseArg(arg, "P", TYPE_ID(Calendar), &calendar))
@@ -872,7 +871,7 @@ static PyObject *t_calendar_isEquivalentTo(t_calendar *self, PyObject *arg)
 
 static PyObject *t_calendar_equals(t_calendar *self, PyObject *arg)
 {
-    icu::Calendar *calendar;
+    Calendar *calendar;
     int b;
 
     if (!parseArg(arg, "P", TYPE_ID(Calendar), &calendar))
@@ -886,7 +885,7 @@ static PyObject *t_calendar_equals(t_calendar *self, PyObject *arg)
 
 static PyObject *t_calendar_before(t_calendar *self, PyObject *arg)
 {
-    icu::Calendar *calendar;
+    Calendar *calendar;
     int b;
 
     if (!parseArg(arg, "P", TYPE_ID(Calendar), &calendar))
@@ -900,7 +899,7 @@ static PyObject *t_calendar_before(t_calendar *self, PyObject *arg)
 
 static PyObject *t_calendar_after(t_calendar *self, PyObject *arg)
 {
-    icu::Calendar *calendar;
+    Calendar *calendar;
     int b;
 
     if (!parseArg(arg, "P", TYPE_ID(Calendar), &calendar))
@@ -962,13 +961,13 @@ static PyObject *t_calendar_fieldDifference(t_calendar *self, PyObject *args)
 
 static PyObject *t_calendar_getTimeZone(t_calendar *self)
 {
-    const icu::TimeZone &tz = self->object->getTimeZone();
+    const TimeZone &tz = self->object->getTimeZone();
     return wrap_TimeZone(tz);
 }
 
 static PyObject *t_calendar_setTimeZone(t_calendar *self, PyObject *arg)
 {
-    icu::TimeZone *tz;
+    TimeZone *tz;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(TimeZone), &tz))
     {
@@ -1217,7 +1216,7 @@ static PyObject *t_calendar_defaultCenturyStartYear(t_calendar *self)
 static PyObject *t_calendar_getLocale(t_calendar *self, PyObject *args)
 {
     ULocDataLocaleType type;
-    icu::Locale locale;
+    Locale locale;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1259,25 +1258,25 @@ static PyObject *t_calendar_getLocaleID(t_calendar *self, PyObject *args)
 
 static PyObject *t_calendar_createInstance(PyTypeObject *type, PyObject *args)
 {
-    icu::TimeZone *tz;
-    icu::Locale *locale;
-    icu::Calendar *calendar;
+    TimeZone *tz;
+    Locale *locale;
+    Calendar *calendar;
 
     switch (PyTuple_Size(args)) {
       case 0:
       {
-          STATUS_CALL(calendar = icu::Calendar::createInstance(status));
+          STATUS_CALL(calendar = Calendar::createInstance(status));
           return wrap_Calendar(calendar);
       }
       case 1:
         if (!parseArgs(args, "P", TYPE_CLASSID(TimeZone), &tz))
         {
-            STATUS_CALL(calendar = icu::Calendar::createInstance(*tz, status));
+            STATUS_CALL(calendar = Calendar::createInstance(*tz, status));
             return wrap_Calendar(calendar);
         }          
         if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
-            STATUS_CALL(calendar = icu::Calendar::createInstance(*locale, status));
+            STATUS_CALL(calendar = Calendar::createInstance(*locale, status));
             return wrap_Calendar(calendar);
         }
         break;
@@ -1287,7 +1286,7 @@ static PyObject *t_calendar_createInstance(PyTypeObject *type, PyObject *args)
                        TYPE_CLASSID(Locale),
                        &tz, &locale))
         {
-            STATUS_CALL(calendar = icu::Calendar::createInstance(*tz, *locale, status));
+            STATUS_CALL(calendar = Calendar::createInstance(*tz, *locale, status));
             return wrap_Calendar(calendar);
         }
         break;
@@ -1299,11 +1298,11 @@ static PyObject *t_calendar_createInstance(PyTypeObject *type, PyObject *args)
 static PyObject *t_calendar_getAvailableLocales(PyTypeObject *type)
 {
     int count;
-    const icu::Locale *locales = icu::Calendar::getAvailableLocales(count);
+    const Locale *locales = Calendar::getAvailableLocales(count);
     PyObject *dict = PyDict_New();
 
     for (int32_t i = 0; i < count; i++) {
-        icu::Locale *locale = (icu::Locale *) locales + i;
+        Locale *locale = (Locale *) locales + i;
         PyObject *obj = wrap_Locale(locale, 0);
         PyDict_SetItemString(dict, locale->getName(), obj);
 	Py_DECREF(obj);
@@ -1314,21 +1313,22 @@ static PyObject *t_calendar_getAvailableLocales(PyTypeObject *type)
 
 static PyObject *t_calendar_getNow(PyTypeObject *type)
 {
-    UDate date = icu::Calendar::getNow();
+    UDate date = Calendar::getNow();
     return PyFloat_FromDouble(date / 1000.0);
 }
 
 static PyObject *t_calendar_str(t_calendar *self)
 {
     UDate date;
-    icu::Locale locale;
-    icu::UnicodeString u;
+    Locale locale;
+    UnicodeString u;
 
     STATUS_CALL(date = self->object->getTime(status));
     STATUS_CALL(locale = self->object->getLocale(ULOC_VALID_LOCALE, status));
 
-    icu::DateFormat *df = icu::DateFormat::createDateTimeInstance(
-        icu::DateFormat::kDefault, icu::DateFormat::kDefault, locale);
+    DateFormat *df = DateFormat::createDateTimeInstance(DateFormat::kDefault,
+                                                        DateFormat::kDefault,
+                                                        locale);
     df->format(date, u);
     delete df;
 
@@ -1338,7 +1338,7 @@ static PyObject *t_calendar_str(t_calendar *self)
 static PyObject *t_calendar_richcmp(t_calendar *self, PyObject *arg, int op)
 {
     int b = 0;
-    icu::Calendar *calendar;
+    Calendar *calendar;
 
     if (!parseArg(arg, "P", TYPE_ID(Calendar), &calendar))
     {
@@ -1367,28 +1367,28 @@ static PyObject *t_calendar_richcmp(t_calendar *self, PyObject *arg, int op)
 static int t_gregoriancalendar_init(t_gregoriancalendar *self,
                                     PyObject *args, PyObject *kwds)
 {
-    icu::SimpleTimeZone *tz;
-    icu::Locale *locale;
+    SimpleTimeZone *tz;
+    Locale *locale;
     int year, month, date, hour, minute, second;
-    icu::GregorianCalendar *calendar;
+    GregorianCalendar *calendar;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        INT_STATUS_CALL(calendar = new icu::GregorianCalendar(status));
+        INT_STATUS_CALL(calendar = new GregorianCalendar(status));
         self->object = calendar;
         self->flags = T_OWNED;
         break;
       case 1:
         if (!parseArgs(args, "P", TYPE_CLASSID(TimeZone), &tz))
         {
-            INT_STATUS_CALL(calendar = new icu::GregorianCalendar(*tz, status));
+            INT_STATUS_CALL(calendar = new GregorianCalendar(*tz, status));
             self->object = calendar;
             self->flags = T_OWNED;
             break;
         }
         if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
-            INT_STATUS_CALL(calendar = new icu::GregorianCalendar(*locale, status));
+            INT_STATUS_CALL(calendar = new GregorianCalendar(*locale, status));
             self->object = calendar;
             self->flags = T_OWNED;
             break;
@@ -1401,7 +1401,7 @@ static int t_gregoriancalendar_init(t_gregoriancalendar *self,
                        TYPE_CLASSID(Locale),
                        &tz, &locale))
         {
-            INT_STATUS_CALL(calendar = new icu::GregorianCalendar(*tz, *locale, status));
+            INT_STATUS_CALL(calendar = new GregorianCalendar(*tz, *locale, status));
             self->object = calendar;
             self->flags = T_OWNED;
             break;
@@ -1411,7 +1411,7 @@ static int t_gregoriancalendar_init(t_gregoriancalendar *self,
       case 3:
         if (!parseArgs(args, "iii", &year, &month, &date))
         {
-            INT_STATUS_CALL(calendar = new icu::GregorianCalendar(year, month, date, status));
+            INT_STATUS_CALL(calendar = new GregorianCalendar(year, month, date, status));
             self->object = calendar;
             self->flags = T_OWNED;
             break;
@@ -1421,7 +1421,7 @@ static int t_gregoriancalendar_init(t_gregoriancalendar *self,
       case 5:
         if (!parseArgs(args, "iiiii", &year, &month, &date, &hour, &minute))
         {
-            INT_STATUS_CALL(calendar = new icu::GregorianCalendar(year, month, date, hour, minute, status));
+            INT_STATUS_CALL(calendar = new GregorianCalendar(year, month, date, hour, minute, status));
             self->object = calendar;
             self->flags = T_OWNED;
             break;
@@ -1432,7 +1432,7 @@ static int t_gregoriancalendar_init(t_gregoriancalendar *self,
         if (!parseArgs(args, "iiiiii", &year, &month, &date, &hour, &minute,
                        &second))
         {
-            INT_STATUS_CALL(calendar = new icu::GregorianCalendar(year, month, date, hour, minute, second, status));
+            INT_STATUS_CALL(calendar = new GregorianCalendar(year, month, date, hour, minute, second, status));
             self->object = calendar;
             self->flags = T_OWNED;
             break;

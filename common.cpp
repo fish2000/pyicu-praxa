@@ -87,8 +87,8 @@ EXPORT ICUException::ICUException(UErrorCode status, char *format, ...)
 EXPORT ICUException::ICUException(UParseError &pe, UErrorCode status)
 {
     PyObject *messages = PyObject_GetAttrString(PyExc_ICUError, "messages");
-    icu::UnicodeString pre((const UChar *) pe.preContext, U_PARSE_CONTEXT_LEN);
-    icu::UnicodeString post((const UChar *) pe.postContext, U_PARSE_CONTEXT_LEN);
+    UnicodeString pre((const UChar *) pe.preContext, U_PARSE_CONTEXT_LEN);
+    UnicodeString post((const UChar *) pe.postContext, U_PARSE_CONTEXT_LEN);
     PyObject *tuple = PyTuple_New(5);
 
     ICUException::code = PyInt_FromLong((long) status);
@@ -123,7 +123,7 @@ EXPORT PyObject *ICUException::reportError()
 }
 
 
-EXPORT PyObject *PyUnicode_FromUnicodeString(icu::UnicodeString *string)
+EXPORT PyObject *PyUnicode_FromUnicodeString(UnicodeString *string)
 {
     if (!string)
     {
@@ -176,13 +176,13 @@ EXPORT PyObject *PyUnicode_FromUnicodeString(const UChar *chars, int size)
     }
 }
 
-EXPORT icu::UnicodeString &PyString_AsUnicodeString(PyObject *object,
-                                                    char *encoding, char *mode,
-                                                    icu::UnicodeString &string)
+EXPORT UnicodeString &PyString_AsUnicodeString(PyObject *object,
+                                               char *encoding, char *mode,
+                                               UnicodeString &string)
 {
     UErrorCode status = U_ZERO_ERROR;
     UConverter *conv = ucnv_open(encoding, &status);
-    icu::UnicodeString result;
+    UnicodeString result;
 
     if (U_FAILURE(status))
         throw ICUException(status);
@@ -201,7 +201,7 @@ EXPORT icu::UnicodeString &PyString_AsUnicodeString(PyObject *object,
     }
 
     PyString_AsStringAndSize(object, &src, &len);
-    result = icu::UnicodeString((const char *) src, (int32_t) len, conv, status);
+    result = UnicodeString((const char *) src, (int32_t) len, conv, status);
 
     if (U_FAILURE(status))
     {
@@ -239,9 +239,9 @@ EXPORT icu::UnicodeString &PyString_AsUnicodeString(PyObject *object,
     return string;
 }
 
-EXPORT icu::UnicodeString &PyObject_AsUnicodeString(PyObject *object,
-                                                    char *encoding, char *mode,
-                                                    icu::UnicodeString &string)
+EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
+                                               char *encoding, char *mode,
+                                               UnicodeString &string)
 {
     if (PyUnicode_CheckExact(object))
     {
@@ -280,19 +280,19 @@ EXPORT icu::UnicodeString &PyObject_AsUnicodeString(PyObject *object,
     return string;
 }
 
-EXPORT icu::UnicodeString &PyObject_AsUnicodeString(PyObject *object,
-                                                    icu::UnicodeString &string)
+EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
+                                               UnicodeString &string)
 {
     return PyObject_AsUnicodeString(object, "utf-8", "strict", string);
 }
 
-EXPORT icu::UnicodeString *PyObject_AsUnicodeString(PyObject *object)
+EXPORT UnicodeString *PyObject_AsUnicodeString(PyObject *object)
 {
     if (object == Py_None)
         return NULL;
     else
     {
-        icu::UnicodeString string;
+        UnicodeString string;
 
         try {
             PyObject_AsUnicodeString(object, string);
@@ -300,7 +300,7 @@ EXPORT icu::UnicodeString *PyObject_AsUnicodeString(PyObject *object)
             throw e;
         }
 
-        return new icu::UnicodeString(string);
+        return new UnicodeString(string);
     }
 }
 
@@ -449,13 +449,13 @@ int isInstance(PyObject *arg, UClassID id, PyTypeObject *type)
     return 0;
 }
 
-icu::UObject **pl2cpa(PyObject *arg, int *len, UClassID id, PyTypeObject *type)
+UObject **pl2cpa(PyObject *arg, int *len, UClassID id, PyTypeObject *type)
 {
     if (PySequence_Check(arg))
     {
         *len = PySequence_Size(arg);
-        icu::UObject **array = (icu::UObject **)
-            calloc(*len, sizeof(icu::UObject *));
+        UObject **array = (UObject **)
+            calloc(*len, sizeof(UObject *));
 
         for (int i = 0; i < *len; i++) {
             PyObject *obj = PySequence_GetItem(arg, i);
@@ -479,8 +479,7 @@ icu::UObject **pl2cpa(PyObject *arg, int *len, UClassID id, PyTypeObject *type)
     return NULL;
 }
 
-PyObject *cpa2pl(icu::UObject **array, int len,
-                PyObject *(*wrap)(icu::UObject *, int))
+PyObject *cpa2pl(UObject **array, int len, PyObject *(*wrap)(UObject *, int))
 {
     PyObject *list = PyList_New(len);
 
@@ -490,56 +489,56 @@ PyObject *cpa2pl(icu::UObject **array, int len,
     return list;
 }
 
-icu::Formattable *toFormattable(PyObject *arg)
+Formattable *toFormattable(PyObject *arg)
 {
     UDate date;
     double d;
     int i;
     PY_LONG_LONG l;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     char *s;
 
     if (!parseArg(arg, "d", &d))
-        return new icu::Formattable(d);
+        return new Formattable(d);
 
     if (!parseArg(arg, "i", &i))
-        return new icu::Formattable(i);
+        return new Formattable(i);
 
     if (!parseArg(arg, "L", &l))
-        return new icu::Formattable(l);
+        return new Formattable(l);
 
     if (!parseArg(arg, "c", &s))
-        return new icu::Formattable(s);
+        return new Formattable(s);
 
     if (!parseArg(arg, "S", &u, &_u))
-        return new icu::Formattable(*u);
+        return new Formattable(*u);
 
     if (!parseArg(arg, "E", &date))
-        return new icu::Formattable(date, icu::Formattable::kIsDate);
+        return new Formattable(date, Formattable::kIsDate);
 
     return NULL;
 }
 
-icu::Formattable *toFormattableArray(PyObject *arg, int *len,
-                                     UClassID id, PyTypeObject *type)
+Formattable *toFormattableArray(PyObject *arg, int *len,
+                                UClassID id, PyTypeObject *type)
 {
     if (PySequence_Check(arg))
     {
         *len = PySequence_Size(arg);
-        icu::Formattable *array = new icu::Formattable[*len + 1];
+        Formattable *array = new Formattable[*len + 1];
 
         for (int i = 0; i < *len; i++) {
             PyObject *obj = PySequence_GetItem(arg, i);
 
             if (isInstance(obj, id, type))
             {
-                array[i] = *(icu::Formattable *) ((t_uobject *) obj)->object;
+                array[i] = *(Formattable *) ((t_uobject *) obj)->object;
                 Py_DECREF(obj);
             }
             else
             {
-                icu::Formattable *f = toFormattable(obj);
+                Formattable *f = toFormattable(obj);
 
                 if (f)
                 {
@@ -562,19 +561,19 @@ icu::Formattable *toFormattableArray(PyObject *arg, int *len,
     return NULL;
 }
 
-static icu::UnicodeString *toUnicodeStringArray(PyObject *arg, int *len)
+static UnicodeString *toUnicodeStringArray(PyObject *arg, int *len)
 {
     if (PySequence_Check(arg))
     {
         *len = PySequence_Size(arg);
-        icu::UnicodeString *array = new icu::UnicodeString[*len + 1];
+        UnicodeString *array = new UnicodeString[*len + 1];
 
         for (int i = 0; i < *len; i++) {
             PyObject *obj = PySequence_GetItem(arg, i);
             
             if (PyObject_TypeCheck(obj, &UObjectType))
             {
-                array[i] = *(icu::UnicodeString *) ((t_uobject *) obj)->object;
+                array[i] = *(UnicodeString *) ((t_uobject *) obj)->object;
                 Py_DECREF(obj);
             }
             else
@@ -867,7 +866,7 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
 
           case 's':           /* string or unicode  */
           {
-              icu::UnicodeString **u = va_arg(list, icu::UnicodeString **);
+              UnicodeString **u = va_arg(list, UnicodeString **);
               try {
                   *u = PyObject_AsUnicodeString(arg);
               } catch (ICUException e) {
@@ -879,10 +878,10 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
 
           case 'S':           /* string, unicode or UnicodeString */
           {
-              icu::UnicodeString **u = va_arg(list, icu::UnicodeString **);
-              icu::UnicodeString *_u = va_arg(list, icu::UnicodeString *);
+              UnicodeString **u = va_arg(list, UnicodeString **);
+              UnicodeString *_u = va_arg(list, UnicodeString *);
               if (PyObject_TypeCheck(arg, &UObjectType))
-                  *u = (icu::UnicodeString *) ((t_uobject *) arg)->object;
+                  *u = (UnicodeString *) ((t_uobject *) arg)->object;
               else
               {
                   try {
@@ -898,7 +897,7 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
 
           case 'T':           /* array of string, unicode or UnicodeString */
           {
-              icu::UnicodeString **array = va_arg(list, icu::UnicodeString **);
+              UnicodeString **array = va_arg(list, UnicodeString **);
               int *len = va_arg(list, int *);
               *array = toUnicodeStringArray(arg, len);
               if (!*array)
@@ -908,21 +907,21 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
 
           case 'U':           /* UnicodeString */
           {
-              icu::UnicodeString **u = va_arg(list, icu::UnicodeString **);
-              *u = (icu::UnicodeString *) ((t_uobject *) arg)->object;
+              UnicodeString **u = va_arg(list, UnicodeString **);
+              *u = (UnicodeString *) ((t_uobject *) arg)->object;
               break;
           }
 
           case 'P':           /* wrapped ICU object */
           {
-              icu::UObject **obj = va_arg(list, icu::UObject **);
+              UObject **obj = va_arg(list, UObject **);
               *obj = ((t_uobject *) arg)->object;
               break;
           }
 
           case 'Q':           /* array of wrapped ICU object pointers */
           {
-              icu::UObject ***array = va_arg(list, icu::UObject ***);
+              UObject ***array = va_arg(list, UObject ***);
               int *len = va_arg(list, int *);
               UClassID id = va_arg(list, UClassID);
               PyTypeObject *type = va_arg(list, PyTypeObject *);
@@ -934,9 +933,9 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
 
           case 'R':           /* array of wrapped ICU objects */
           {
-	      typedef icu::UObject *(*convFn)(PyObject *, int *,
-					      UClassID, PyTypeObject *);
-              icu::UObject **array = va_arg(list, icu::UObject **);
+	      typedef UObject *(*convFn)(PyObject *, int *,
+                                         UClassID, PyTypeObject *);
+              UObject **array = va_arg(list, UObject **);
               int *len = va_arg(list, int *);
               UClassID id = va_arg(list, UClassID);
               PyTypeObject *type = va_arg(list, PyTypeObject *);
@@ -1055,7 +1054,7 @@ int isUnicodeString(PyObject *arg)
 {
     return (PyObject_TypeCheck(arg, &UObjectType) &&
             (((t_uobject *) arg)->object->getDynamicClassID() ==
-             icu::UnicodeString::getStaticClassID()));
+             UnicodeString::getStaticClassID()));
 }
 
 void _init_common(PyObject *m)

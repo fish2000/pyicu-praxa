@@ -34,15 +34,15 @@ public:
 
 class t_uobject : public _wrapper {
 public:
-    icu::UObject *object;
+    UObject *object;
 };
 
 extern PyTypeObject UObjectType;
 extern PyTypeObject FormattableType;
 
-PyObject *wrap_StringEnumeration(icu::StringEnumeration *, int);
-PyObject *wrap_Formattable(icu::Formattable *, int);
-PyObject *wrap_Formattable(icu::Formattable &);
+PyObject *wrap_StringEnumeration(StringEnumeration *, int);
+PyObject *wrap_Formattable(Formattable *, int);
+PyObject *wrap_Formattable(Formattable &);
 
 
 void _init_bases(PyObject *m);

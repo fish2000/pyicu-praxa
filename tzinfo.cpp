@@ -422,7 +422,7 @@ static PyObject *t_floatingtz_richcmp(t_floatingtz *self,
 
 static PyObject *t_tzinfo__resetDefault(PyTypeObject *cls)
 {
-    PyObject *tz = wrap_TimeZone(icu::TimeZone::createDefault());
+    PyObject *tz = wrap_TimeZone(TimeZone::createDefault());
 
     if (tz)
     {
@@ -562,7 +562,7 @@ static PyObject *t_tzinfo_utcoffset(t_tzinfo *self, PyObject *dt)
         return NULL;
 
     // python's MINYEAR is 1
-    int era = icu::GregorianCalendar::AD;
+    int era = GregorianCalendar::AD;
     int year = PyDateTime_GET_YEAR(dt);
 
     // python's month is 1-based, 1 is January

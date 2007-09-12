@@ -99,13 +99,13 @@ PyTypeObject UObjectType = {
     (newfunc)t_uobject_new,              /* tp_new */
 };
 
-PyObject *wrap_UObject(icu::UObject *object, int flags)
+PyObject *wrap_UObject(UObject *object, int flags)
 {
     if (object)
     {
-        if (icu::UnicodeString::getStaticClassID() ==
+        if (UnicodeString::getStaticClassID() ==
             object->getDynamicClassID())
-            return PyUnicode_FromUnicodeString((icu::UnicodeString *) object);
+            return PyUnicode_FromUnicodeString((UnicodeString *) object);
 
         t_uobject *self = (t_uobject *) UObjectType.tp_alloc(&UObjectType, 0);
         if (self)
@@ -130,7 +130,7 @@ static PyObject *t_uobject__getOwned(t_uobject *self, void *data)
 
 class t_replaceable : public _wrapper {
 public:
-    icu::Replaceable *object;
+    Replaceable *object;
 };
 
 static PyObject *t_replaceable_length(t_replaceable *self);
@@ -146,14 +146,13 @@ static PyMethodDef t_replaceable_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Replaceable, t_replaceable, UObject, icu::Replaceable,
-             abstract_init);
+DECLARE_TYPE(Replaceable, t_replaceable, UObject, Replaceable, abstract_init);
 
 /* UnicodeString */
 
 class t_unicodestring : public _wrapper {
 public:
-    icu::UnicodeString *object;
+    UnicodeString *object;
 };
 
 static int t_unicodestring_init(t_unicodestring *self,
@@ -236,14 +235,14 @@ static PyMethodDef t_unicodestring_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(UnicodeString, t_unicodestring, Replaceable, icu::UnicodeString,
+DECLARE_TYPE(UnicodeString, t_unicodestring, Replaceable, UnicodeString,
              t_unicodestring_init);
 
 /* Formattable */
 
 class t_formattable : public _wrapper {
 public:
-    icu::Formattable *object;
+    Formattable *object;
 };
 
 static int t_formattable_init(t_formattable *self,
@@ -277,12 +276,12 @@ static PyMethodDef t_formattable_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Formattable, t_formattable, UObject, icu::Formattable,
+DECLARE_TYPE(Formattable, t_formattable, UObject, Formattable,
              t_formattable_init);
 
-PyObject *wrap_Formattable(icu::Formattable &formattable)
+PyObject *wrap_Formattable(Formattable &formattable)
 {
-    return wrap_Formattable(new icu::Formattable(formattable), T_OWNED);
+    return wrap_Formattable(new Formattable(formattable), T_OWNED);
 }
 
 
@@ -290,21 +289,20 @@ PyObject *wrap_Formattable(icu::Formattable &formattable)
 
 class t_measureunit : public _wrapper {
 public:
-    icu::MeasureUnit *object;
+    MeasureUnit *object;
 };
 
 static PyMethodDef t_measureunit_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(MeasureUnit, t_measureunit, UObject, icu::MeasureUnit,
-             abstract_init);
+DECLARE_TYPE(MeasureUnit, t_measureunit, UObject, MeasureUnit, abstract_init);
 
 /* Measure */
 
 class t_measure : public _wrapper {
 public:
-    icu::Measure *object;
+    Measure *object;
 };
 
 static PyObject *t_measure_getNumber(t_measure *self);
@@ -316,13 +314,13 @@ static PyMethodDef t_measure_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Measure, t_measure, UObject, icu::Measure, abstract_init);
+DECLARE_TYPE(Measure, t_measure, UObject, Measure, abstract_init);
 
 /* CurrencyUnit */
 
 class t_currencyunit : public _wrapper {
 public:
-    icu::CurrencyUnit *object;
+    CurrencyUnit *object;
 };
 
 static int t_currencyunit_init(t_currencyunit *self,
@@ -334,14 +332,14 @@ static PyMethodDef t_currencyunit_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(CurrencyUnit, t_currencyunit, MeasureUnit, icu::CurrencyUnit,
+DECLARE_TYPE(CurrencyUnit, t_currencyunit, MeasureUnit, CurrencyUnit,
              t_currencyunit_init);
 
 /* CurrencyAmount */
 
 class t_currencyamount : public _wrapper {
 public:
-    icu::CurrencyAmount *object;
+    CurrencyAmount *object;
 };
 
 static int t_currencyamount_init(t_currencyamount *self,
@@ -353,14 +351,14 @@ static PyMethodDef t_currencyamount_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(CurrencyAmount, t_currencyamount, Measure, icu::CurrencyAmount,
+DECLARE_TYPE(CurrencyAmount, t_currencyamount, Measure, CurrencyAmount,
              t_currencyamount_init);
 
 /* StringEnumeration */
 
 class t_stringenumeration : public _wrapper {
 public:
-    icu::StringEnumeration *object;
+    StringEnumeration *object;
 };
 
 static PyObject *t_stringenumeration_count(t_stringenumeration *self);
@@ -379,7 +377,7 @@ static PyMethodDef t_stringenumeration_methods[] = {
 };
 
 DECLARE_TYPE(StringEnumeration, t_stringenumeration, UObject,
-             icu::StringEnumeration, abstract_init);
+             StringEnumeration, abstract_init);
 
 
 /* UObject */
@@ -534,14 +532,14 @@ static PyObject *t_replaceable_hasMetaData(t_replaceable *self)
 static int t_unicodestring_init(t_unicodestring *self,
                                 PyObject *args, PyObject *kwds)
 {
-    icu::UnicodeString *u;
+    UnicodeString *u;
     PyObject *obj;
     char *encoding, *mode;
     int i;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        self->object = new icu::UnicodeString();
+        self->object = new UnicodeString();
         self->flags = T_OWNED;
         break;
       case 1:
@@ -553,13 +551,13 @@ static int t_unicodestring_init(t_unicodestring *self,
         }
         if (!parseArgs(args, "U", &u))
         {
-            self->object = new icu::UnicodeString(*u);
+            self->object = new UnicodeString(*u);
             self->flags = T_OWNED;
             break;
         }
         if (!parseArgs(args, "i", &i))
         {
-            self->object = new icu::UnicodeString((UChar32) i);
+            self->object = new UnicodeString((UChar32) i);
             self->flags = T_OWNED;
             break;
         }
@@ -568,11 +566,11 @@ static int t_unicodestring_init(t_unicodestring *self,
       case 2:
         if (!parseArgs(args, "Cc", &obj, &encoding))
         {
-            icu::UnicodeString u;
+            UnicodeString u;
 
             try {
                 PyObject_AsUnicodeString(obj, encoding, "strict", u);
-                self->object = new icu::UnicodeString(u);
+                self->object = new UnicodeString(u);
                 self->flags = T_OWNED;
             } catch (ICUException e) {
                 e.reportError();
@@ -585,11 +583,11 @@ static int t_unicodestring_init(t_unicodestring *self,
       case 3:
         if (!parseArgs(args, "Ccc", &obj, &encoding, &mode))
         {
-            icu::UnicodeString u;
+            UnicodeString u;
 
             try {
                 PyObject_AsUnicodeString(obj, encoding, mode, u);
-                self->object = new icu::UnicodeString(u);
+                self->object = new UnicodeString(u);
                 self->flags = T_OWNED;
             } catch (ICUException e) {
                 e.reportError();
@@ -733,8 +731,8 @@ static int verifyStartEnd(int &start, int &end, int len)
 
 static PyObject *t_unicodestring_append(t_unicodestring *self, PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int i, start, len;
 
     switch (PyTuple_Size(args)) {
@@ -778,8 +776,8 @@ static PyObject *t_unicodestring_append(t_unicodestring *self, PyObject *args)
 
 static PyObject *t_unicodestring_compare(t_unicodestring *self, PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int start, len;
 
     switch (PyTuple_Size(args)) {
@@ -810,8 +808,8 @@ static PyObject *t_unicodestring_compare(t_unicodestring *self, PyObject *args)
 static PyObject *t_unicodestring_compareBetween(t_unicodestring *self,
                                                 PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int start, end, srcStart, srcEnd;
 
     if (!parseArgs(args, "iiSii", &start, &end, &u, &_u, &srcStart, &srcEnd))
@@ -834,8 +832,8 @@ static PyObject *t_unicodestring_compareBetween(t_unicodestring *self,
 static PyObject *t_unicodestring_compareCodePointOrder(t_unicodestring *self,
                                                        PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int start, len;
 
     switch (PyTuple_Size(args)) {
@@ -866,8 +864,8 @@ static PyObject *t_unicodestring_compareCodePointOrder(t_unicodestring *self,
 
 static PyObject *t_unicodestring_compareCodePointOrderBetween(t_unicodestring *self, PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int start, end, srcStart, srcEnd;
 
     if (!parseArgs(args, "iiSii", &start, &end, &u, &_u, &srcStart, &srcEnd))
@@ -890,8 +888,8 @@ static PyObject *t_unicodestring_compareCodePointOrderBetween(t_unicodestring *s
 static PyObject *t_unicodestring_caseCompare(t_unicodestring *self,
                                              PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int start, len, options;
 
     switch (PyTuple_Size(args)) {
@@ -923,8 +921,8 @@ static PyObject *t_unicodestring_caseCompare(t_unicodestring *self,
 static PyObject *t_unicodestring_caseCompareBetween(t_unicodestring *self,
                                                     PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int start, end, srcStart, srcEnd, options;
 
     if (!parseArgs(args, "iiSiii", &start, &end, &u, &_u, &srcStart, &srcEnd,
@@ -948,8 +946,8 @@ static PyObject *t_unicodestring_caseCompareBetween(t_unicodestring *self,
 static PyObject *t_unicodestring_startsWith(t_unicodestring *self,
                                             PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int start, len;
 
     switch (PyTuple_Size(args)) {
@@ -981,8 +979,8 @@ static PyObject *t_unicodestring_startsWith(t_unicodestring *self,
 static PyObject *t_unicodestring_endsWith(t_unicodestring *self,
                                           PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int start, len;
 
     switch (PyTuple_Size(args)) {
@@ -1013,8 +1011,8 @@ static PyObject *t_unicodestring_endsWith(t_unicodestring *self,
 
 static PyObject *t_unicodestring_indexOf(t_unicodestring *self, PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int c, start, len, srcStart, srcLen;
 
     switch (PyTuple_Size(args)) {
@@ -1113,8 +1111,8 @@ static PyObject *t_unicodestring_indexOf(t_unicodestring *self, PyObject *args)
 static PyObject *t_unicodestring_lastIndexOf(t_unicodestring *self,
                                              PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int c, start, len, srcStart, srcLen;
 
     switch (PyTuple_Size(args)) {
@@ -1225,7 +1223,7 @@ static PyObject *t_unicodestring_reverse(t_unicodestring *self)
 
 static PyObject *t_unicodestring_toUpper(t_unicodestring *self, PyObject *args)
 {
-    icu::Locale *locale;
+    Locale *locale;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1245,7 +1243,7 @@ static PyObject *t_unicodestring_toUpper(t_unicodestring *self, PyObject *args)
 
 static PyObject *t_unicodestring_toLower(t_unicodestring *self, PyObject *args)
 {
-    icu::Locale *locale;
+    Locale *locale;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1265,8 +1263,8 @@ static PyObject *t_unicodestring_toLower(t_unicodestring *self, PyObject *args)
 
 static PyObject *t_unicodestring_toTitle(t_unicodestring *self, PyObject *args)
 {
-    icu::BreakIterator *iterator;
-    icu::Locale *locale;
+    BreakIterator *iterator;
+    Locale *locale;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -1401,7 +1399,7 @@ static PyObject *t_unicodestring_idna_toASCII(t_unicodestring *self,
     UParseError parseError;
     int options = UIDNA_DEFAULT;
     int len = self->object->length();
-    icu::UnicodeString *u;
+    UnicodeString *u;
     UChar *dest;
 
     if (!PyArg_ParseTuple(args, "|i", &options))
@@ -1423,7 +1421,7 @@ static PyObject *t_unicodestring_idna_toASCII(t_unicodestring *self,
         return ICUException(parseError, status).reportError();
     }
 
-    u = new icu::UnicodeString(dest, len);
+    u = new UnicodeString(dest, len);
     delete dest;
 
     return wrap_UnicodeString(u, T_OWNED);
@@ -1436,7 +1434,7 @@ static PyObject *t_unicodestring_idna_toUnicode(t_unicodestring *self,
     UParseError parseError;
     int options = UIDNA_DEFAULT;
     int len = self->object->length();
-    icu::UnicodeString *u;
+    UnicodeString *u;
     UChar *dest;
 
     if (!PyArg_ParseTuple(args, "|i", &options))
@@ -1458,7 +1456,7 @@ static PyObject *t_unicodestring_idna_toUnicode(t_unicodestring *self,
         return ICUException(parseError, status).reportError();
     }
 
-    u = new icu::UnicodeString(dest, len);
+    u = new UnicodeString(dest, len);
     delete dest;
 
     return wrap_UnicodeString(u, T_OWNED);
@@ -1471,7 +1469,7 @@ static PyObject *t_unicodestring_idna_IDNtoASCII(t_unicodestring *self,
     UParseError parseError;
     int options = UIDNA_DEFAULT;
     int len = self->object->length();
-    icu::UnicodeString *u;
+    UnicodeString *u;
     UChar *dest;
 
     if (!PyArg_ParseTuple(args, "|i", &options))
@@ -1493,7 +1491,7 @@ static PyObject *t_unicodestring_idna_IDNtoASCII(t_unicodestring *self,
         return ICUException(parseError, status).reportError();
     }
 
-    u = new icu::UnicodeString(dest, len);
+    u = new UnicodeString(dest, len);
     delete dest;
 
     return wrap_UnicodeString(u, T_OWNED);
@@ -1506,7 +1504,7 @@ static PyObject *t_unicodestring_idna_IDNtoUnicode(t_unicodestring *self,
     UParseError parseError;
     int options = UIDNA_DEFAULT;
     int len = self->object->length();
-    icu::UnicodeString *u;
+    UnicodeString *u;
     UChar *dest;
 
     if (!PyArg_ParseTuple(args, "|i", &options))
@@ -1528,7 +1526,7 @@ static PyObject *t_unicodestring_idna_IDNtoUnicode(t_unicodestring *self,
         return ICUException(parseError, status).reportError();
     }
 
-    u = new icu::UnicodeString(dest, len);
+    u = new UnicodeString(dest, len);
     delete dest;
 
     return wrap_UnicodeString(u, T_OWNED);
@@ -1538,8 +1536,8 @@ static PyObject *t_unicodestring_idna_compare(t_unicodestring *self,
                                               PyObject *args)
 {
     int options = UIDNA_DEFAULT;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int n;
 
     switch (PyTuple_Size(args)) {
@@ -1572,12 +1570,12 @@ static PyObject *t_unicodestring_idna_compare(t_unicodestring *self,
 static PyObject *t_unicodestring_richcmp(t_unicodestring *self,
                                          PyObject *arg, int op)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int b = 0;
 
     if (isUnicodeString(arg))
-        u = (icu::UnicodeString *) ((t_uobject *) arg)->object;
+        u = (UnicodeString *) ((t_uobject *) arg)->object;
     else
         try {
             PyObject_AsUnicodeString(arg, _u);
@@ -1620,20 +1618,20 @@ static Py_ssize_t t_unicodestring_length(t_unicodestring *self)
 
 static PyObject *t_unicodestring_concat(t_unicodestring *self, PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int i;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
-        icu::UnicodeString *v = new icu::UnicodeString(*self->object);
+        UnicodeString *v = new UnicodeString(*self->object);
         *v += *u;
         return wrap_UnicodeString(v, T_OWNED);
     }
 
     if (!parseArg(arg, "i", &i))
     {
-        icu::UnicodeString *v = new icu::UnicodeString(*self->object);
+        UnicodeString *v = new UnicodeString(*self->object);
 
         if (sizeof(Py_UNICODE) == sizeof(UChar))
             v->append((UChar) i);
@@ -1649,11 +1647,11 @@ static PyObject *t_unicodestring_concat(t_unicodestring *self, PyObject *arg)
 static PyObject *t_unicodestring_repeat(t_unicodestring *self, Py_ssize_t n)
 {
     if (n <= 0)
-        return wrap_UnicodeString(new icu::UnicodeString(), T_OWNED);
+        return wrap_UnicodeString(new UnicodeString(), T_OWNED);
     else
     {
-        icu::UnicodeString *u = self->object;
-        icu::UnicodeString *v = new icu::UnicodeString(u->length() * n, 0, 0);
+        UnicodeString *u = self->object;
+        UnicodeString *v = new UnicodeString(u->length() * n, 0, 0);
     
         while (n-- > 0)
             *v += *u;
@@ -1664,7 +1662,7 @@ static PyObject *t_unicodestring_repeat(t_unicodestring *self, Py_ssize_t n)
 
 static PyObject *t_unicodestring_item(t_unicodestring *self, int n)
 {
-    icu::UnicodeString *u = self->object;
+    UnicodeString *u = self->object;
     int len = u->length();
 
     if (n < 0)
@@ -1691,7 +1689,7 @@ static PyObject *t_unicodestring_item(t_unicodestring *self, int n)
 static PyObject *t_unicodestring_slice(t_unicodestring *self,
                                        Py_ssize_t l, Py_ssize_t h)
 {
-    icu::UnicodeString *u = self->object;
+    UnicodeString *u = self->object;
     int len = u->length();
 
     if (l < 0)
@@ -1704,7 +1702,7 @@ static PyObject *t_unicodestring_slice(t_unicodestring *self,
     else if (h > len)
         h = len;
 
-    icu::UnicodeString *v = new icu::UnicodeString();
+    UnicodeString *v = new UnicodeString();
 
     if (l >= 0 && h >= 0)
     {
@@ -1721,7 +1719,7 @@ static PyObject *t_unicodestring_slice(t_unicodestring *self,
 static int t_unicodestring_ass_item(t_unicodestring *self,
                                     Py_ssize_t n, PyObject *arg)
 {
-    icu::UnicodeString *u = self->object;
+    UnicodeString *u = self->object;
     int len = u->length();
 
     if (n < 0)
@@ -1741,8 +1739,8 @@ static int t_unicodestring_ass_item(t_unicodestring *self,
             return 0;
         }
 
-        icu::UnicodeString *v;
-        icu::UnicodeString _v;
+        UnicodeString *v;
+        UnicodeString _v;
 
         if (!parseArg(arg, "S", &v, &_v))
         {
@@ -1770,12 +1768,12 @@ static int t_unicodestring_ass_slice(t_unicodestring *self,
                                      Py_ssize_t l, Py_ssize_t h,
                                      PyObject *arg)
 {
-    icu::UnicodeString *v;
-    icu::UnicodeString _v;
+    UnicodeString *v;
+    UnicodeString _v;
 
     if (!parseArg(arg, "S", &v, &_v))
     {
-        icu::UnicodeString *u = self->object;
+        UnicodeString *u = self->object;
         int len = u->length();
 
         if (l < 0)
@@ -1807,8 +1805,8 @@ static int t_unicodestring_ass_slice(t_unicodestring *self,
 
 static int t_unicodestring_contains(t_unicodestring *self, PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
         return self->object->indexOf(*u) == 0;
@@ -1820,8 +1818,8 @@ static int t_unicodestring_contains(t_unicodestring *self, PyObject *arg)
 static PyObject *t_unicodestring_inplace_concat(t_unicodestring *self,
                                                 PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     int i;
 
     if (!parseArg(arg, "S", &u, &_u))
@@ -1853,7 +1851,7 @@ static PyObject *t_unicodestring_inplace_repeat(t_unicodestring *self,
         self->object->remove();
     else if (n > 1)
     {
-        icu::UnicodeString v = *self->object;
+        UnicodeString v = *self->object;
         while (n-- > 1)
             *self->object += v;
     }
@@ -1882,11 +1880,11 @@ static int t_formattable_init(t_formattable *self,
                               PyObject *args, PyObject *kwds)
 {
     UDate date;
-    icu::Formattable::ISDATE flag;
+    Formattable::ISDATE flag;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        self->object = new icu::Formattable();
+        self->object = new Formattable();
         self->flags = T_OWNED;
         break;
       case 1:
@@ -1901,7 +1899,7 @@ static int t_formattable_init(t_formattable *self,
       case 2:
         if (!parseArgs(args, "Di", &date, &flag))
         {
-            self->object = new icu::Formattable(date, flag);
+            self->object = new Formattable(date, flag);
             self->flags = T_OWNED;
             break;
         }
@@ -1980,7 +1978,7 @@ static PyObject *t_formattable_getString(t_formattable *self, PyObject *args)
     switch (PyTuple_Size(args)) {
       case 0:
       {
-          icu::UnicodeString u;
+          UnicodeString u;
 
           self->object->getString(u, status);
           if (U_FAILURE(status))
@@ -1991,7 +1989,7 @@ static PyObject *t_formattable_getString(t_formattable *self, PyObject *args)
       case 1:
       {
           PyObject *arg = PyTuple_GET_ITEM(args, 0);
-          icu::UnicodeString *u;
+          UnicodeString *u;
 
           if (!parseArg(arg, "U", &u))
           {
@@ -2063,8 +2061,8 @@ static PyObject *t_formattable_setDate(t_formattable *self, PyObject *arg)
 
 static PyObject *t_formattable_setString(t_formattable *self, PyObject *arg)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
@@ -2078,7 +2076,7 @@ static PyObject *t_formattable_setString(t_formattable *self, PyObject *arg)
 static PyObject *t_formattable_richcmp(t_formattable *self,
                                        PyObject *arg, int op)
 {
-    icu::Formattable *f;
+    Formattable *f;
 
     if (!parseArg(arg, "P", TYPE_CLASSID(Formattable), &f))
     {
@@ -2105,12 +2103,12 @@ static PyObject *t_formattable_richcmp(t_formattable *self,
 static PyObject *t_formattable_str(t_formattable *self)
 {
     UErrorCode status = U_ZERO_ERROR;
-    icu::UnicodeString u;
+    UnicodeString u;
 
     switch (self->object->getType()) {
-      case icu::Formattable::kDate:
+      case Formattable::kDate:
       {
-          icu::SimpleDateFormat f = icu::SimpleDateFormat(status);
+          SimpleDateFormat f = SimpleDateFormat(status);
           if (U_FAILURE(status))
               return ICUException(status).reportError();
 
@@ -2119,11 +2117,11 @@ static PyObject *t_formattable_str(t_formattable *self)
               return ICUException(status).reportError();
           break;
       }
-      case icu::Formattable::kDouble:
-      case icu::Formattable::kLong:
-      case icu::Formattable::kInt64:
+      case Formattable::kDouble:
+      case Formattable::kLong:
+      case Formattable::kInt64:
       {
-          icu::DecimalFormat f = icu::DecimalFormat(status);
+          DecimalFormat f = DecimalFormat(status);
           if (U_FAILURE(status))
               return ICUException(status).reportError();
 
@@ -2132,7 +2130,7 @@ static PyObject *t_formattable_str(t_formattable *self)
               return ICUException(status).reportError();
           break;
       }
-      case icu::Formattable::kString:
+      case Formattable::kString:
       {
           self->object->getString(u, status);
           if (U_FAILURE(status))
@@ -2209,13 +2207,13 @@ static PyObject *t_measureunit_richcmp(t_measureunit *self,
 
 static PyObject *t_measure_getNumber(t_measure *self)
 {
-    icu::Formattable *f = new icu::Formattable(self->object->getNumber());
+    Formattable *f = new Formattable(self->object->getNumber());
     return wrap_Formattable(f, T_OWNED);
 }
 
 static PyObject *t_measure_getUnit(t_measure *self)
 {
-    icu::MeasureUnit *u = (icu::MeasureUnit *) self->object->getUnit().clone();
+    MeasureUnit *u = (MeasureUnit *) self->object->getUnit().clone();
     return wrap_MeasureUnit(u, T_OWNED);
 }
 
@@ -2249,13 +2247,12 @@ static int t_currencyunit_init(t_currencyunit *self,
                                PyObject *args, PyObject *kwds)
 {
     UErrorCode status = U_ZERO_ERROR;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArgs(args, "S", &u, &_u))
     {
-        icu::CurrencyUnit *cu =
-            new icu::CurrencyUnit(u->getTerminatedBuffer(), status);
+        CurrencyUnit *cu = new CurrencyUnit(u->getTerminatedBuffer(), status);
 
         if (U_FAILURE(status))
         {
@@ -2275,13 +2272,13 @@ static int t_currencyunit_init(t_currencyunit *self,
 
 static PyObject *t_currencyunit_getISOCurrency(t_currencyunit *self)
 {
-    icu::UnicodeString u(self->object->getISOCurrency());
+    UnicodeString u(self->object->getISOCurrency());
     return PyUnicode_FromUnicodeString(&u);
 }
 
 static PyObject *t_currencyunit_str(t_currencyunit *self)
 {
-    icu::UnicodeString u(self->object->getISOCurrency());
+    UnicodeString u(self->object->getISOCurrency());
     return PyUnicode_FromUnicodeString(&u);
 }
 
@@ -2292,16 +2289,16 @@ static int t_currencyamount_init(t_currencyamount *self,
                                  PyObject *args, PyObject *kwds)
 {
     UErrorCode status = U_ZERO_ERROR;
-    icu::Formattable *f;
+    Formattable *f;
     double d;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     if (!parseArgs(args, "PS", TYPE_CLASSID(Formattable),
                    &f, &u, &_u))
     {
-        icu::CurrencyAmount *ca =
-            new icu::CurrencyAmount(*f, u->getTerminatedBuffer(), status);
+        CurrencyAmount *ca =
+            new CurrencyAmount(*f, u->getTerminatedBuffer(), status);
 
         if (U_FAILURE(status))
         {
@@ -2317,8 +2314,8 @@ static int t_currencyamount_init(t_currencyamount *self,
 
     if (!parseArgs(args, "dS", &d, &u, &_u))
     {
-        icu::CurrencyAmount *ca =
-            new icu::CurrencyAmount(d, u->getTerminatedBuffer(), status);
+        CurrencyAmount *ca =
+            new CurrencyAmount(d, u->getTerminatedBuffer(), status);
 
         if (U_FAILURE(status))
         {
@@ -2338,16 +2335,16 @@ static int t_currencyamount_init(t_currencyamount *self,
 
 static PyObject *t_currencyamount_getCurrency(t_currencyamount *self)
 {
-    icu::CurrencyUnit *cu = new icu::CurrencyUnit(self->object->getCurrency());
+    CurrencyUnit *cu = new CurrencyUnit(self->object->getCurrency());
     return wrap_CurrencyUnit(cu, T_OWNED);
 }
 
 static PyObject *t_currencyamount_str(t_currencyamount *self)
 {
-    icu::UnicodeString u(self->object->getISOCurrency());
+    UnicodeString u(self->object->getISOCurrency());
     PyObject *currency = PyUnicode_FromUnicodeString(&u);
 
-    icu::Formattable number = self->object->getNumber();
+    Formattable number = self->object->getNumber();
     PyObject *amount = PyFloat_FromDouble(number.getDouble());
 
     PyObject *format = PyString_FromString("%s %0.2f");
@@ -2421,14 +2418,14 @@ static PyObject *t_stringenumeration_unext(t_stringenumeration *self)
         return NULL;
     }
 
-    icu::UnicodeString u(str);
+    UnicodeString u(str);
     return PyUnicode_FromUnicodeString(&u);
 }
 
 static PyObject *t_stringenumeration_snext(t_stringenumeration *self)
 {
     UErrorCode status = U_ZERO_ERROR;
-    const icu::UnicodeString *str = self->object->snext(status);
+    const UnicodeString *str = self->object->snext(status);
 
     if (U_FAILURE(status))
         return ICUException(status).reportError();
@@ -2439,7 +2436,7 @@ static PyObject *t_stringenumeration_snext(t_stringenumeration *self)
         return NULL;
     }
 
-    return wrap_UnicodeString(new icu::UnicodeString(*str), T_OWNED);
+    return wrap_UnicodeString(new UnicodeString(*str), T_OWNED);
 }                
 
 static PyObject *t_stringenumeration_iter(t_stringenumeration *self)

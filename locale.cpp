@@ -35,7 +35,7 @@ DECLARE_CONSTANTS_TYPE(UResType);
 
 class t_locale : public _wrapper {
 public:
-    icu::Locale *object;
+    Locale *object;
 };
 
 static int t_locale_init(t_locale *self, PyObject *args, PyObject *kwds);
@@ -132,18 +132,18 @@ static PyMethodDef t_locale_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Locale, t_locale, UObject, icu::Locale, t_locale_init);
+DECLARE_TYPE(Locale, t_locale, UObject, Locale, t_locale_init);
 
-PyObject *wrap_Locale(const icu::Locale &locale)
+PyObject *wrap_Locale(const Locale &locale)
 {
-    return wrap_Locale(new icu::Locale(locale), T_OWNED);
+    return wrap_Locale(new Locale(locale), T_OWNED);
 }
 
 /* ResourceBundle */
 
 class t_resourcebundle : public _wrapper {
 public:
-    icu::ResourceBundle *object;
+    ResourceBundle *object;
 };
 
 static int t_resourcebundle_init(t_resourcebundle *self,
@@ -195,12 +195,11 @@ static PyMethodDef t_resourcebundle_methods[] = {
 };
 
 DECLARE_TYPE(ResourceBundle, t_resourcebundle, UObject,
-             icu::ResourceBundle, t_resourcebundle_init);
+             ResourceBundle, t_resourcebundle_init);
 
-static PyObject *wrap_ResourceBundle(const icu::ResourceBundle &resourcebundle)
+static PyObject *wrap_ResourceBundle(const ResourceBundle &resourcebundle)
 {
-    return wrap_ResourceBundle(new icu::ResourceBundle(resourcebundle),
-                               T_OWNED);
+    return wrap_ResourceBundle(new ResourceBundle(resourcebundle), T_OWNED);
 }
 
 /* Locale */
@@ -211,13 +210,13 @@ static int t_locale_init(t_locale *self, PyObject *args, PyObject *kwds)
 
     switch (PyTuple_Size(args)) {
       case 0:
-        self->object = new icu::Locale();
+        self->object = new Locale();
         self->flags = T_OWNED;
         break;
       case 1:
         if (!parseArgs(args, "c", &language))
         {
-            self->object = new icu::Locale(language);
+            self->object = new Locale(language);
             self->flags = T_OWNED;
             break;
         }
@@ -226,7 +225,7 @@ static int t_locale_init(t_locale *self, PyObject *args, PyObject *kwds)
       case 2:
         if (!parseArgs(args, "cc", &language, &country))
         {
-            self->object = new icu::Locale(language, country);
+            self->object = new Locale(language, country);
             self->flags = T_OWNED;
             break;
         }
@@ -235,7 +234,7 @@ static int t_locale_init(t_locale *self, PyObject *args, PyObject *kwds)
       case 3:
         if (!parseArgs(args, "ccc", &language, &country, &variant))
         {
-            self->object = new icu::Locale(language, country, variant);
+            self->object = new Locale(language, country, variant);
             self->flags = T_OWNED;
             break;
         }
@@ -299,9 +298,9 @@ static PyObject *t_locale_getLCID(t_locale *self)
 
 static PyObject *t_locale_getDisplayLanguage(t_locale *self, PyObject *args)
 {
-    icu::Locale *locale;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    Locale *locale;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -334,9 +333,9 @@ static PyObject *t_locale_getDisplayLanguage(t_locale *self, PyObject *args)
 
 static PyObject *t_locale_getDisplayScript(t_locale *self, PyObject *args)
 {
-    icu::Locale *locale;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    Locale *locale;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -369,9 +368,9 @@ static PyObject *t_locale_getDisplayScript(t_locale *self, PyObject *args)
 
 static PyObject *t_locale_getDisplayCountry(t_locale *self, PyObject *args)
 {
-    icu::Locale *locale;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    Locale *locale;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -404,9 +403,9 @@ static PyObject *t_locale_getDisplayCountry(t_locale *self, PyObject *args)
 
 static PyObject *t_locale_getDisplayVariant(t_locale *self, PyObject *args)
 {
-    icu::Locale *locale;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    Locale *locale;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -439,9 +438,9 @@ static PyObject *t_locale_getDisplayVariant(t_locale *self, PyObject *args)
 
 static PyObject *t_locale_getDisplayName(t_locale *self, PyObject *args)
 {
-    icu::Locale *locale;
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    Locale *locale;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -473,7 +472,7 @@ static PyObject *t_locale_getDisplayName(t_locale *self, PyObject *args)
 
 static PyObject *t_locale_createKeywords(t_locale *self)
 {
-    icu::StringEnumeration *se;
+    StringEnumeration *se;
     STATUS_CALL(se = self->object->createKeywords(status));
 
     return wrap_StringEnumeration(se, T_OWNED);
@@ -481,126 +480,126 @@ static PyObject *t_locale_createKeywords(t_locale *self)
 
 static PyObject *t_locale_getEnglish(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getEnglish());
+    return wrap_Locale(Locale::getEnglish());
 }
 
 static PyObject *t_locale_getFrench(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getFrench());
+    return wrap_Locale(Locale::getFrench());
 }
 
 static PyObject *t_locale_getGerman(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getGerman());
+    return wrap_Locale(Locale::getGerman());
 }
 
 static PyObject *t_locale_getItalian(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getItalian());
+    return wrap_Locale(Locale::getItalian());
 }
 
 static PyObject *t_locale_getJapanese(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getJapanese());
+    return wrap_Locale(Locale::getJapanese());
 }
 
 static PyObject *t_locale_getKorean(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getKorean());
+    return wrap_Locale(Locale::getKorean());
 }
 
 static PyObject *t_locale_getChinese(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getChinese());
+    return wrap_Locale(Locale::getChinese());
 }
 
 static PyObject *t_locale_getSimplifiedChinese(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getSimplifiedChinese());
+    return wrap_Locale(Locale::getSimplifiedChinese());
 }
 
 static PyObject *t_locale_getTraditionalChinese(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getTraditionalChinese());
+    return wrap_Locale(Locale::getTraditionalChinese());
 }
 
 static PyObject *t_locale_getFrance(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getFrance());
+    return wrap_Locale(Locale::getFrance());
 }
 
 static PyObject *t_locale_getGermany(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getGermany());
+    return wrap_Locale(Locale::getGermany());
 }
 
 static PyObject *t_locale_getItaly(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getItaly());
+    return wrap_Locale(Locale::getItaly());
 }
 
 static PyObject *t_locale_getJapan(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getJapan());
+    return wrap_Locale(Locale::getJapan());
 }
 
 static PyObject *t_locale_getKorea(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getKorea());
+    return wrap_Locale(Locale::getKorea());
 }
 
 static PyObject *t_locale_getChina(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getChina());
+    return wrap_Locale(Locale::getChina());
 }
 
 static PyObject *t_locale_getPRC(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getPRC());
+    return wrap_Locale(Locale::getPRC());
 }
 
 static PyObject *t_locale_getTaiwan(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getTaiwan());
+    return wrap_Locale(Locale::getTaiwan());
 }
 
 static PyObject *t_locale_getUK(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getUK());
+    return wrap_Locale(Locale::getUK());
 }
 
 static PyObject *t_locale_getUS(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getUS());
+    return wrap_Locale(Locale::getUS());
 }
 
 static PyObject *t_locale_getCanada(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getCanada());
+    return wrap_Locale(Locale::getCanada());
 }
 
 static PyObject *t_locale_getCanadaFrench(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getCanadaFrench());
+    return wrap_Locale(Locale::getCanadaFrench());
 }
 
 static PyObject *t_locale_getDefault(PyTypeObject *self)
 {
-    return wrap_Locale(icu::Locale::getDefault());
+    return wrap_Locale(Locale::getDefault());
 }
 
 static PyObject *t_locale_setDefault(PyTypeObject *type, PyObject *args)
 {
-    icu::Locale *locale;
+    Locale *locale;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        STATUS_CALL(icu::Locale::setDefault(NULL, status));
+        STATUS_CALL(Locale::setDefault(NULL, status));
         Py_RETURN_NONE;
       case 1:
         if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
-            STATUS_CALL(icu::Locale::setDefault(*locale, status));
+            STATUS_CALL(Locale::setDefault(*locale, status));
             Py_RETURN_NONE;
         }
         break;
@@ -611,17 +610,17 @@ static PyObject *t_locale_setDefault(PyTypeObject *type, PyObject *args)
 
 static PyObject *t_locale_createFromName(PyTypeObject *type, PyObject *args)
 {
-    icu::Locale locale;
+    Locale locale;
     char *name;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        locale = icu::Locale::createFromName(NULL);
+        locale = Locale::createFromName(NULL);
         return wrap_Locale(locale);
       case 1:
         if (!parseArgs(args, "c", &name))
         {
-            locale = icu::Locale::createFromName(name);
+            locale = Locale::createFromName(name);
             return wrap_Locale(locale);
         }
         break;
@@ -632,12 +631,12 @@ static PyObject *t_locale_createFromName(PyTypeObject *type, PyObject *args)
 
 static PyObject *t_locale_createCanonical(PyTypeObject *type, PyObject *arg)
 {
-    icu::Locale locale;
+    Locale locale;
     char *name;
 
     if (!parseArg(arg, "c", &name))
     {
-        locale = icu::Locale::createCanonical(name);
+        locale = Locale::createCanonical(name);
         return wrap_Locale(locale);
     }
 
@@ -647,11 +646,11 @@ static PyObject *t_locale_createCanonical(PyTypeObject *type, PyObject *arg)
 static PyObject *t_locale_getAvailableLocales(PyTypeObject *type)
 {
     int count;
-    const icu::Locale *locales = icu::Locale::getAvailableLocales(count);
+    const Locale *locales = Locale::getAvailableLocales(count);
     PyObject *dict = PyDict_New();
 
     for (int32_t i = 0; i < count; i++) {
-        icu::Locale *locale = (icu::Locale *) locales + i;
+        Locale *locale = (Locale *) locales + i;
         PyObject *obj = wrap_Locale(locale, 0);
         PyDict_SetItemString(dict, locale->getName(), obj);
 	Py_DECREF(obj);
@@ -682,7 +681,7 @@ static PyObject *t_locale_getKeywordValue(t_locale *self, PyObject *arg)
 
 static PyObject *t_locale_getISOCountries(PyTypeObject *type)
 {
-    const char *const *countries = icu::Locale::getISOCountries();
+    const char *const *countries = Locale::getISOCountries();
     PyObject *list;
     int len = 0;
 
@@ -699,7 +698,7 @@ static PyObject *t_locale_getISOCountries(PyTypeObject *type)
 
 static PyObject *t_locale_getISOLanguages(PyTypeObject *type)
 {
-    const char *const *languages = icu::Locale::getISOLanguages();
+    const char *const *languages = Locale::getISOLanguages();
     PyObject *list;
     int len = 0;
 
@@ -725,21 +724,21 @@ static PyObject *t_locale_str(t_locale *self)
 static int t_resourcebundle_init(t_resourcebundle *self,
                                  PyObject *args, PyObject *kwds)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
-    icu::Locale *locale;
-    icu::ResourceBundle *bundle;
+    UnicodeString *u;
+    UnicodeString _u;
+    Locale *locale;
+    ResourceBundle *bundle;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        INT_STATUS_CALL(bundle = new icu::ResourceBundle(status));
+        INT_STATUS_CALL(bundle = new ResourceBundle(status));
         self->object = bundle;
         self->flags = T_OWNED;
         break;
       case 1:
         if (!parseArgs(args, "S", &u, &_u))
         {
-            INT_STATUS_CALL(bundle = new icu::ResourceBundle(*u, status));
+            INT_STATUS_CALL(bundle = new ResourceBundle(*u, status));
             self->object = bundle;
             self->flags = T_OWNED;
             break;
@@ -748,8 +747,7 @@ static int t_resourcebundle_init(t_resourcebundle *self,
         if (!parseArgs(args, "SP", TYPE_CLASSID(Locale),
                        &u, &_u, &locale))
         {
-            INT_STATUS_CALL(bundle = new icu::ResourceBundle(*u, *locale,
-                                                             status));
+            INT_STATUS_CALL(bundle = new ResourceBundle(*u, *locale, status));
             self->object = bundle;
             self->flags = T_OWNED;
             break;
@@ -772,8 +770,8 @@ static PyObject *t_resourcebundle_getSize(t_resourcebundle *self)
 static PyObject *t_resourcebundle_getString(t_resourcebundle *self,
                                             PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -842,8 +840,8 @@ static PyObject *t_resourcebundle_getNext(t_resourcebundle *self)
 static PyObject *t_resourcebundle_getNextString(t_resourcebundle *self,
                                                 PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -889,8 +887,8 @@ static PyObject *t_resourcebundle_getWithFallback(t_resourcebundle *self,
 static PyObject *t_resourcebundle_getStringEx(t_resourcebundle *self,
                                               PyObject *args)
 {
-    icu::UnicodeString *u;
-    icu::UnicodeString _u;
+    UnicodeString *u;
+    UnicodeString _u;
     char *key;
     int i;
 
@@ -964,7 +962,7 @@ static PyObject *t_resourcebundle_getLocale(t_resourcebundle *self,
       case 1:
         if (!parseArgs(args, "i", &type))
         {
-            icu::Locale locale;
+            Locale locale;
 
             STATUS_CALL(locale = self->object->getLocale(type, status));
             return wrap_Locale(locale);
