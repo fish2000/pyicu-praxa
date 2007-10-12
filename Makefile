@@ -90,7 +90,7 @@ ifeq ($(DEBUG),1)
 CCFLAGS=-O0 -g
 LDFLAGS=-g
 else
-CCFLAGS=-O2
+CCFLAGS=-O3
 LDFLAGS=
 endif
 OBJS=$(MODULES:%=$(BINDIR)/%.o)
@@ -106,7 +106,7 @@ ifeq ($(DEBUG),1)
 CCFLAGS=-O0 -g -fPIC
 LDFLAGS=-g
 else
-CCFLAGS=-O2 -fPIC
+CCFLAGS=-O3 -fPIC
 LDFLAGS=
 endif
 OBJS=$(MODULES:%=$(BINDIR)/%.o)

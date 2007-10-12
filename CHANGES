@@ -8,6 +8,7 @@ Version 0.6 ->
   - fixed bug 9229
   - reworked FloatingTZ to optionally wrap a specific tzinfo instead of default
   - incorporated c++ patches by Fredrik Roubert
+  - changed Exact unicode and string check to allow subclasses
   - 
 
 Version 0.5 -> 0.6

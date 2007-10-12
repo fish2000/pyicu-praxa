@@ -243,7 +243,7 @@ EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
                                                char *encoding, char *mode,
                                                UnicodeString &string)
 {
-    if (PyUnicode_CheckExact(object))
+    if (PyUnicode_Check(object))
     {
         if (sizeof(Py_UNICODE) == sizeof(UChar))
             string.setTo((const UChar *) PyUnicode_AS_UNICODE(object),
@@ -269,7 +269,7 @@ EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
             delete chars;
         }
     }
-    else if (PyString_CheckExact(object))
+    else if (PyString_Check(object))
         PyString_AsUnicodeString(object, encoding, mode, string);
     else
     {
