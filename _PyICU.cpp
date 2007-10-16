@@ -110,7 +110,9 @@ PyTypeObject ConstVariableDescriptorType = {
 static void t_descriptor_dealloc(t_descriptor *self)
 {
     if (self->flags & DESCRIPTOR_STATIC)
+    {
         Py_DECREF(self->access.value);
+    }
     self->ob_type->tp_free((PyObject *) self);
 }
 
