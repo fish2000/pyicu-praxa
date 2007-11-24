@@ -8,7 +8,7 @@ except ImportError:
 
 
 VERSION = '0.8'
-ICU_VERSION = '3.8'
+ICU_VERSION = '3.8'   # version 3.6 is also supported
 
 INCLUDES = {
     'darwin': ['/usr/local/icu-%s/include' %(ICU_VERSION)],

@@ -47,17 +47,14 @@
   Building PyICU
   --------------
 
-  Before building PyICU the ICU 3.4 libraries must be built and
+  Before building PyICU the ICU 3.6 or 3.8 libraries must be built and
   installed. Refer to each system's instructions for more information.
 
-  As for version 0.5 PyICU no longer uses SWIG.
+  As of version 0.5 PyICU no longer uses SWIG.
 
-  PyICU is built with GNU Make and a C++ compiler (g++ on Unix,
-  Microsoft Visual C++ on Windows). In order to use GNU Make on Windows, you
-  need to install the Cygwin environment first.
-
-  Edit the section in the Makefile for your operating system.
-  Run make and make install.
+  As of version 0.8 PyICU is built with distutils or setuptools:
+     - python setup.py build
+     - sudo python setup.py install
 
 
   Running PyICU
