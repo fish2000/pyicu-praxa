@@ -443,7 +443,8 @@ static PyObject *t_uobject_str(t_uobject *self)
     if (self->object)
     {
         char buf[32];
-        sprintf(buf, "0x%x", (unsigned int)self->object->getDynamicClassID());
+        sprintf(buf, "0x%lx",
+		(unsigned long) self->object->getDynamicClassID());
         return PyString_FromString(buf);
     }
 

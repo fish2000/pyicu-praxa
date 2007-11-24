@@ -506,7 +506,7 @@ Formattable *toFormattable(PyObject *arg)
         return new Formattable(i);
 
     if (!parseArg(arg, "L", &l))
-        return new Formattable(l);
+      return new Formattable((int64_t) l);
 
     if (!parseArg(arg, "c", &s))
         return new Formattable(s);
