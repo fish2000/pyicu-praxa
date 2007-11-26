@@ -14,7 +14,8 @@ Version 0.6 -> 0.8
   - incorporated c++ patches by Fredrik Roubert
   - changed Exact unicode and string check to allow subclasses
   - replaced Makefile with setup.py for distutils-based build (Bernd Zeimetz)
-  - PyICU now wraps ICU 3.8
+  - PyICU supported with ICU 3.6 or 3.8
+  - PyICU supported on 64-bit processors (bug 11394)
 
 Version 0.5 -> 0.6
 ------------------
