@@ -57,6 +57,7 @@ else:
 
 setup(name="PyICU",
       description='Python extension wrapping the ICU C++ API',
+      long_description=open('DESCRIPTION').read(),
       version=VERSION,
       test_suite="test",
       url='http://pyicu.osafoundation.org/',

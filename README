@@ -7,7 +7,6 @@
   --------
 
    - Welcome
-   - Installing PyICU
    - Building PyICU
    - Running PyICU
    - What's available
@@ -25,25 +24,6 @@
   IBM's ICU homepage is: http://www-306.ibm.com/software/globalization/icu/
 
 
-  Installing PyICU
-  ----------------
-
-  To build PyICU from sources, see next topic
-
-  To install PyICU binaries you just downloaded:
-
-    - install the files in the python directory into your python
-      installation's site-packages directory
-
-    Linux only:
-    - install the files in the lib directory into /usr/local/lib or a
-      directory that is on your LD_LIBRARY_PATH
-
-    Mac OS X only:
-    - install the files in the lib directory into /usr/local/lib or a
-      directory that is on your DYLD_LIBRARY_PATH
-
-
   Building PyICU
   --------------
 
@@ -53,6 +33,8 @@
   As of version 0.5 PyICU no longer uses SWIG.
 
   As of version 0.8 PyICU is built with distutils or setuptools:
+     - verify that the INCLUDES, LFLAGS, CFLAGS and LIBRARIES dictionaries in
+       setup.py contain correct values for your platform
      - python setup.py build
      - sudo python setup.py install
 
@@ -62,22 +44,23 @@
 
     . Mac OS X
       Make sure that DYLD_LIBRARY_PATH contains paths to the directory(ies)
-      containing the ICU libs and PyICU's libPyICU.dylib
+      containing the ICU libs.
 
     . Linux
       Make sure that LD_LIBRARY_PATH contains paths to the directory(ies)
-      containing the ICU libs and PyICU's libPyICU.so
+      containing the ICU libs or that you added the corresponding -rpath
+      argument to LFLAGS.
 
     . Windows
       Make sure that PATH contains paths to the directory(ies)
-      containing the ICU DLLs and PyICU's libPyICU.dll
+      containing the ICU DLLs.
 
 
   What's available
   ----------------
 
   PyICU is under active development. Currently, the string, locale, format,
-  calendar, timezone and various iterator classes are available.
+  calendar, timezone, charset and various iterator classes are available.
   See the CHANGES file for an up to date log of changes and additions.
 
 
