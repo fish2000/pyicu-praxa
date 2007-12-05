@@ -409,7 +409,13 @@ static PyObject *types;
 
 void registerType(PyTypeObject *type, UClassID id)
 {
-    PyObject *n = PyInt_FromLong((long) id);
+    PyObject *n;
+
+    if (sizeof(void *) == sizeof(int))
+        n = PyInt_FromLong((Py_intptr_t) id);
+    else
+        n = PyLong_FromLongLong((Py_intptr_t) id);
+
     PyObject *list = PyList_New(0);
     PyObject *bn;
 
@@ -435,8 +441,19 @@ int isInstance(PyObject *arg, UClassID id, PyTypeObject *type)
         if (id == oid)
             return 1;
 
-        PyObject *bn = PyInt_FromLong((long) id);
-        PyObject *n = PyInt_FromLong((long) oid);
+	PyObject *bn, *n;
+
+	if (sizeof(void *) == sizeof(int))
+	{
+	    bn = PyInt_FromLong((Py_intptr_t) id);
+	    n = PyInt_FromLong((Py_intptr_t) oid);
+	}
+	else
+	{
+	    bn = PyLong_FromLongLong((Py_intptr_t) id);
+	    n = PyLong_FromLongLong((Py_intptr_t) oid);
+	}
+
         PyObject *list = PyDict_GetItem(types, bn);
         int b = PySequence_Contains(list, n);
         
