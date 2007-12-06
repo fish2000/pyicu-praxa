@@ -213,7 +213,7 @@ PyTypeObject name##Type = {                                             \
     name::getStaticClassID(), &name##Type
 
 #define TYPE_ID(name)                           \
-    name##_ID, &name##Type
+    (UClassID) (name##_ID), &name##Type
 
 #define INSTALL_TYPE(name, module)                                   \
     if (PyType_Ready(&name##Type) == 0)                              \
