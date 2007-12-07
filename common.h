@@ -98,6 +98,8 @@ public:
     virtual const UnicodeString* snext(UErrorCode& status);
     virtual void reset(UErrorCode& status);
     virtual UClassID getDynamicClassID() const;
+private:
+    UEnumeration *uenum; // owned
 };
 U_NAMESPACE_END
 
