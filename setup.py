@@ -13,24 +13,28 @@ ICU_VERSION = '3.8'   # version 3.6 is also supported
 INCLUDES = {
     'darwin': ['/usr/local/icu-%s/include' %(ICU_VERSION)],
     'linux2': [],
+    'freebsd7': ['/usr/local/include'],
     'win32': [],
 }
 
 CFLAGS = {
     'darwin': [],
     'linux2': [],
+    'freebsd7': [],
     'win32': ['/Zc:wchar_t'],
 }
 
 LFLAGS = {
     'darwin': ['-L/usr/local/icu-%s/lib' %(ICU_VERSION)],
     'linux2': [],
+    'freebsd7': ['-L/usr/local/lib'],
     'win32': [],
 }
 
 LIBRARIES = {
     'darwin': ['icui18n', 'icuuc', 'icudata'],
     'linux2': ['icui18n', 'icuuc', 'icudata'],
+    'freebsd7': ['icui18n', 'icuuc', 'icudata'],
     'win32': ['icuin', 'icuuc', 'icudt'],
 }
 

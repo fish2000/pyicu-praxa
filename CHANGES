@@ -5,6 +5,7 @@ Version 0.8 ->
 ------------------
   - fixed 64-bit random crasher bug in registerType()/isInstance()
   - fixed bug 11548
+  - added entries for freebsd7 to setup.py (Jan Gehring)
   - 
 
 Version 0.6 -> 0.8
