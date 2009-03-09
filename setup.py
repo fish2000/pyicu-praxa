@@ -15,6 +15,7 @@ INCLUDES = {
     'linux2': [],
     'freebsd7': ['/usr/local/include'],
     'win32': [],
+    'sunos5': [],
 }
 
 CFLAGS = {
@@ -22,6 +23,7 @@ CFLAGS = {
     'linux2': [],
     'freebsd7': [],
     'win32': ['/Zc:wchar_t'],
+    'sunos5': [],
 }
 
 LFLAGS = {
@@ -29,6 +31,7 @@ LFLAGS = {
     'linux2': [],
     'freebsd7': ['-L/usr/local/lib'],
     'win32': [],
+    'sunos5': [],
 }
 
 LIBRARIES = {
@@ -36,6 +39,7 @@ LIBRARIES = {
     'linux2': ['icui18n', 'icuuc', 'icudata'],
     'freebsd7': ['icui18n', 'icuuc', 'icudata'],
     'win32': ['icuin', 'icuuc', 'icudt'],
+    'sunos5': ['icui18n', 'icuuc', 'icudata'],
 }
 
 if 'PYICU_INCLUDES' in os.environ:

@@ -46,7 +46,7 @@
       Make sure that DYLD_LIBRARY_PATH contains paths to the directory(ies)
       containing the ICU libs.
 
-    . Linux
+    . Linux & Solaris
       Make sure that LD_LIBRARY_PATH contains paths to the directory(ies)
       containing the ICU libs or that you added the corresponding -rpath
       argument to LFLAGS.
