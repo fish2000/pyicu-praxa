@@ -1003,8 +1003,6 @@ static PyObject *t_resourcebundle_str(t_resourcebundle *self)
         return PyString_FromString("URES_TABLE");
       case URES_ALIAS:
         return PyString_FromString("URES_ALIAS");
-      case URES_TABLE32:
-        return PyString_FromString("URES_TABLE32");
       case URES_ARRAY:
         return PyString_FromString("URES_ARRAY");
       case URES_INT_VECTOR:
@@ -1036,7 +1034,6 @@ void _init_locale(PyObject *m)
     INSTALL_ENUM(UResType, URES_BINARY);
     INSTALL_ENUM(UResType, URES_TABLE);
     INSTALL_ENUM(UResType, URES_ALIAS);
-    INSTALL_ENUM(UResType, URES_TABLE32);
     INSTALL_ENUM(UResType, URES_INT);
     INSTALL_ENUM(UResType, URES_ARRAY);
     INSTALL_ENUM(UResType, URES_INT_VECTOR);

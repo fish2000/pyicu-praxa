@@ -8,7 +8,8 @@ Version 0.8 ->
   - added entries for freebsd7 to setup.py (Jan Gehring)
   - added support for building on Solaris (Christian Kesselheim)
   - added missing wrapper for Collator.getSortKey()
-  - added support for built-in Transliterators
+  - added support for built-in Transliterators (bug 12870)
+  - removed support for ICU internal URES_TABLE32 ResourceBundle type
   - 
 
 Version 0.6 -> 0.8

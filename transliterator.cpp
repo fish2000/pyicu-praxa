@@ -40,11 +40,9 @@ public:
 
 static PyObject *t_transliterator_getMaximumContextLength(t_transliterator *self);
 static PyObject *t_transliterator_countElements(t_transliterator *self);
-static PyObject *t_transliterator_getElement(t_transliterator *self,
-                                             PyObject *arg);
+static PyObject *t_transliterator_getElement(t_transliterator *self, PyObject *arg);
 static PyObject *t_transliterator_createInverse(t_transliterator *self);
-static PyObject *t_transliterator_transliterate(t_transliterator *self,
-                                                PyObject *args);
+static PyObject *t_transliterator_transliterate(t_transliterator *self, PyObject *args);
 static PyObject *t_transliterator_getAvailableIDs(PyTypeObject *type);
 static PyObject *t_transliterator_createInstance(PyTypeObject *type, PyObject *args);
 
@@ -135,8 +133,8 @@ static PyObject *t_transliterator_createInverse(t_transliterator *self)
 static PyObject *t_transliterator_getAvailableIDs(PyTypeObject *type)
 {
     StringEnumeration *se;
-    STATUS_CALL(se = Transliterator::getAvailableIDs(status));
 
+    STATUS_CALL(se = Transliterator::getAvailableIDs(status));
     return wrap_StringEnumeration(se, T_OWNED);
 }
 

@@ -27,6 +27,7 @@
 extern PyTypeObject TransliteratorType;
 
 PyObject *wrap_Transliterator(Transliterator *transliterator, int flags);
+PyObject *wrap_Transliterator(const Transliterator &transliterator);
 
 void _init_transliterator(PyObject *m);
 
