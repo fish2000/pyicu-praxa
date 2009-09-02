@@ -28,6 +28,7 @@
 #include "errors.h"
 #include "bases.h"
 #include "locale.h"
+#include "transliterator.h"
 #include "iterators.h"
 #include "format.h"
 #include "dateformat.h"
@@ -225,6 +226,7 @@ extern "C" {
         _init_errors(m);
         _init_bases(m);
         _init_locale(m);
+        _init_transliterator(m);
         _init_iterators(m);
         _init_format(m);
         _init_dateformat(m);

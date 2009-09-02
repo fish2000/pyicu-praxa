@@ -84,6 +84,7 @@ typedef intintobjargproc ssizessizeobjargproc;
 #include <unicode/tblcoll.h>
 #include <unicode/ucsdet.h>
 #include <unicode/uidna.h>
+#include <unicode/translit.h>
 
 U_NAMESPACE_USE
 

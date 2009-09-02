@@ -8,6 +8,7 @@ Version 0.8 ->
   - added entries for freebsd7 to setup.py (Jan Gehring)
   - added support for building on Solaris (Christian Kesselheim)
   - added missing wrapper for Collator.getSortKey()
+  - added support for built-in Transliterators
   - 
 
 Version 0.6 -> 0.8
