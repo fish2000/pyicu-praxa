@@ -1,5 +1,5 @@
 # ====================================================================
-# Copyright (c) 2009 Open Source Applications Foundation.
+# Copyright (c) 2009-2010 Open Source Applications Foundation.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -31,12 +31,18 @@ class TestTransliterator(TestCase):
 
     def testTransliterate(self):
 
-        trans = Transliterator.createInstance('Accents-Any', UTransDirection.UTRANS_FORWARD)
+        trans = Transliterator.createInstance('Accents-Any',
+                                              UTransDirection.UTRANS_FORWARD)
         inverse = trans.createInverse()
-        string = u'\xe9v\xe9nement'
 
-        self.assert_(trans.transliterate(string) == u"e<'>ve<'>nement")
-        self.assert_(inverse.transliterate(trans.transliterate(string)) == string)
+        string = u'\xe9v\xe9nement'
+        if ICU_VERSION < '4.0':
+            result = u"e<'>ve<'>nement"
+        else:
+            result = u"e\u2190'\u2192ve\u2190'\u2192nement"
+
+        self.assert_(trans.transliterate(string) == result)
+        self.assert_(inverse.transliterate(result) == string)
         
 
 if __name__ == "__main__":
