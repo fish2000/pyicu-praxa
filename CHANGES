@@ -12,6 +12,7 @@ Version 0.8 -> 0.9
   - removed support for ICU internal URES_TABLE32 ResourceBundle type
   - added support for TimeZone::getDSTSavings() (Jimmy Yuen Ho Wong)
   - added support for ICU 4.2
+  - refreshed README
 
 Version 0.6 -> 0.8
 ------------------

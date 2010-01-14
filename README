@@ -21,18 +21,16 @@
 
   PyICU is a project maintained by the Open Source Applications Foundation.
 
-  IBM's ICU homepage is: http://www-306.ibm.com/software/globalization/icu/
+  The ICU homepage is: http://site.icu-project.org/
 
 
   Building PyICU
   --------------
 
-  Before building PyICU the ICU 3.6 or 3.8 libraries must be built and
-  installed. Refer to each system's instructions for more information.
+  Before building PyICU the ICU libraries must be built and installed. Refer
+  to each system's instructions for more information.
 
-  As of version 0.5 PyICU no longer uses SWIG.
-
-  As of version 0.8 PyICU is built with distutils or setuptools:
+  PyICU is built with distutils or setuptools:
      - verify that the INCLUDES, LFLAGS, CFLAGS and LIBRARIES dictionaries in
        setup.py contain correct values for your platform
      - python setup.py build
@@ -59,18 +57,19 @@
   What's available
   ----------------
 
-  PyICU is under active development. Currently, the string, locale, format,
+  PyICU is under development. Currently, the string, locale, format,
   calendar, timezone, charset and various iterator classes are available.
+  Support for more classes is being added over time and patches are welcome.
+
   See the CHANGES file for an up to date log of changes and additions.
 
 
   API Documentation
   -----------------
 
-  At the moment, there is no API documentation for PyICU. The API for ICU is
-  documented at http://icu.sourceforge.net/apiref/icu4c/ and the following
-  patterns can be used to translate from the C++ APIs to the corresponding
-  Python APIs.
+  There is no API documentation for PyICU. The API for ICU is documented at
+  http://icu-project.org/apiref/icu4c/ and the following patterns can be
+  used to translate from the C++ APIs to the corresponding Python APIs.
 
     - strings
 
@@ -95,7 +94,7 @@
     APIs making it accessible in simpler ways:
     For example, the 'UnicodeString &Locale::getDisplayName(UnicodeString &)'
     API, documented here:
-        http://icu.sourceforge.net/apiref/icu4c/classLocale.html#a19
+        http://icu-project.org/apiref/icu4c/classLocale.html
     can be invoked from Python in several ways:
 
       1. The ICU way
@@ -154,7 +153,7 @@
 
     For example, the 'UnicodeString &DateFormat::format(const Formattable &,
     UnicodeString &, UErrorCode &)' API, documented here
-        http://icu.sourceforge.net/apiref/icu4c/classDateFormat.html#a6
+        http://icu-project.org/apiref/icu4c/classDateFormat.html
     is invoked from Python with:
 
         >>> from PyICU import DateFormat, Formattable
@@ -167,7 +166,7 @@
      
     Of course, the simpler 'UnicodeString &DateFormat::format(UDate,
     UnicodeString &)' documented here:
-        http://icu.sourceforge.net/apiref/icu4c/classDateFormat.html#a5
+        http://icu-project.org/apiref/icu4c/classDateFormat.html
     can be used too:
 
         >>> from PyICU import DateFormat
