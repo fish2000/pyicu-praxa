@@ -37,6 +37,7 @@
 #include "collator.h"
 #include "charset.h"
 #include "tzinfo.h"
+#include "unicodeset.h"
 
 
 /* const variable descriptor */
@@ -235,5 +236,6 @@ extern "C" {
         _init_collator(m);
         _init_charset(m);
         _init_tzinfo(m);
+        _init_unicodeset(m);
     }
 }

@@ -26,6 +26,7 @@
 
 #include "bases.h"
 #include "transliterator.h"
+#include "unicodeset.h"
 #include "macros.h"
 
 DECLARE_CONSTANTS_TYPE(UTransDirection);
@@ -41,6 +42,8 @@ public:
 static PyObject *t_transliterator_getMaximumContextLength(t_transliterator *self);
 static PyObject *t_transliterator_countElements(t_transliterator *self);
 static PyObject *t_transliterator_getElement(t_transliterator *self, PyObject *arg);
+static PyObject *t_transliterator_getSourceSet(t_transliterator *self);
+static PyObject *t_transliterator_getTargetSet(t_transliterator *self);
 static PyObject *t_transliterator_createInverse(t_transliterator *self);
 static PyObject *t_transliterator_transliterate(t_transliterator *self, PyObject *args);
 static PyObject *t_transliterator_getAvailableIDs(PyTypeObject *type);
@@ -51,6 +54,8 @@ static PyMethodDef t_transliterator_methods[] = {
     DECLARE_METHOD(t_transliterator, getMaximumContextLength, METH_NOARGS),
     DECLARE_METHOD(t_transliterator, countElements, METH_NOARGS),
     DECLARE_METHOD(t_transliterator, getElement, METH_O),
+    DECLARE_METHOD(t_transliterator, getSourceSet, METH_NOARGS),
+    DECLARE_METHOD(t_transliterator, getTargetSet, METH_NOARGS),
     DECLARE_METHOD(t_transliterator, createInverse, METH_NOARGS),
     DECLARE_METHOD(t_transliterator, getAvailableIDs, METH_NOARGS | METH_CLASS),
     DECLARE_METHOD(t_transliterator, createInstance, METH_VARARGS | METH_CLASS),
@@ -120,6 +125,22 @@ static PyObject *t_transliterator_getElement(t_transliterator *self,
     STATUS_CALL(transliterator = &self->object->getElement(i, status));
 
     return wrap_Transliterator(*transliterator);
+}
+
+static PyObject *t_transliterator_getSourceSet(t_transliterator *self)
+{
+    UnicodeSet set;
+
+    self->object->getSourceSet(set);
+    return wrap_UnicodeSet(new UnicodeSet(set), T_OWNED);
+}
+
+static PyObject *t_transliterator_getTargetSet(t_transliterator *self)
+{
+    UnicodeSet set;
+
+    self->object->getTargetSet(set);
+    return wrap_UnicodeSet(new UnicodeSet(set), T_OWNED);
 }
 
 static PyObject *t_transliterator_createInverse(t_transliterator *self)

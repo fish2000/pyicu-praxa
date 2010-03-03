@@ -85,6 +85,10 @@ typedef intintobjargproc ssizessizeobjargproc;
 #include <unicode/ucsdet.h>
 #include <unicode/uidna.h>
 #include <unicode/translit.h>
+#include <unicode/unifunct.h>
+#include <unicode/unimatch.h>
+#include <unicode/unifilt.h>
+#include <unicode/uniset.h>
 
 U_NAMESPACE_USE
 
@@ -121,6 +125,7 @@ enum {
     DateFormat_ID,
     Calendar_ID,
     Collator_ID,
+    UnicodeMatcher_ID
 };
 
 void _init_common(PyObject *m);

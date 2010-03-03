@@ -1,6 +1,11 @@
 
 For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 
+Version 0.9 ->
+------------------
+  - added support for UnicodeSet
+  - 
+
 Version 0.8 -> 0.9
 ------------------
   - fixed 64-bit random crasher bug in registerType()/isInstance()
