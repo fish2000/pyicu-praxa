@@ -21,33 +21,10 @@
  * ====================================================================
  */
 
-#ifndef _bases_h
-#define _bases_h
+#ifndef _regex_h
+#define _regex_h
 
-#define T_OWNED    0x0001
-
-class _wrapper {
-public:
-    PyObject_HEAD
-    int flags;
-};
-
-class t_uobject : public _wrapper {
-public:
-    UObject *object;
-};
-
-void t_uobject_dealloc(t_uobject *self);
-
-extern PyTypeObject UObjectType;
-extern PyTypeObject FormattableType;
-
-PyObject *wrap_StringEnumeration(StringEnumeration *, int);
-PyObject *wrap_Formattable(Formattable *, int);
-PyObject *wrap_Formattable(Formattable &);
+void _init_regex(PyObject *m);
 
 
-void _init_bases(PyObject *m);
-
-
-#endif /* _bases_h */
+#endif /* _regex_h */

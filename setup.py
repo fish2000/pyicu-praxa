@@ -8,7 +8,6 @@ except ImportError:
 
 
 VERSION = '0.9'
-ICU_VERSION = '4.2.1'   # versions 3.6, 3.8 are also supported
 
 INCLUDES = {
     'darwin': ['/usr/local/include'],

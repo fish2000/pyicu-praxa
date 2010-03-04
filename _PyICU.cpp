@@ -38,6 +38,7 @@
 #include "charset.h"
 #include "tzinfo.h"
 #include "unicodeset.h"
+#include "regex.h"
 
 
 /* const variable descriptor */
@@ -237,5 +238,6 @@ extern "C" {
         _init_charset(m);
         _init_tzinfo(m);
         _init_unicodeset(m);
+        _init_regex(m);
     }
 }

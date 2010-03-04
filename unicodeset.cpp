@@ -1178,7 +1178,6 @@ static PySequenceMethods t_unicodeset_as_sequence = {
 };
 
 
-
 void _init_unicodeset(PyObject *m)
 {
     UnicodeSetType.tp_str = (reprfunc) t_unicodeset_str;

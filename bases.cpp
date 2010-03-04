@@ -32,7 +32,6 @@
 
 /* UObject */
 
-static void t_uobject_dealloc(t_uobject *self);
 static PyObject *t_uobject_new(PyTypeObject *type,
                                PyObject *args, PyObject *kwds);
 
@@ -382,7 +381,7 @@ DECLARE_TYPE(StringEnumeration, t_stringenumeration, UObject,
 
 /* UObject */
 
-static void t_uobject_dealloc(t_uobject *self)
+void t_uobject_dealloc(t_uobject *self)
 {
     if (self->object)
     {
