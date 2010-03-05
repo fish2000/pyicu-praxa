@@ -33,7 +33,7 @@ DECLARE_CONSTANTS_TYPE(UNormalizationMode);
 DECLARE_CONSTANTS_TYPE(UNormalizationCheckResult);
 
 
-/* RegexPattern */
+/* Normalizer */
 
 class t_normalizer : public _wrapper {
 public:
@@ -371,7 +371,6 @@ static PyObject *t_normalizer_concatenate(PyTypeObject *type, PyObject *args)
         STATUS_CALL(Normalizer::concatenate(*u0, *u1, u,
                                             mode, options, status));
         return PyUnicode_FromUnicodeString(&u);
-
     }
 
     return PyErr_SetArgsError(type, "concatenate", args);

@@ -834,7 +834,13 @@ static PyObject *t_resourcebundle_resetIterator(t_resourcebundle *self)
 
 static PyObject *t_resourcebundle_getNext(t_resourcebundle *self)
 {
-    STATUS_CALL(return wrap_ResourceBundle(self->object->getNext(status)));
+    UErrorCode status = U_ZERO_ERROR;
+    ResourceBundle rb = self->object->getNext(status);
+
+    if (U_FAILURE(status))
+        return ICUException(status).reportError();
+
+    return wrap_ResourceBundle(rb);
 }
 
 static PyObject *t_resourcebundle_getNextString(t_resourcebundle *self,
@@ -861,14 +867,29 @@ static PyObject *t_resourcebundle_getNextString(t_resourcebundle *self,
 
 static PyObject *t_resourcebundle_get(t_resourcebundle *self, PyObject *arg)
 {
-    int i;
+    UErrorCode status = U_ZERO_ERROR;
     char *key;
+    int i;
 
     if (!parseArg(arg, "i", &i))
-        STATUS_CALL(return wrap_ResourceBundle(self->object->get(i, status)));
+    {
+        ResourceBundle rb = self->object->get(i, status);
+
+        if (U_FAILURE(status))
+            return ICUException(status).reportError();
+
+        return wrap_ResourceBundle(rb);
+    }
 
     if (!parseArg(arg, "c", &key))
-        STATUS_CALL(return wrap_ResourceBundle(self->object->get(key, status)));
+    {
+        ResourceBundle rb = self->object->get(key, status);
+
+        if (U_FAILURE(status))
+            return ICUException(status).reportError();
+
+        return wrap_ResourceBundle(rb);
+    }
 
     return PyErr_SetArgsError((PyObject *) self, "get", arg);
 }
@@ -876,10 +897,18 @@ static PyObject *t_resourcebundle_get(t_resourcebundle *self, PyObject *arg)
 static PyObject *t_resourcebundle_getWithFallback(t_resourcebundle *self,
                                                   PyObject *arg)
 {
+    UErrorCode status = U_ZERO_ERROR;
     char *key;
 
     if (!parseArg(arg, "c", &key))
-        STATUS_CALL(return wrap_ResourceBundle(self->object->getWithFallback(key, status)));
+    {
+        ResourceBundle rb = self->object->getWithFallback(key, status);
+
+        if (U_FAILURE(status))
+            return ICUException(status).reportError();
+
+        return wrap_ResourceBundle(rb);
+    }
 
     return PyErr_SetArgsError((PyObject *) self, "getWithFallback", arg);
 }
@@ -984,7 +1013,15 @@ static PyObject *t_resourcebundle_iter(t_resourcebundle *self)
 static PyObject *t_resourcebundle_next(t_resourcebundle *self)
 {
     if (self->object->hasNext())
-        STATUS_CALL(return wrap_ResourceBundle(self->object->getNext(status)));
+    {
+        UErrorCode status = U_ZERO_ERROR;
+        ResourceBundle rb = self->object->getNext(status);
+
+        if (U_FAILURE(status))
+            return ICUException(status).reportError();
+
+        return wrap_ResourceBundle(rb);
+    }
 
     PyErr_SetNone(PyExc_StopIteration);
     return NULL;
