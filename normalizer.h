@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2010 Open Source Applications Foundation.
+ * Copyright (c) 2010-2010 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,13 +21,9 @@
  * ====================================================================
  */
 
-#ifndef _iterators_h
-#define _iterators_h
+#ifndef _normalizer_h
+#define _normalizer_h
 
-extern PyTypeObject BreakIteratorType;
-extern PyTypeObject CharacterIteratorType;
+void _init_normalizer(PyObject *m);
 
-void _init_iterators(PyObject *m);
-
-
-#endif /* _iterators_h */
+#endif /* _normalizer_h */

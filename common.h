@@ -90,6 +90,7 @@ typedef intintobjargproc ssizessizeobjargproc;
 #include <unicode/unifilt.h>
 #include <unicode/uniset.h>
 #include <unicode/regex.h>
+#include <unicode/normlzr.h>
 
 U_NAMESPACE_USE
 

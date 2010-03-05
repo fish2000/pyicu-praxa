@@ -39,6 +39,7 @@
 #include "tzinfo.h"
 #include "unicodeset.h"
 #include "regex.h"
+#include "normalizer.h"
 
 
 /* const variable descriptor */
@@ -239,5 +240,6 @@ extern "C" {
         _init_tzinfo(m);
         _init_unicodeset(m);
         _init_regex(m);
+        _init_normalizer(m);
     }
 }

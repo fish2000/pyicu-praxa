@@ -5,6 +5,7 @@ Version 0.9 ->
 ------------------
   - added support for UnicodeSet
   - added support for RegexPattern and RegexMatcher
+  - added support for Normalizer
   - 
 
 Version 0.8 -> 0.9

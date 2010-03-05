@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2010 Open Source Applications Foundation.
+ * Copyright (c) 2010-2010 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -857,7 +857,12 @@ static PyObject *t_regexmatcher_str(t_regexmatcher *self)
 static void t_regexmatcher_dealloc(t_regexmatcher *self)
 {
     Py_XDECREF(self->callable);
-    delete self->input;
+    if (self->input)
+    {
+        delete self->input;
+        self->input = NULL;
+    }
+
     t_uobject_dealloc((t_uobject *) self);
 }
 
