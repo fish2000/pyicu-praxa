@@ -3,9 +3,13 @@ For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 
 Version 0.9 ->
 ------------------
-  - added support for UnicodeSet
+  - added support for UnicodeSet, UnicodeFunctor, UnicodeFilter, UnicodeMatcher
   - added support for RegexPattern and RegexMatcher
   - added support for Normalizer
+  - added support for UTransPosition (Christoph Burgmer)
+  - added support for UTransPosition and UnicodeFilter methods to Transliterator
+  - fixed bug in UnicodeString single character assignment method
+  - added support for extending Transliterator from Python (Christoph Burgmer)
   - 
 
 Version 0.8 -> 0.9

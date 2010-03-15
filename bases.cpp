@@ -1746,7 +1746,7 @@ static int t_unicodestring_ass_item(t_unicodestring *self,
         {
             if (v->length() == 1)
             {
-                u[n] = v[n];
+                u->setCharAt(n, v->charAt(0));
                 return 0;
             }
             else

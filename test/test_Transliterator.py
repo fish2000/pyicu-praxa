@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # ====================================================================
 # Copyright (c) 2009-2010 Open Source Applications Foundation.
 #
@@ -43,6 +44,22 @@ class TestTransliterator(TestCase):
 
         self.assert_(trans.transliterate(string) == result)
         self.assert_(inverse.transliterate(result) == string)
+
+    def testPythonTransliterator(self):
+
+        class vowelSubst(Transliterator):
+            def __init__(self, char=u'i'):
+                super(vowelSubst, self).__init__("vowel")
+                self.char = char
+            def handleTransliterate(self, text, pos, incremental):
+                for i in xrange(pos.start, pos.limit):
+                    if text[i] in u"aeiouüöä":
+                        text[i] = self.char
+                pos.start = pos.limit
+
+        trans = vowelSubst()
+        result = trans.transliterate(u"Drei Chinesen mit dem Kontrabass")
+        self.assert_(result == u'Drii Chinisin mit dim Kintribiss')
         
 
 if __name__ == "__main__":

@@ -737,6 +737,15 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
                 break;
             return -1;
 
+          case 'O':           /* python object of give type */
+          {
+              PyTypeObject *type = va_arg(list, PyTypeObject *);
+
+              if (PyObject_TypeCheck(arg, type))
+                  break;
+              return -1;
+          }
+
           case 'P':           /* wrapped ICU object */
           {
               UClassID id = va_arg(list, UClassID);
@@ -908,6 +917,13 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
           {
               UnicodeString **u = va_arg(list, UnicodeString **);
               *u = (UnicodeString *) ((t_uobject *) arg)->object;
+              break;
+          }
+
+          case 'O':           /* python object of give type */
+          {
+              PyObject **obj = va_arg(list, PyObject **);
+              *obj = arg;
               break;
           }
 

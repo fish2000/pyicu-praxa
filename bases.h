@@ -45,6 +45,7 @@ extern PyTypeObject FormattableType;
 PyObject *wrap_StringEnumeration(StringEnumeration *, int);
 PyObject *wrap_Formattable(Formattable *, int);
 PyObject *wrap_Formattable(Formattable &);
+PyObject *wrap_UnicodeString(UnicodeString *, int);
 
 
 void _init_bases(PyObject *m);
