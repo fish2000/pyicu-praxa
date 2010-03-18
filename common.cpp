@@ -704,7 +704,8 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
                 break;
             return -1;
 
-          case 's':           /* string or unicode */
+          case 's':           /* string or unicode, to UnicodeString ref */
+          case 'u':           /* string or unicode, to new UnicodeString ptr */
             if (PyString_Check(arg) || PyUnicode_Check(arg))
                 break;
             return -1;
@@ -872,7 +873,19 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
               break;
           }
 
-          case 's':           /* string or unicode  */
+          case 's':           /* string or unicode, to UnicodeString ref */
+          {
+              UnicodeString *u = va_arg(list, UnicodeString *);
+              try {
+                  PyObject_AsUnicodeString(arg, *u);
+              } catch (ICUException e) {
+                  e.reportError();
+                  return -1;
+              }
+              break;
+          }
+
+          case 'u':           /* string or unicode, to new UnicodeString ptr */
           {
               UnicodeString **u = va_arg(list, UnicodeString **);
               try {

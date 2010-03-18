@@ -306,18 +306,29 @@ static PyObject *t_unicodefilter_matches(t_unicodefilter *self,
 static PyObject *t_unicodefilter_toPattern(t_unicodefilter *self,
                                            PyObject *args)
 {
-    UnicodeString u;
+    UnicodeString *u, _u;
     int escapeUnprintable = 0;
 
     switch (PyTuple_Size(args)) {
       case 0:
-        self->object->toPattern(u);
-        return PyUnicode_FromUnicodeString(&u);
+        self->object->toPattern(_u);
+        return PyUnicode_FromUnicodeString(&_u);
       case 1:
+        if (!parseArgs(args, "U", &u))
+        {
+            self->object->toPattern(*u, (UBool) escapeUnprintable);
+            Py_RETURN_ARG(args, 0);
+        }
         if (!parseArgs(args, "B", &escapeUnprintable))
         {
-            self->object->toPattern(u, (UBool) escapeUnprintable);
-            return PyUnicode_FromUnicodeString(&u);
+            self->object->toPattern(_u, (UBool) escapeUnprintable);
+            return PyUnicode_FromUnicodeString(&_u);
+        }
+      case 2:
+        if (!parseArgs(args, "UB", &u, &escapeUnprintable))
+        {
+            self->object->toPattern(*u, (UBool) escapeUnprintable);
+            Py_RETURN_ARG(args, 0);
         }
     }
             

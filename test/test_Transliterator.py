@@ -45,6 +45,17 @@ class TestTransliterator(TestCase):
         self.assert_(trans.transliterate(string) == result)
         self.assert_(inverse.transliterate(result) == string)
 
+    def testUnicodeString(self):
+
+        trans = Transliterator.createInstance('NumericPinyin-Latin',
+                                              UTransDirection.UTRANS_FORWARD)
+        string = UnicodeString("Shang4hai3 zi4lai2shui3 lai2 zi4 hai3 shang4")
+        result = u'Sh\xe0ngh\u01cei z\xecl\xe1ishu\u01d0 l\xe1i z\xec h\u01cei sh\xe0ng'
+
+        self.assert_(trans.transliterate(unicode(string)) == result)
+        self.assert_(trans.transliterate(string) == result)
+        self.assert_(string == result)
+
     def testPythonTransliterator(self):
 
         class vowelSubst(Transliterator):

@@ -29,10 +29,11 @@ public:
     Transliterator *object;
 };
 
+
 U_NAMESPACE_BEGIN
 
 class U_I18N_API PythonTransliterator : public Transliterator {
-  private:
+  protected:
     t_transliterator *self;
 
   public:

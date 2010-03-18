@@ -10,6 +10,7 @@ Version 0.9 ->
   - added support for UTransPosition and UnicodeFilter methods to Transliterator
   - fixed bug in UnicodeString single character assignment method
   - added support for extending Transliterator from Python (Christoph Burgmer)
+  - improved support for in-place operations on UnicodeStrings
   - 
 
 Version 0.8 -> 0.9

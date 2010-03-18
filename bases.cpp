@@ -543,7 +543,7 @@ static int t_unicodestring_init(t_unicodestring *self,
         self->flags = T_OWNED;
         break;
       case 1:
-        if (!parseArgs(args, "s", &u))
+        if (!parseArgs(args, "u", &u))
         {
             self->object = u;
             self->flags = T_OWNED;

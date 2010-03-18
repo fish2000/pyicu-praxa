@@ -334,14 +334,25 @@ static PyObject *t_transliterator_transliterate(t_transliterator *self,
 
     switch (PyTuple_Size(args)) {
       case 1:
-        if (!parseArgs(args, "S", &u0, &_u0))
+        if (!parseArgs(args, "U", &u0))
+        {
+            self->object->transliterate(*u0);
+            Py_RETURN_ARG(args, 0);
+        }
+        if (!parseArgs(args, "s", &_u0))
         {
             self->object->transliterate(_u0);
             return PyUnicode_FromUnicodeString(&_u0);
         }
         break;
       case 2:
-        if (!parseArgs(args, "SO", &u0, &_u0,
+        if (!parseArgs(args, "UO", &u0,
+                       &UTransPositionType, &utransposition))
+        {
+            STATUS_CALL(self->object->transliterate(*u0, *utransposition->object, status));
+            Py_RETURN_ARG(args, 0);
+        }
+        if (!parseArgs(args, "sO", &_u0,
                        &UTransPositionType, &utransposition))
         {
             STATUS_CALL(self->object->transliterate(_u0, *utransposition->object, status));
@@ -349,12 +360,31 @@ static PyObject *t_transliterator_transliterate(t_transliterator *self,
         }
         break;
       case 3:
-        if (!parseArgs(args, "Sii", &u0, &_u0, &start, &limit))
+        if (!parseArgs(args, "Uii", &u0, &start, &limit))
+        {
+            limit = self->object->transliterate(*u0, start, limit);
+            return PyInt_FromLong(limit);
+        }
+        if (!parseArgs(args, "sii", &_u0, &start, &limit))
         {
             self->object->transliterate(_u0, start, limit);
             return PyUnicode_FromUnicodeString(&_u0);
         }
-        if (!parseArgs(args, "SOS", &u0, &_u0,
+        if (!parseArgs(args, "UOS", &u0,
+                       &UTransPositionType, &utransposition, &u1, &_u1))
+        {
+            STATUS_CALL(len = u1->toUTF32(&c, 1, status));
+            if (len == 1)
+            {
+                STATUS_CALL(self->object->transliterate(*u0, *utransposition->object, c, status));
+            }
+            else
+            {
+                STATUS_CALL(self->object->transliterate(*u0, *utransposition->object, _u1, status));
+            }
+            Py_RETURN_ARG(args, 0);
+        }
+        if (!parseArgs(args, "sOS", &_u0,
                        &UTransPositionType, &utransposition, &u1, &_u1))
         {
             STATUS_CALL(len = u1->toUTF32(&c, 1, status));
@@ -380,7 +410,12 @@ static PyObject *t_transliterator_finishTransliteration(t_transliterator *self,
     UnicodeString *u, _u;
     t_utransposition *utransposition;
 
-    if (!parseArgs(args, "SO", &u, &_u, &UTransPositionType, &utransposition))
+    if (!parseArgs(args, "UO", &u, &UTransPositionType, &utransposition))
+    {
+        self->object->finishTransliteration(*u, *utransposition->object);
+        Py_RETURN_ARG(args, 0);
+    }
+    if (!parseArgs(args, "sO", &_u, &UTransPositionType, &utransposition))
     {
         self->object->finishTransliteration(_u, *utransposition->object);
         return PyUnicode_FromUnicodeString(&_u);
@@ -396,7 +431,14 @@ static PyObject *t_transliterator_filteredTransliterate(t_transliterator *self,
     t_utransposition *utransposition;
     UBool incremental;
 
-    if (!parseArgs(args, "SOB", &u, &_u, &UTransPositionType, &utransposition,
+    if (!parseArgs(args, "UOB", &u, &UTransPositionType, &utransposition,
+                   &incremental))
+    {
+        self->object->filteredTransliterate(*u, *utransposition->object,
+                                            incremental);
+        Py_RETURN_ARG(args, 0);
+    }
+    if (!parseArgs(args, "sOB", &_u, &UTransPositionType, &utransposition,
                    &incremental))
     {
         self->object->filteredTransliterate(_u, *utransposition->object,
@@ -502,8 +544,7 @@ static PyObject *t_transliterator_createInstance(PyTypeObject *type,
                                                  PyObject *args)
 {
     Transliterator *transliterator;
-    UnicodeString *u;
-    UnicodeString _u;
+    UnicodeString *u, _u;
     UTransDirection direction;
 
     if (!parseArgs(args, "Si", &u, &_u, &direction))
