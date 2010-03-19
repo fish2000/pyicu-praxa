@@ -138,9 +138,6 @@ void PythonTransliterator::handleTransliterate(Replaceable& text,
             PyObject_CallMethodObjArgs((PyObject *) self, name, p_text, p_pos,
                                        incremental ? Py_True : Py_False, NULL);
 
-        if (result == NULL)
-            PyErr_Clear();
-
         Py_DECREF(name);
         Py_DECREF(p_text);
         Py_DECREF(p_pos);
@@ -336,12 +333,12 @@ static PyObject *t_transliterator_transliterate(t_transliterator *self,
       case 1:
         if (!parseArgs(args, "U", &u0))
         {
-            self->object->transliterate(*u0);
+            PYTHON_CALL(self->object->transliterate(*u0));
             Py_RETURN_ARG(args, 0);
         }
         if (!parseArgs(args, "s", &_u0))
         {
-            self->object->transliterate(_u0);
+            PYTHON_CALL(self->object->transliterate(_u0));
             return PyUnicode_FromUnicodeString(&_u0);
         }
         break;
@@ -349,25 +346,25 @@ static PyObject *t_transliterator_transliterate(t_transliterator *self,
         if (!parseArgs(args, "UO", &u0,
                        &UTransPositionType, &utransposition))
         {
-            STATUS_CALL(self->object->transliterate(*u0, *utransposition->object, status));
+            STATUS_PYTHON_CALL(self->object->transliterate(*u0, *utransposition->object, status));
             Py_RETURN_ARG(args, 0);
         }
         if (!parseArgs(args, "sO", &_u0,
                        &UTransPositionType, &utransposition))
         {
-            STATUS_CALL(self->object->transliterate(_u0, *utransposition->object, status));
+            STATUS_PYTHON_CALL(self->object->transliterate(_u0, *utransposition->object, status));
             return PyUnicode_FromUnicodeString(&_u0);
         }
         break;
       case 3:
         if (!parseArgs(args, "Uii", &u0, &start, &limit))
         {
-            limit = self->object->transliterate(*u0, start, limit);
+            PYTHON_CALL(limit = self->object->transliterate(*u0, start, limit));
             return PyInt_FromLong(limit);
         }
         if (!parseArgs(args, "sii", &_u0, &start, &limit))
         {
-            self->object->transliterate(_u0, start, limit);
+            PYTHON_CALL(self->object->transliterate(_u0, start, limit));
             return PyUnicode_FromUnicodeString(&_u0);
         }
         if (!parseArgs(args, "UOS", &u0,
@@ -376,11 +373,11 @@ static PyObject *t_transliterator_transliterate(t_transliterator *self,
             STATUS_CALL(len = u1->toUTF32(&c, 1, status));
             if (len == 1)
             {
-                STATUS_CALL(self->object->transliterate(*u0, *utransposition->object, c, status));
+                STATUS_PYTHON_CALL(self->object->transliterate(*u0, *utransposition->object, c, status));
             }
             else
             {
-                STATUS_CALL(self->object->transliterate(*u0, *utransposition->object, _u1, status));
+                STATUS_PYTHON_CALL(self->object->transliterate(*u0, *utransposition->object, _u1, status));
             }
             Py_RETURN_ARG(args, 0);
         }
@@ -390,11 +387,11 @@ static PyObject *t_transliterator_transliterate(t_transliterator *self,
             STATUS_CALL(len = u1->toUTF32(&c, 1, status));
             if (len == 1)
             {
-                STATUS_CALL(self->object->transliterate(_u0, *utransposition->object, c, status));
+                STATUS_PYTHON_CALL(self->object->transliterate(_u0, *utransposition->object, c, status));
             }
             else
             {
-                STATUS_CALL(self->object->transliterate(_u0, *utransposition->object, _u1, status));
+                STATUS_PYTHON_CALL(self->object->transliterate(_u0, *utransposition->object, _u1, status));
             }
             return PyUnicode_FromUnicodeString(&_u0);
         }

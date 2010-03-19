@@ -59,18 +59,29 @@ class TestTransliterator(TestCase):
     def testPythonTransliterator(self):
 
         class vowelSubst(Transliterator):
-            def __init__(self, char=u'i'):
-                super(vowelSubst, self).__init__("vowel")
-                self.char = char
-            def handleTransliterate(self, text, pos, incremental):
+            def __init__(_self, char=u'i'):
+                super(vowelSubst, _self).__init__("vowel")
+                _self.char = char
+            def handleTransliterate(_self, text, pos, incremental):
                 for i in xrange(pos.start, pos.limit):
                     if text[i] in u"aeiouüöä":
-                        text[i] = self.char
+                        text[i] = _self.char
                 pos.start = pos.limit
 
         trans = vowelSubst()
         result = trans.transliterate(u"Drei Chinesen mit dem Kontrabass")
         self.assert_(result == u'Drii Chinisin mit dim Kintribiss')
+
+    def testPythonTransliteratorException(self):
+
+        class faultySubst(Transliterator):
+            def __init__(_self):
+                super(faultySubst, _self).__init__("faulty")
+            def handleTransliterate(_self, text, pos, incremental):
+                raise ValueError("faulty")
+
+        trans = faultySubst()
+        self.assertRaises(ValueError, trans.transliterate, "whatever")
         
 
 if __name__ == "__main__":

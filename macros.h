@@ -29,12 +29,36 @@ PyObject *make_descriptor(PyTypeObject *value);
 PyObject *make_descriptor(PyObject *(*get)(PyObject *));
 
 
+#define PYTHON_CALL(action)                                             \
+    {                                                                   \
+        action;                                                         \
+        if (PyErr_Occurred())                                           \
+            return NULL;                                                \
+    }
+
+#define INT_PYTHON_CALL(action)                                         \
+    {                                                                   \
+        action;                                                         \
+        if (PyErr_Occurred())                                           \
+            return -1;                                                  \
+    }
+
 #define STATUS_CALL(action)                                             \
     {                                                                   \
         UErrorCode status = U_ZERO_ERROR;                               \
         action;                                                         \
         if (U_FAILURE(status))                                          \
             return ICUException(status).reportError();                  \
+    }
+
+#define STATUS_PYTHON_CALL(action)                                      \
+    {                                                                   \
+        UErrorCode status = U_ZERO_ERROR;                               \
+        action;                                                         \
+        if (U_FAILURE(status))                                          \
+            return ICUException(status).reportError();                  \
+        if (PyErr_Occurred())                                           \
+            return NULL;                                                \
     }
 
 #define STATUS_PARSER_CALL(action)                                      \
@@ -44,6 +68,17 @@ PyObject *make_descriptor(PyObject *(*get)(PyObject *));
         action;                                                         \
         if (U_FAILURE(status))                                          \
             return ICUException(parseError, status).reportError();      \
+    }
+
+#define STATUS_PARSER_PYTHON_CALL(action)                               \
+    {                                                                   \
+        UErrorCode status = U_ZERO_ERROR;                               \
+        UParseError parseError;                                         \
+        action;                                                         \
+        if (U_FAILURE(status))                                          \
+            return ICUException(parseError, status).reportError();      \
+        if (PyErr_Occurred())                                           \
+            return NULL;                                                \
     }
 
 #define INT_STATUS_CALL(action)                                         \
@@ -57,6 +92,19 @@ PyObject *make_descriptor(PyObject *(*get)(PyObject *));
         }                                                               \
     }
 
+#define INT_STATUS_PYTHON_CALL(action)                                  \
+    {                                                                   \
+        UErrorCode status = U_ZERO_ERROR;                               \
+        action;                                                         \
+        if (U_FAILURE(status))                                          \
+        {                                                               \
+            ICUException(status).reportError();                         \
+            return -1;                                                  \
+        }                                                               \
+        if (PyErr_Occurred())                                           \
+            return -1;                                                  \
+    }
+
 #define INT_STATUS_PARSER_CALL(action)                                  \
     {                                                                   \
         UErrorCode status = U_ZERO_ERROR;                               \
@@ -67,6 +115,20 @@ PyObject *make_descriptor(PyObject *(*get)(PyObject *));
             ICUException(parseError, status).reportError();             \
             return -1;                                                  \
         }                                                               \
+    }
+
+#define INT_STATUS_PARSER_PYTHON_CALL(action)                           \
+    {                                                                   \
+        UErrorCode status = U_ZERO_ERROR;                               \
+        UParseError parseError;                                         \
+        action;                                                         \
+        if (U_FAILURE(status))                                          \
+        {                                                               \
+            ICUException(parseError, status).reportError();             \
+            return -1;                                                  \
+        }                                                               \
+        if (PyErr_Occurred())                                           \
+            return -1;                                                  \
     }
 
 
