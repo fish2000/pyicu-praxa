@@ -69,8 +69,19 @@ class TestTransliterator(TestCase):
                 pos.start = pos.limit
 
         trans = vowelSubst()
-        result = trans.transliterate(u"Drei Chinesen mit dem Kontrabass")
-        self.assert_(result == u'Drii Chinisin mit dim Kintribiss')
+
+        # see http://en.wikipedia.org/wiki/Drei_Chinesen_mit_dem_Kontrabass
+        string = u"Drei Chinesen mit dem Kontrabass"
+        result = u'Drii Chinisin mit dim Kintribiss'
+        self.assert_(trans.transliterate(string) == result)
+ 
+        # test registration
+        Transliterator.registerInstance(trans)
+
+        regTrans = Transliterator.createInstance("vowel",
+                                                 UTransDirection.UTRANS_FORWARD)
+
+        self.assert_(regTrans.transliterate(string) == result)
 
     def testPythonTransliteratorException(self):
 

@@ -82,6 +82,7 @@ static PyObject *t_transliterator_adoptFilter(t_transliterator *self, PyObject *
 static PyObject *t_transliterator_getAvailableIDs(PyTypeObject *type);
 static PyObject *t_transliterator_createInstance(PyTypeObject *type, PyObject *args);
 static PyObject *t_transliterator_createFromRules(PyTypeObject *type, PyObject *args);
+static PyObject *t_transliterator_registerInstance(PyTypeObject *type, PyObject *args);
 
 static PyMethodDef t_transliterator_methods[] = {
     DECLARE_METHOD(t_transliterator, transliterate, METH_VARARGS),
@@ -99,6 +100,7 @@ static PyMethodDef t_transliterator_methods[] = {
     DECLARE_METHOD(t_transliterator, getAvailableIDs, METH_NOARGS | METH_CLASS),
     DECLARE_METHOD(t_transliterator, createInstance, METH_VARARGS | METH_CLASS),
     DECLARE_METHOD(t_transliterator, createFromRules, METH_VARARGS | METH_CLASS),
+    DECLARE_METHOD(t_transliterator, registerInstance, METH_VARARGS | METH_CLASS),
     { NULL, NULL, 0, NULL }
 };
 
@@ -115,6 +117,7 @@ PythonTransliterator::PythonTransliterator(t_transliterator *self,
     Transliterator(id, NULL)
 {
     this->self = self;
+    Py_XINCREF(this->self);
 }
 
 PythonTransliterator::PythonTransliterator(t_transliterator *self,
@@ -123,6 +126,27 @@ PythonTransliterator::PythonTransliterator(t_transliterator *self,
     Transliterator(id, adoptedFilter)
 {
     this->self = self;
+    Py_XINCREF(this->self);
+}
+
+/**
+ * Copy constructor.
+ */
+PythonTransliterator::PythonTransliterator(const PythonTransliterator& p) :
+    Transliterator(p)
+{
+    this->self = p.self;
+    Py_XINCREF(this->self);
+}
+
+PythonTransliterator::~PythonTransliterator()
+{
+    Py_XDECREF(this->self);
+}
+
+Transliterator* PythonTransliterator::clone(void) const
+{
+    return new PythonTransliterator(*this);
 }
 
 void PythonTransliterator::handleTransliterate(Replaceable& text,
@@ -568,6 +592,20 @@ static PyObject *t_transliterator_createFromRules(PyTypeObject *type,
     }
 
     return PyErr_SetArgsError(type, "createFromRules", args);
+}
+
+static PyObject *t_transliterator_registerInstance(PyTypeObject *type,
+                                                   PyObject *args)
+{
+    Transliterator *transliterator;
+
+    if (!parseArgs(args, "P", TYPE_CLASSID(Transliterator), &transliterator))
+    {
+        Transliterator::registerInstance(transliterator);
+        Py_RETURN_NONE;
+    }
+
+    return PyErr_SetArgsError(type, "registerInstance", args);
 }
 
 static PyObject *t_transliterator_str(t_transliterator *self)

@@ -52,6 +52,21 @@ class U_I18N_API PythonTransliterator : public Transliterator {
                          UnicodeFilter *adoptedFilter);
 
     /**
+     * Copy constructor.
+     */
+    PythonTransliterator(const PythonTransliterator&);
+
+    /**
+     * Destructor.
+     */
+    virtual ~PythonTransliterator();
+
+    /**
+     * Transliterator API.
+     */
+    virtual Transliterator* clone(void) const;
+
+    /**
      * Implements {@link Transliterator#handleTransliterate}.
      */
     virtual void handleTransliterate(Replaceable& text,
