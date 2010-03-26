@@ -123,6 +123,33 @@ static PyMethodDef t_measureformat_methods[] = {
 DECLARE_TYPE(MeasureFormat, t_measureformat, Format, MeasureFormat,
              abstract_init);
 
+#if U_ICU_VERSION_HEX >= 0x04020000
+
+/* TimeUnitFormat */
+
+class t_timeunitformat : public _wrapper {
+public:
+    TimeUnitFormat *object;
+};
+
+static int t_timeunitformat_init(t_timeunitformat *self,
+                                 PyObject *args, PyObject *kwds);
+static PyObject *t_timeunitformat_setLocale(t_timeunitformat *self,
+                                            PyObject *arg);
+static PyObject *t_timeunitformat_setNumberFormat(t_timeunitformat *self,
+                                                  PyObject *arg);
+
+static PyMethodDef t_timeunitformat_methods[] = {
+    DECLARE_METHOD(t_timeunitformat, setLocale, METH_O),
+    DECLARE_METHOD(t_timeunitformat, setNumberFormat, METH_O),
+    { NULL, NULL, 0, NULL }
+};
+
+DECLARE_TYPE(TimeUnitFormat, t_timeunitformat, MeasureFormat, TimeUnitFormat,
+             t_timeunitformat_init);
+
+#endif
+
 /* MessageFormat */
 
 class t_messageformat : public _wrapper {
@@ -567,6 +594,7 @@ static PyObject *t_format_richcmp(t_format *self, PyObject *arg, int op)
 
 
 /* MeasureFormat */
+
 static PyObject *t_measureformat_createCurrencyFormat(PyTypeObject *type,
                                                       PyObject *args)
 {
@@ -588,6 +616,81 @@ static PyObject *t_measureformat_createCurrencyFormat(PyTypeObject *type,
 
     return PyErr_SetArgsError(type, "createCurrencyFormat", args);
 }
+
+
+#if U_ICU_VERSION_HEX >= 0x04020000
+
+/* TimeUnitFormat */
+
+static int t_timeunitformat_init(t_timeunitformat *self,
+                                 PyObject *args, PyObject *kwds)
+{
+    TimeUnitFormat::EStyle style;
+    Locale *locale;
+
+    switch (PyTuple_Size(args)) {
+      case 0:
+        INT_STATUS_CALL(self->object = new TimeUnitFormat(status));
+        self->flags = T_OWNED;
+        break;
+      case 1:
+        if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
+        {
+            INT_STATUS_CALL(self->object = new TimeUnitFormat(*locale, status));
+            self->flags = T_OWNED;
+            break;
+        }
+        PyErr_SetArgsError((PyObject *) self, "__init__", args);
+        return -1;
+      case 2:
+        if (!parseArgs(args, "Pi", TYPE_CLASSID(Locale), &locale, &style))
+        {
+            INT_STATUS_CALL(self->object = new TimeUnitFormat(*locale, style, status));
+            self->flags = T_OWNED;
+            break;
+        }
+        PyErr_SetArgsError((PyObject *) self, "__init__", args);
+        return -1;
+      default:
+        PyErr_SetArgsError((PyObject *) self, "__init__", args);
+        return -1;
+    }
+        
+    if (self->object)
+        return 0;
+
+    return -1;
+}
+
+static PyObject *t_timeunitformat_setLocale(t_timeunitformat *self,
+                                            PyObject *arg)
+{
+    Locale *locale;
+
+    if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
+    {
+        STATUS_CALL(self->object->setLocale(*locale, status));
+        Py_RETURN_NONE;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "setLocale", arg);
+}
+
+static PyObject *t_timeunitformat_setNumberFormat(t_timeunitformat *self,
+                                                  PyObject *arg)
+{
+    NumberFormat *format;
+
+    if (!parseArg(arg, "P", TYPE_CLASSID(NumberFormat), &format))
+    {
+        STATUS_CALL(self->object->setNumberFormat(*format, status));
+        Py_RETURN_NONE;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "setNumberFormat", arg);
+}
+
+#endif
 
 
 /* MessageFormat */
@@ -1113,9 +1216,15 @@ void _init_format(PyObject *m)
     INSTALL_TYPE(Format, m);
     INSTALL_TYPE(MeasureFormat, m);
     REGISTER_TYPE(MessageFormat, m);
+#if U_ICU_VERSION_HEX >= 0x04020000
+    REGISTER_TYPE(TimeUnitFormat, m);
+#endif
 #if U_ICU_VERSION_HEX >= 0x04040000
     REGISTER_TYPE(SelectFormat, m);
 #endif
 
     INSTALL_STATIC_INT(FieldPosition, DONT_CARE);
+
+    INSTALL_STATIC_INT(TimeUnitFormat, kFull);
+    INSTALL_STATIC_INT(TimeUnitFormat, kAbbreviate);
 }

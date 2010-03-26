@@ -14,6 +14,8 @@ Version 0.9 ->
   - added support for Transliterator::registerInstance (Christoph Burgmer)
   - tested with ICU 4.4
   - added support for Normalizer2, FilteredNormalizer2 if ICU version >= 4.4
+  - added support for SelectFormat if ICU version >= 4.4
+  - added support for TimeUnitFormat if ICU version >= 4.2
   - 
 
 Version 0.8 -> 0.9
