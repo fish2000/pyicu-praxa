@@ -92,6 +92,14 @@ typedef intintobjargproc ssizessizeobjargproc;
 #include <unicode/regex.h>
 #include <unicode/normlzr.h>
 
+#define U_ICU_VERSION_HEX ((U_ICU_VERSION_MAJOR_NUM << 24) +    \
+                           (U_ICU_VERSION_MINOR_NUM << 16) +    \
+                           (U_ICU_VERSION_PATCHLEVEL_NUM << 8))
+
+#if U_ICU_VERSION_HEX >= 0x04040000
+#include <unicode/normalizer2.h>
+#endif
+
 U_NAMESPACE_USE
 
 /* lifted from ustrenum.h */

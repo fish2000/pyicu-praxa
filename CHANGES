@@ -11,6 +11,9 @@ Version 0.9 ->
   - fixed bug in UnicodeString single character assignment method
   - added support for extending Transliterator from Python (Christoph Burgmer)
   - improved support for in-place operations on UnicodeStrings
+  - added support for Transliterator::registerInstance (Christoph Burgmer)
+  - tested with ICU 4.4
+  - added support for Normalizer2, FilteredNormalizer2 if ICU version >= 4.4
   - 
 
 Version 0.8 -> 0.9
@@ -95,5 +98,4 @@ Version 0.1 -> 0.2
 
 Version 0.0 -> 0.1
 ------------------
-
 - initial release

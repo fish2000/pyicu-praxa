@@ -142,6 +142,7 @@ PythonTransliterator::PythonTransliterator(const PythonTransliterator& p) :
 PythonTransliterator::~PythonTransliterator()
 {
     Py_XDECREF(this->self);
+    this->self = NULL;
 }
 
 Transliterator* PythonTransliterator::clone(void) const

@@ -27,11 +27,14 @@
 #include "bases.h"
 #include "iterators.h"
 #include "normalizer.h"
+#include "unicodeset.h"
 #include "macros.h"
 
 DECLARE_CONSTANTS_TYPE(UNormalizationMode);
 DECLARE_CONSTANTS_TYPE(UNormalizationCheckResult);
-
+#if U_ICU_VERSION_HEX >= 0x0404000
+DECLARE_CONSTANTS_TYPE(UNormalizationMode2);
+#endif
 
 /* Normalizer */
 
@@ -90,6 +93,68 @@ static PyMethodDef t_normalizer_methods[] = {
 };
 
 DECLARE_TYPE(Normalizer, t_normalizer, UObject, Normalizer, t_normalizer_init);
+
+
+#if U_ICU_VERSION_HEX >= 0x04040000
+
+/* Normalizer2 */
+
+class t_normalizer2 : public _wrapper {
+public:
+    Normalizer2 *object;
+};
+
+static PyObject *t_normalizer2_normalize(t_normalizer2 *self, PyObject *args);
+static PyObject *t_normalizer2_normalizeSecondAndAppend(t_normalizer2 *self,
+                                                        PyObject *args);
+static PyObject *t_normalizer2_append(t_normalizer2 *self, PyObject *args);
+static PyObject *t_normalizer2_isNormalized(t_normalizer2 *self, PyObject *arg);
+static PyObject *t_normalizer2_quickCheck(t_normalizer2 *self, PyObject *arg);
+static PyObject *t_normalizer2_spanQuickCheckYes(t_normalizer2 *self,
+                                                 PyObject *arg);
+static PyObject *t_normalizer2_hasBoundaryBefore(t_normalizer2 *self,
+                                                 PyObject *arg);
+static PyObject *t_normalizer2_hasBoundaryAfter(t_normalizer2 *self,
+                                                PyObject *arg);
+static PyObject *t_normalizer2_isInert(t_normalizer2 *self, PyObject *arg);
+static PyObject *t_normalizer2_getInstance(PyTypeObject *type, PyObject *args);
+
+static PyMethodDef t_normalizer2_methods[] = {
+    DECLARE_METHOD(t_normalizer2, normalize, METH_VARARGS),
+    DECLARE_METHOD(t_normalizer2, normalizeSecondAndAppend, METH_VARARGS),
+    DECLARE_METHOD(t_normalizer2, append, METH_VARARGS),
+    DECLARE_METHOD(t_normalizer2, isNormalized, METH_O),
+    DECLARE_METHOD(t_normalizer2, quickCheck, METH_O),
+    DECLARE_METHOD(t_normalizer2, spanQuickCheckYes, METH_O),
+    DECLARE_METHOD(t_normalizer2, hasBoundaryBefore, METH_O),
+    DECLARE_METHOD(t_normalizer2, hasBoundaryAfter, METH_O),
+    DECLARE_METHOD(t_normalizer2, isInert, METH_O),
+    DECLARE_METHOD(t_normalizer2, getInstance, METH_VARARGS | METH_CLASS),
+    { NULL, NULL, 0, NULL }
+};
+
+DECLARE_TYPE(Normalizer2, t_normalizer2, UObject, Normalizer2, abstract_init);
+
+
+/* FilteredNormalizer2 */
+
+class t_filterednormalizer2 : public _wrapper {
+public:
+    FilteredNormalizer2 *object;
+    UnicodeSet *filter;
+};
+
+static PyMethodDef t_filterednormalizer2_methods[] = {
+    { NULL, NULL, 0, NULL }
+};
+
+static int t_filterednormalizer2_init(t_filterednormalizer2 *self,
+                                      PyObject *args, PyObject *kwds);
+
+DECLARE_TYPE(FilteredNormalizer2, t_filterednormalizer2, Normalizer2,
+             FilteredNormalizer2, t_filterednormalizer2_init);
+
+#endif
 
 
 /* Normalizer */
@@ -424,15 +489,257 @@ static int t_normalizer_hash(t_normalizer *self)
 }
 
 
+#if U_ICU_VERSION_HEX >= 0x04040000
+
+/* Normalizer2 */
+
+static PyObject *t_normalizer2_normalize(t_normalizer2 *self, PyObject *args)
+{
+    UnicodeString *u, _u, *result;
+
+    switch (PyTuple_Size(args)) {
+      case 1:
+        if (!parseArgs(args, "S", &u, &_u))
+        {
+            UnicodeString dest;
+
+            STATUS_CALL(self->object->normalize(*u, dest, status));
+            return PyUnicode_FromUnicodeString(&dest);
+        }
+        break;
+      case 2:
+        if (!parseArgs(args, "SU", &u, &_u, &result))
+        {
+            STATUS_CALL(self->object->normalize(*u, *result, status));
+            Py_RETURN_ARG(args, 1);
+        }
+        break;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "normalize", args);
+}
+
+static PyObject *t_normalizer2_normalizeSecondAndAppend(t_normalizer2 *self,
+                                                        PyObject *args)
+{
+    UnicodeString *u, _u, *result;
+
+    if (!parseArgs(args, "US", &result, &u, &_u))
+    {
+        STATUS_CALL(self->object->normalizeSecondAndAppend(*result, *u,
+                                                           status));
+        Py_RETURN_ARG(args, 0);
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "normalizeSecondAndAppend", args);
+}
+
+static PyObject *t_normalizer2_append(t_normalizer2 *self, PyObject *args)
+{
+    UnicodeString *u, _u, *result;
+
+    if (!parseArgs(args, "US", &result, &u, &_u))
+    {
+        STATUS_CALL(self->object->append(*result, *u, status));
+        Py_RETURN_ARG(args, 0);
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "append", args);
+}
+
+static PyObject *t_normalizer2_isNormalized(t_normalizer2 *self, PyObject *arg)
+{
+    UnicodeString *u, _u;
+
+    if (!parseArg(arg, "U", &u, &_u))
+    {
+        UBool b;
+
+        STATUS_CALL(b = self->object->isNormalized(*u, status));
+        Py_RETURN_BOOL(b);
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "isNormalized", arg);
+}
+
+static PyObject *t_normalizer2_quickCheck(t_normalizer2 *self, PyObject *arg)
+{
+    UnicodeString *u, _u;
+
+    if (!parseArg(arg, "U", &u, &_u))
+    {
+        UNormalizationCheckResult uncr;
+
+        STATUS_CALL(uncr = self->object->quickCheck(*u, status));
+        return PyInt_FromLong(uncr);
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "quickCheck", arg);
+}
+
+static PyObject *t_normalizer2_spanQuickCheckYes(t_normalizer2 *self,
+                                                 PyObject *arg)
+{
+    UnicodeString *u, _u;
+
+    if (!parseArg(arg, "U", &u, &_u))
+    {
+        int32_t end;
+
+        STATUS_CALL(end = self->object->spanQuickCheckYes(*u, status));
+        return PyInt_FromLong(end);
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "spanQuickCheckYes", arg);
+}
+
+static PyObject *t_normalizer2_hasBoundaryBefore(t_normalizer2 *self,
+                                                 PyObject *arg)
+{
+    UnicodeString *u, _u;
+
+    if (!parseArg(arg, "U", &u, &_u))
+    {
+        UChar32 c;
+        int32_t len;
+        UBool b;
+
+        STATUS_CALL(len = u->toUTF32(&c, 1, status));
+        if (len == 1)
+        {
+            b = self->object->hasBoundaryBefore(c);
+            Py_RETURN_BOOL(b);
+        }
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "hasBoundaryBefore", arg);
+}
+
+static PyObject *t_normalizer2_hasBoundaryAfter(t_normalizer2 *self,
+                                                PyObject *arg)
+{
+    UnicodeString *u, _u;
+
+    if (!parseArg(arg, "U", &u, &_u))
+    {
+        UChar32 c;
+        int32_t len;
+        UBool b;
+
+        STATUS_CALL(len = u->toUTF32(&c, 1, status));
+        if (len == 1)
+        {
+            b = self->object->hasBoundaryAfter(c);
+            Py_RETURN_BOOL(b);
+        }
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "hasBoundaryAfter", arg);
+}
+
+static PyObject *t_normalizer2_isInert(t_normalizer2 *self, PyObject *arg)
+{
+    UnicodeString *u, _u;
+
+    if (!parseArg(arg, "U", &u, &_u))
+    {
+        UChar32 c;
+        int32_t len;
+        UBool b;
+
+        STATUS_CALL(len = u->toUTF32(&c, 1, status));
+        if (len == 1)
+        {
+            b = self->object->isInert(c);
+            Py_RETURN_BOOL(b);
+        }
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "isInert", arg);
+}
+
+
+static PyObject *t_normalizer2_getInstance(PyTypeObject *type, PyObject *args)
+{
+    const char *packageName, *name;
+    UNormalization2Mode mode;
+    const Normalizer2 *normalizer;
+
+    if (PyArg_ParseTuple(args, "zsi", &packageName, &name, &mode))
+    {
+        STATUS_CALL(normalizer = Normalizer2::getInstance(packageName, name,
+                                                          mode, status));
+        return wrap_Normalizer2((Normalizer2 *) normalizer, 0);
+    }
+
+    return PyErr_SetArgsError(type, "getInstance", args);
+}
+
+
+/* FilteredNormalizer2 */
+
+static int t_filterednormalizer2_init(t_filterednormalizer2 *self,
+                                      PyObject *args, PyObject *kwds)
+{
+    Normalizer2 *normalizer;
+    UnicodeSet *filter;
+    
+    if (!parseArgs(args, "PP",
+                   TYPE_CLASSID(Normalizer2), TYPE_CLASSID(UnicodeSet),
+                   &normalizer, &filter))
+    {
+        self->filter = new UnicodeSet(*filter);
+        self->filter->freeze();
+        self->object = new FilteredNormalizer2(*normalizer, *self->filter);
+        self->flags = T_OWNED;
+
+        return 0;
+    }
+
+    PyErr_SetArgsError((PyObject *) self, "__init__", args);
+    return -1;
+}
+
+static void t_filterednormalizer2_dealloc(t_filterednormalizer2 *self)
+{
+    if (self->object)
+    {
+        if (self->flags & T_OWNED)
+        {
+            delete self->object;
+            delete self->filter;
+        }
+            
+        self->object = NULL;
+        self->filter = NULL;
+    }
+
+    self->ob_type->tp_free((PyObject *) self);
+}
+
+#endif
+
+
 void _init_normalizer(PyObject *m)
 {
     NormalizerType.tp_richcompare = (richcmpfunc) t_normalizer_richcmp;
     NormalizerType.tp_hash = (hashfunc) t_normalizer_hash;
+#if U_ICU_VERSION_HEX >= 0x04040000
+    FilteredNormalizer2Type.tp_dealloc = (destructor)
+        t_filterednormalizer2_dealloc;
+#endif
 
     REGISTER_TYPE(Normalizer, m);
+#if U_ICU_VERSION_HEX >= 0x04040000
+    REGISTER_TYPE(Normalizer2, m);
+    REGISTER_TYPE(FilteredNormalizer2, m);
+#endif
 
     INSTALL_CONSTANTS_TYPE(UNormalizationMode, m);
     INSTALL_CONSTANTS_TYPE(UNormalizationCheckResult, m);
+#if U_ICU_VERSION_HEX >= 0x04040000
+    INSTALL_CONSTANTS_TYPE(UNormalizationMode2, m);
+#endif
 
     INSTALL_ENUM(UNormalizationMode, UNORM_NONE);
     INSTALL_ENUM(UNormalizationMode, UNORM_NFD);
@@ -445,4 +752,11 @@ void _init_normalizer(PyObject *m)
     INSTALL_ENUM(UNormalizationCheckResult, UNORM_NO);
     INSTALL_ENUM(UNormalizationCheckResult, UNORM_YES);
     INSTALL_ENUM(UNormalizationCheckResult, UNORM_MAYBE);
+
+#if U_ICU_VERSION_HEX >= 0x04040000
+    INSTALL_ENUM(UNormalizationMode2, UNORM2_COMPOSE);
+    INSTALL_ENUM(UNormalizationMode2, UNORM2_DECOMPOSE);
+    INSTALL_ENUM(UNormalizationMode2, UNORM2_FCD);
+    INSTALL_ENUM(UNormalizationMode2, UNORM2_COMPOSE_CONTIGUOUS);
+#endif
 }
