@@ -98,6 +98,7 @@ typedef intintobjargproc ssizessizeobjargproc;
 
 #if U_ICU_VERSION_HEX >= 0x04040000
 #include <unicode/normalizer2.h>
+#include <unicode/selfmt.h>
 #endif
 
 U_NAMESPACE_USE

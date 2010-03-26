@@ -32,6 +32,11 @@ class TestNormalizer2(TestCase):
 
     def testNormalize(self):
 
+        try:
+            from PyICU import Normalizer2
+        except ImportError:
+            return
+
         normalizer = Normalizer2.getInstance(None, "nfkc_cf",
                                              UNormalizationMode2.UNORM2_COMPOSE)
 

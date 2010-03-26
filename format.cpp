@@ -175,6 +175,37 @@ static PyMethodDef t_messageformat_methods[] = {
 DECLARE_TYPE(MessageFormat, t_messageformat, Format, MessageFormat,
              t_messageformat_init);
 
+#if U_ICU_VERSION_HEX >= 0x04040000
+
+/* SelectFormat */
+
+class t_selectformat : public _wrapper {
+public:
+    SelectFormat *object;
+};
+
+static int t_selectformat_init(t_selectformat *self,
+                               PyObject *args, PyObject *kwds);
+static PyObject *t_selectformat_applyPattern(t_selectformat *self,
+                                             PyObject *arg);
+static PyObject *t_selectformat_toPattern(t_selectformat *self, PyObject *args);
+static PyObject *t_selectformat_format(t_selectformat *self, PyObject *args);
+static PyObject *t_selectformat_parseObject(t_selectformat *self,
+                                            PyObject *args);
+
+static PyMethodDef t_selectformat_methods[] = {
+    DECLARE_METHOD(t_selectformat, applyPattern, METH_O),
+    DECLARE_METHOD(t_selectformat, toPattern, METH_VARARGS),
+    DECLARE_METHOD(t_selectformat, format, METH_VARARGS),
+    DECLARE_METHOD(t_selectformat, parseObject, METH_VARARGS),
+    { NULL, NULL, 0, NULL }
+};
+
+DECLARE_TYPE(SelectFormat, t_selectformat, Format, SelectFormat,
+             t_selectformat_init);
+
+#endif
+
 
 /* FieldPosition */
 
@@ -671,6 +702,11 @@ PyObject *wrap_Format(Format *format)
     if (id == MessageFormat::getStaticClassID())
         return wrap_MessageFormat((MessageFormat *) format, T_OWNED);
 
+#if U_ICU_VERSION_HEX >= 0x04040000
+    if (id == SelectFormat::getStaticClassID())
+        return wrap_SelectFormat((SelectFormat *) format, T_OWNED);
+#endif
+
     if (id == ChoiceFormat::getStaticClassID())
         return wrap_ChoiceFormat((ChoiceFormat *) format, T_OWNED);
 
@@ -731,11 +767,9 @@ static PyObject *t_messageformat_setFormat(t_messageformat *self,
 static PyObject *t_messageformat_format(t_messageformat *self, PyObject *args)
 {
     Formattable *f;
+    UnicodeString *u, _u;
+    FieldPosition *fp, _fp;
     int len;
-    UnicodeString *u;
-    UnicodeString _u;
-    FieldPosition *fp;
-    FieldPosition _fp;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -921,6 +955,147 @@ static PyObject *t_messageformat_mod(t_messageformat *self, PyObject *args)
 }
 
 
+#if U_ICU_VERSION_HEX >= 0x04040000
+
+/* SelectFormat */
+
+static int t_selectformat_init(t_selectformat *self,
+                               PyObject *args, PyObject *kwds)
+{
+    UnicodeString *u, _u;
+
+    if (!parseArgs(args, "S", &u, &_u))
+    {
+        SelectFormat *format;
+
+        INT_STATUS_CALL(format = new SelectFormat(*u, status));
+        self->object = format;
+        self->flags = T_OWNED;
+
+        return 0;
+    }
+
+    PyErr_SetArgsError((PyObject *) self, "__init__", args);
+    return -1;
+}
+
+static PyObject *t_selectformat_applyPattern(t_selectformat *self,
+                                             PyObject *arg)
+{
+    UnicodeString *u, _u;
+
+    if (!parseArg(arg, "S", &u, &_u))
+    {
+        STATUS_CALL(self->object->applyPattern(*u, status));
+        Py_RETURN_NONE;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "applyPattern", arg);
+}
+
+static PyObject *t_selectformat_toPattern(t_selectformat *self, PyObject *args)
+{
+    UnicodeString *u, _u;
+
+    switch (PyTuple_Size(args)) {
+      case 0:
+        self->object->toPattern(_u);
+        return PyUnicode_FromUnicodeString(&_u);
+      case 1:
+        if (!parseArgs(args, "U", &u))
+        {
+            self->object->toPattern(*u);
+            Py_RETURN_ARG(args, 0);
+        }
+        break;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "toPattern", args);
+}
+
+PyObject *t_selectformat_format(t_selectformat *self, PyObject *args)
+{
+    UnicodeString *u0, _u0;
+    UnicodeString *u1, _u1;
+    Formattable *obj;
+    FieldPosition *fp, _fp;
+
+    switch (PyTuple_Size(args)) {
+      case 1:
+        if (!parseArgs(args, "P", TYPE_CLASSID(Formattable), &obj))
+        {
+            STATUS_CALL(self->object->format(*obj, _u1, _fp, status));
+            return PyUnicode_FromUnicodeString(&_u1);
+        }
+        break;
+        if (!parseArgs(args, "S", &u0, &_u0, &obj))
+        {
+            STATUS_CALL(self->object->format(*u0, _u1, _fp, status));
+            return PyUnicode_FromUnicodeString(&_u1);
+        }
+        break;
+      case 2:
+        if (!parseArgs(args, "PU", TYPE_CLASSID(Formattable), &obj, &u1))
+        {
+            STATUS_CALL(self->object->format(*obj, *u1, _fp, status));
+            Py_RETURN_ARG(args, 1);
+        }
+        if (!parseArgs(args, "SU", &u0, &_u0, &u1))
+        {
+            STATUS_CALL(self->object->format(*u0, *u1, _fp, status));
+            Py_RETURN_ARG(args, 1);
+        }
+        if (!parseArgs(args, "PP",
+                       TYPE_CLASSID(Formattable), TYPE_CLASSID(FieldPosition),
+                       &obj, &fp))
+        {
+            STATUS_CALL(self->object->format(*obj, _u1, *fp, status));
+            return PyUnicode_FromUnicodeString(&_u1);
+        }
+        if (!parseArgs(args, "SP", TYPE_CLASSID(FieldPosition), &u0, &_u0, &fp))
+        {
+            STATUS_CALL(self->object->format(*u0, _u1, *fp, status));
+            return PyUnicode_FromUnicodeString(&_u1);
+        }
+        break;
+      case 3:
+        if (!parseArgs(args, "PUP",
+                       TYPE_CLASSID(Formattable), TYPE_CLASSID(FieldPosition),
+                       &obj, &u1, &fp))
+        {
+            STATUS_CALL(self->object->format(*obj, *u1, *fp, status));
+            Py_RETURN_ARG(args, 1);
+        }
+        if (!parseArgs(args, "SUP", TYPE_CLASSID(FieldPosition),
+                       &u0, &_u0, &u1, &fp))
+        {
+            STATUS_CALL(self->object->format(*u0, *u1, *fp, status));
+            Py_RETURN_ARG(args, 1);
+        }
+        break;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "format", args);
+}
+
+static PyObject *t_selectformat_parseObject(t_selectformat *self,
+                                            PyObject *args)
+{
+    PyErr_SetString(PyExc_NotImplementedError, "SelectFormat.parseObject()");
+    return NULL;
+}
+
+static PyObject *t_selectformat_str(t_selectformat *self)
+{
+    UnicodeString u;
+
+    self->object->toPattern(u);
+    return PyUnicode_FromUnicodeString(&u);
+}
+
+#endif
+
+
 void _init_format(PyObject *m)
 {
     FieldPositionType.tp_richcompare = (richcmpfunc) t_fieldposition_richcmp;
@@ -929,12 +1104,18 @@ void _init_format(PyObject *m)
     MessageFormatType.tp_str = (reprfunc) t_messageformat_str;
     MessageFormatType.tp_as_number = &t_messageformat_as_number;
     MessageFormatType.tp_flags |= Py_TPFLAGS_CHECKTYPES;
+#if U_ICU_VERSION_HEX >= 0x04040000
+    SelectFormatType.tp_str = (reprfunc) t_selectformat_str;
+#endif
 
     REGISTER_TYPE(FieldPosition, m);
     REGISTER_TYPE(ParsePosition, m);
     INSTALL_TYPE(Format, m);
     INSTALL_TYPE(MeasureFormat, m);
     REGISTER_TYPE(MessageFormat, m);
+#if U_ICU_VERSION_HEX >= 0x04040000
+    REGISTER_TYPE(SelectFormat, m);
+#endif
 
     INSTALL_STATIC_INT(FieldPosition, DONT_CARE);
 }

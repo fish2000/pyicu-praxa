@@ -32,7 +32,7 @@
 
 DECLARE_CONSTANTS_TYPE(UNormalizationMode);
 DECLARE_CONSTANTS_TYPE(UNormalizationCheckResult);
-#if U_ICU_VERSION_HEX >= 0x0404000
+#if U_ICU_VERSION_HEX >= 0x04040000
 DECLARE_CONSTANTS_TYPE(UNormalizationMode2);
 #endif
 
