@@ -337,4 +337,32 @@ PyTypeObject name##Type = {                                             \
     Py_INCREF(self);                                    \
     return (PyObject *) self;
 
+
+#define DECLARE_RICHCMP(name, t_name) \
+    static PyObject *t_name ## _richcmp(t_name *self,                   \
+                                        PyObject *arg, int op)          \
+    {                                                                   \
+        int b = 0;                                                      \
+        name *object;                                                   \
+        if (!parseArg(arg, "P", TYPE_CLASSID(name), &object))           \
+        {                                                               \
+            switch (op) {                                               \
+              case Py_EQ:                                               \
+              case Py_NE:                                               \
+                b = *self->object == *object;                           \
+                if (op == Py_EQ)                                        \
+                    Py_RETURN_BOOL(b);                                  \
+                Py_RETURN_BOOL(!b);                                     \
+              case Py_LT:                                               \
+              case Py_LE:                                               \
+              case Py_GT:                                               \
+              case Py_GE:                                               \
+                PyErr_SetNone(PyExc_NotImplementedError);               \
+                return NULL;                                            \
+            }                                                           \
+        }                                                               \
+        return PyErr_SetArgsError((PyObject *) self, "__richcmp__", arg); \
+    }
+
+
 #endif /* _macros_h */
