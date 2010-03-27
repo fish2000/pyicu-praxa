@@ -1239,7 +1239,7 @@ static int t_unicodesetiterator_init(t_unicodesetiterator *self,
         if (!parseArgs(args, "P", TYPE_CLASSID(UnicodeSet), &set))
         {
             self->object = new UnicodeSetIterator(*set);
-            self->flags = 0;
+            self->flags = T_OWNED;
             self->set = PyTuple_GetItem(args, 0); Py_INCREF(self->set);
             break;
         }
