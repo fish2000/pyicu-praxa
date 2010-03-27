@@ -32,9 +32,11 @@ public:
 extern PyTypeObject FormatType;
 extern PyTypeObject FieldPositionType;
 extern PyTypeObject ParsePositionType;
+extern PyTypeObject PluralRulesType;
 
 PyObject *t_format_format(t_format *self, PyObject *args);
 PyObject *wrap_Format(Format *format);
+PyObject *wrap_PluralRules(PluralRules *rules, int flag);
 
 void _init_format(PyObject *m);
 
