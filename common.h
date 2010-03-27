@@ -96,6 +96,11 @@ typedef intintobjargproc ssizessizeobjargproc;
                            (U_ICU_VERSION_MINOR_NUM << 16) +    \
                            (U_ICU_VERSION_PATCHLEVEL_NUM << 8))
 
+#if U_ICU_VERSION_HEX >= 0x04000000
+#include <unicode/plurfmt.h>
+#include <unicode/plurrule.h>
+#endif
+
 #if U_ICU_VERSION_HEX >= 0x04020000
 #include <unicode/tmutfmt.h>
 #endif

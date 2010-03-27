@@ -609,7 +609,7 @@ static PyObject *t_regexmatcher_useTransparentBounds(t_regexmatcher *self,
 {
     UBool b;
 
-    if (parseArg(arg, "B", &b))
+    if (!parseArg(arg, "B", &b))
     {
         self->object->useTransparentBounds(b);
         Py_RETURN_SELF();

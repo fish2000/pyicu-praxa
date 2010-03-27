@@ -202,6 +202,72 @@ static PyMethodDef t_messageformat_methods[] = {
 DECLARE_TYPE(MessageFormat, t_messageformat, Format, MessageFormat,
              t_messageformat_init);
 
+#if U_ICU_VERSION_HEX >= 0x04000000
+
+/* PluralRules */
+
+class t_pluralrules : public _wrapper {
+public:
+    PluralRules *object;
+};
+
+static int t_pluralrules_init(t_pluralrules *self,
+                              PyObject *args, PyObject *kwds);
+static PyObject *t_pluralrules_select(t_pluralrules *self, PyObject *arg);
+static PyObject *t_pluralrules_getKeywords(t_pluralrules *self);
+static PyObject *t_pluralrules_getKeywordOther(t_pluralrules *self);
+static PyObject *t_pluralrules_isKeyword(t_pluralrules *self, PyObject *arg);
+static PyObject *t_pluralrules_createRules(PyTypeObject *type, PyObject *arg);
+static PyObject *t_pluralrules_createDefaultRules(PyTypeObject *type);
+static PyObject *t_pluralrules_forLocale(PyTypeObject *type, PyObject *arg);
+
+static PyMethodDef t_pluralrules_methods[] = {
+    DECLARE_METHOD(t_pluralrules, select, METH_O),
+    DECLARE_METHOD(t_pluralrules, getKeywords, METH_NOARGS),
+    DECLARE_METHOD(t_pluralrules, getKeywordOther, METH_NOARGS),
+    DECLARE_METHOD(t_pluralrules, isKeyword, METH_O),
+    DECLARE_METHOD(t_pluralrules, createRules, METH_O | METH_CLASS),
+    DECLARE_METHOD(t_pluralrules, createDefaultRules, METH_NOARGS | METH_CLASS),
+    DECLARE_METHOD(t_pluralrules, forLocale, METH_O | METH_CLASS),
+    { NULL, NULL, 0, NULL }
+};
+
+DECLARE_TYPE(PluralRules, t_pluralrules, UObject, PluralRules,
+             t_pluralrules_init);
+
+/* PluralFormat */
+
+class t_pluralformat : public _wrapper {
+public:
+    PluralFormat *object;
+    NumberFormat *format;
+};
+
+static int t_pluralformat_init(t_pluralformat *self,
+                               PyObject *args, PyObject *kwds);
+static PyObject *t_pluralformat_setLocale(t_pluralformat *self,
+                                            PyObject *arg);
+static PyObject *t_pluralformat_setNumberFormat(t_pluralformat *self,
+                                                  PyObject *arg);
+static PyObject *t_pluralformat_toPattern(t_pluralformat *self, PyObject *args);
+static PyObject *t_pluralformat_applyPattern(t_pluralformat *self,
+                                             PyObject *arg);
+static PyObject *t_pluralformat_format(t_pluralformat *self, PyObject *args);
+
+static PyMethodDef t_pluralformat_methods[] = {
+    DECLARE_METHOD(t_pluralformat, setLocale, METH_O),
+    DECLARE_METHOD(t_pluralformat, setNumberFormat, METH_O),
+    DECLARE_METHOD(t_pluralformat, toPattern, METH_VARARGS),
+    DECLARE_METHOD(t_pluralformat, applyPattern, METH_O),
+    DECLARE_METHOD(t_pluralformat, format, METH_VARARGS),
+    { NULL, NULL, 0, NULL }
+};
+
+DECLARE_TYPE(PluralFormat, t_pluralformat, Format, PluralFormat,
+             t_pluralformat_init);
+
+#endif
+
 #if U_ICU_VERSION_HEX >= 0x04040000
 
 /* SelectFormat */
@@ -805,6 +871,16 @@ PyObject *wrap_Format(Format *format)
     if (id == MessageFormat::getStaticClassID())
         return wrap_MessageFormat((MessageFormat *) format, T_OWNED);
 
+#if U_ICU_VERSION_HEX >= 0x04000000
+    if (id == PluralFormat::getStaticClassID())
+        return wrap_PluralFormat((PluralFormat *) format, T_OWNED);
+#endif
+
+#if U_ICU_VERSION_HEX >= 0x04020000
+    if (id == TimeUnitFormat::getStaticClassID())
+        return wrap_TimeUnitFormat((TimeUnitFormat *) format, T_OWNED);
+#endif
+
 #if U_ICU_VERSION_HEX >= 0x04040000
     if (id == SelectFormat::getStaticClassID())
         return wrap_SelectFormat((SelectFormat *) format, T_OWNED);
@@ -1058,6 +1134,358 @@ static PyObject *t_messageformat_mod(t_messageformat *self, PyObject *args)
 }
 
 
+#if U_ICU_VERSION_HEX >= 0x04000000
+
+/* PluralRules */
+
+static int t_pluralrules_init(t_pluralrules *self,
+                              PyObject *args, PyObject *kwds)
+{
+    if (PyTuple_Size(args) == 0)
+    {
+        INT_STATUS_CALL(self->object = new PluralRules(status));
+        self->flags = T_OWNED;
+
+        return 0;
+    }
+
+    PyErr_SetArgsError((PyObject *) self, "__init__", args);
+    return -1;
+}
+
+static PyObject *t_pluralrules_select(t_pluralrules *self, PyObject *arg)
+{
+    UnicodeString u;
+    int32_t n;
+    double d;
+
+    if (!parseArg(arg, "i", &n))
+        u = self->object->select(n);
+    else if (!parseArg(arg, "d", &d))
+        u = self->object->select(d);
+    else
+        return PyErr_SetArgsError((PyObject *) self, "select", arg);
+        
+    return PyUnicode_FromUnicodeString(&u);
+}
+
+static PyObject *t_pluralrules_getKeywords(t_pluralrules *self)
+{
+    StringEnumeration *se;
+    STATUS_CALL(se = self->object->getKeywords(status));
+
+    return wrap_StringEnumeration(se, T_OWNED);
+}
+
+static PyObject *t_pluralrules_getKeywordOther(t_pluralrules *self)
+{
+    UnicodeString u = self->object->getKeywordOther();
+    return PyUnicode_FromUnicodeString(&u);
+}
+
+static PyObject *t_pluralrules_isKeyword(t_pluralrules *self, PyObject *arg)
+{
+    UnicodeString *u, _u;
+
+    if (!parseArg(arg, "S", &u, &_u))
+    {
+        UBool b = self->object->isKeyword(*u);
+        Py_RETURN_BOOL(b);
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "isKeyword", arg);
+}
+
+
+static PyObject *t_pluralrules_createRules(PyTypeObject *type, PyObject *arg)
+{
+    UnicodeString *u, _u;
+
+    if (!parseArg(arg, "S", &u, &_u))
+    {
+        PluralRules *rules;
+        STATUS_CALL(rules = PluralRules::createRules(*u, status));
+        return wrap_PluralRules(rules, T_OWNED);
+    }
+
+    return PyErr_SetArgsError(type, "createRules", arg);
+}
+
+static PyObject *t_pluralrules_createDefaultRules(PyTypeObject *type)
+{
+    PluralRules *rules;
+    STATUS_CALL(rules = PluralRules::createDefaultRules(status));
+
+    return wrap_PluralRules(rules, T_OWNED);
+}
+
+static PyObject *t_pluralrules_forLocale(PyTypeObject *type, PyObject *arg)
+{
+    Locale *locale;
+
+    if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
+    {
+        PluralRules *rules;
+        STATUS_CALL(rules = PluralRules::forLocale(*locale, status));
+        return wrap_PluralRules(rules, T_OWNED);
+    }
+
+    return PyErr_SetArgsError(type, "forLocale", arg);
+}
+
+static PyObject *t_pluralrules_richcmp(t_pluralrules *self,
+                                       PyObject *arg, int op)
+{
+    int b = 0;
+    PluralRules *rules;
+
+    if (!parseArg(arg, "P", TYPE_CLASSID(PluralRules), &rules))
+    {
+        switch (op) {
+          case Py_EQ:
+          case Py_NE:
+            b = *self->object == *rules;
+            if (op == Py_EQ)
+                Py_RETURN_BOOL(b);
+            Py_RETURN_BOOL(!b);
+          case Py_LT:
+          case Py_LE:
+          case Py_GT:
+          case Py_GE:
+            PyErr_SetNone(PyExc_NotImplementedError);
+            return NULL;
+        }
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "__richcmp__", arg);
+}
+
+
+/* PluralFormat */
+
+static int t_pluralformat_init(t_pluralformat *self,
+                               PyObject *args, PyObject *kwds)
+{
+    Locale *locale;
+    PluralRules *rules;
+    UnicodeString *u, _u;
+
+    switch (PyTuple_Size(args)) {
+      case 0:
+        INT_STATUS_CALL(self->object = new PluralFormat(status));
+        self->flags = T_OWNED;
+        break;
+      case 1:
+        if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
+        {
+            INT_STATUS_CALL(self->object = new PluralFormat(*locale, status));
+            self->flags = T_OWNED;
+            break;
+        }
+        if (!parseArgs(args, "P", TYPE_CLASSID(PluralRules), &rules))
+        {
+            INT_STATUS_CALL(self->object = new PluralFormat(*rules, status));
+            self->flags = T_OWNED;
+            break;
+        }
+        if (!parseArgs(args, "S", &u, &_u))
+        {
+            INT_STATUS_CALL(self->object = new PluralFormat(*u, status));
+            self->flags = T_OWNED;
+            break;
+        }
+        PyErr_SetArgsError((PyObject *) self, "__init__", args);
+        return -1;
+      case 2:
+        if (!parseArgs(args, "PP",
+                       TYPE_CLASSID(Locale), TYPE_CLASSID(PluralRules),
+                       &locale, &rules))
+        {
+            INT_STATUS_CALL(self->object = new PluralFormat(*locale, *rules,
+                                                            status));
+            self->flags = T_OWNED;
+            break;
+        }
+        if (!parseArgs(args, "PS", TYPE_CLASSID(Locale), &locale, &u, &_u))
+        {
+            INT_STATUS_CALL(self->object = new PluralFormat(*locale, *u,
+                                                            status));
+            self->flags = T_OWNED;
+            break;
+        }
+        if (!parseArgs(args, "PS", TYPE_CLASSID(PluralRules), &rules, &u, &_u))
+        {
+            INT_STATUS_CALL(self->object = new PluralFormat(*rules, *u,
+                                                            status));
+            self->flags = T_OWNED;
+            break;
+        }
+        PyErr_SetArgsError((PyObject *) self, "__init__", args);
+        return -1;
+      case 3:
+        if (!parseArgs(args, "PPS",
+                       TYPE_CLASSID(Locale), TYPE_CLASSID(PluralRules),
+                       &locale, &rules, &u, &_u))
+        {
+            INT_STATUS_CALL(self->object = new PluralFormat(*locale, *rules, *u,
+                                                            status));
+            self->flags = T_OWNED;
+            break;
+        }
+        PyErr_SetArgsError((PyObject *) self, "__init__", args);
+        return -1;
+      default:
+        PyErr_SetArgsError((PyObject *) self, "__init__", args);
+        return -1;
+    }
+
+    if (self->object)
+        return 0;
+
+    return -1;
+}
+
+static PyObject *t_pluralformat_setLocale(t_pluralformat *self, PyObject *arg)
+{
+    Locale *locale;
+
+    if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
+    {
+        STATUS_CALL(self->object->setLocale(*locale, status));
+        Py_RETURN_NONE;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "setLocale", arg);
+}
+
+static PyObject *t_pluralformat_setNumberFormat(t_pluralformat *self,
+                                                PyObject *arg)
+{
+    NumberFormat *format;
+
+    if (!parseArg(arg, "P", TYPE_CLASSID(NumberFormat), &format))
+    {
+        self->format = (NumberFormat *) format->clone();
+        STATUS_CALL(self->object->setNumberFormat(self->format, status));
+        Py_RETURN_NONE;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "setNumberFormat", arg);
+}
+
+static PyObject *t_pluralformat_toPattern(t_pluralformat *self, PyObject *args)
+{
+    UnicodeString *u, _u;
+
+    switch (PyTuple_Size(args)) {
+      case 0:
+        self->object->toPattern(_u);
+        return PyUnicode_FromUnicodeString(&_u);
+      case 1:
+        if (!parseArgs(args, "U", &u))
+        {
+            self->object->toPattern(*u);
+            Py_RETURN_ARG(args, 0);
+        }
+        break;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "toPattern", args);
+}
+
+static PyObject *t_pluralformat_applyPattern(t_pluralformat *self,
+                                             PyObject *arg)
+{
+    UnicodeString *u, _u;
+
+    if (!parseArg(arg, "S", &u, &_u))
+    {
+        STATUS_CALL(self->object->applyPattern(*u, status));
+        Py_RETURN_NONE;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "applyPattern", arg);
+}
+
+static PyObject *t_pluralformat_format(t_pluralformat *self, PyObject *args)
+{
+    UnicodeString *u, _u;
+    FieldPosition *fp, _fp;
+    double d;
+    int n;
+
+    switch (PyTuple_Size(args)) {
+      case 1:
+        if (!parseArgs(args, "i", &n))
+        {
+            STATUS_CALL(_u = self->object->format(n, status));
+            return PyUnicode_FromUnicodeString(&_u);
+        }
+        if (!parseArgs(args, "d", &d))
+        {
+            STATUS_CALL(_u = self->object->format(d, status));
+            return PyUnicode_FromUnicodeString(&_u);
+        }
+        break;
+      case 2:
+        if (!parseArgs(args, "iS", &n, &u, &_u))
+        {
+            STATUS_CALL(self->object->format(n, *u, _fp, status));
+            Py_RETURN_ARG(args, 1);
+        }
+        if (!parseArgs(args, "dS", &d, &u, &_u))
+        {
+            STATUS_CALL(self->object->format(d, *u, _fp, status));
+            Py_RETURN_ARG(args, 1);
+        }
+        break;
+      case 3:
+        if (!parseArgs(args, "iSP", TYPE_CLASSID(FieldPosition),
+                       &n, &u, &_u, &fp))
+        {
+            STATUS_CALL(self->object->format(n, *u, *fp, status));
+            Py_RETURN_ARG(args, 1);
+        }
+        if (!parseArgs(args, "dSP", TYPE_CLASSID(FieldPosition),
+                       &d, &u, &_u, &fp))
+        {
+            STATUS_CALL(self->object->format(d, *u, *fp, status));
+            Py_RETURN_ARG(args, 1);
+        }
+        break;
+    }
+
+    return t_format_format((t_format *) self, args);
+}
+
+static PyObject *t_pluralformat_str(t_pluralformat *self)
+{
+    UnicodeString u;
+
+    self->object->toPattern(u);
+    return PyUnicode_FromUnicodeString(&u);
+}
+
+static void t_pluralformat_dealloc(t_pluralformat *self)
+{
+    if (self->object)
+    {
+        if (self->flags & T_OWNED)
+        {
+            delete self->object;
+            delete self->format;
+        }
+            
+        self->object = NULL;
+        self->format = NULL;
+    }
+
+    self->ob_type->tp_free((PyObject *) self);
+}
+
+#endif
+
+
 #if U_ICU_VERSION_HEX >= 0x04040000
 
 /* SelectFormat */
@@ -1207,6 +1635,11 @@ void _init_format(PyObject *m)
     MessageFormatType.tp_str = (reprfunc) t_messageformat_str;
     MessageFormatType.tp_as_number = &t_messageformat_as_number;
     MessageFormatType.tp_flags |= Py_TPFLAGS_CHECKTYPES;
+#if U_ICU_VERSION_HEX >= 0x04000000
+    PluralRulesType.tp_richcompare = (richcmpfunc) t_pluralrules_richcmp;
+    PluralFormatType.tp_str = (reprfunc) t_pluralformat_str;
+    PluralFormatType.tp_dealloc = (destructor) t_pluralformat_dealloc;
+#endif
 #if U_ICU_VERSION_HEX >= 0x04040000
     SelectFormatType.tp_str = (reprfunc) t_selectformat_str;
 #endif
@@ -1216,6 +1649,10 @@ void _init_format(PyObject *m)
     INSTALL_TYPE(Format, m);
     INSTALL_TYPE(MeasureFormat, m);
     REGISTER_TYPE(MessageFormat, m);
+#if U_ICU_VERSION_HEX >= 0x04000000
+    REGISTER_TYPE(PluralRules, m);
+    REGISTER_TYPE(PluralFormat, m);
+#endif
 #if U_ICU_VERSION_HEX >= 0x04020000
     REGISTER_TYPE(TimeUnitFormat, m);
 #endif
