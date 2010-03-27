@@ -1325,7 +1325,7 @@ static PyObject *t_unicodesetiterator_reset(t_unicodesetiterator *self,
       case 1:
         if (!parseArgs(args, "P", TYPE_CLASSID(UnicodeSet), &set))
         {
-            PyObject *setObject = PyTuple_GetItem(args, 1);
+            PyObject *setObject = PyTuple_GetItem(args, 0);
 
             Py_INCREF(setObject); Py_XDECREF(self->set); self->set = setObject;
             self->object->reset(*set);
