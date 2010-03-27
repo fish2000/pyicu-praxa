@@ -89,6 +89,7 @@ typedef intintobjargproc ssizessizeobjargproc;
 #include <unicode/unimatch.h>
 #include <unicode/unifilt.h>
 #include <unicode/uniset.h>
+#include <unicode/usetiter.h>
 #include <unicode/regex.h>
 #include <unicode/normlzr.h>
 

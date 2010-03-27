@@ -198,6 +198,37 @@ DECLARE_TYPE(UnicodeSet, t_unicodeset, UnicodeFilter, UnicodeSet,
              t_unicodeset_init);
 
 
+/* UnicodeSetIterator */
+
+class t_unicodesetiterator : public _wrapper {
+public:
+    UnicodeSetIterator *object;
+    PyObject *set;
+};
+
+static int t_unicodesetiterator_init(t_unicodesetiterator *self,
+                                     PyObject *args, PyObject *kwds);
+static PyObject *t_unicodesetiterator_isString(t_unicodesetiterator *self);
+static PyObject *t_unicodesetiterator_getCodepoint(t_unicodesetiterator *self);
+static PyObject *t_unicodesetiterator_getCodepointEnd(t_unicodesetiterator *self);
+static PyObject *t_unicodesetiterator_getString(t_unicodesetiterator *self);
+static PyObject *t_unicodesetiterator_next(t_unicodesetiterator *self);
+static PyObject *t_unicodesetiterator_nextRange(t_unicodesetiterator *self);
+
+static PyMethodDef t_unicodesetiterator_methods[] = {
+    DECLARE_METHOD(t_unicodesetiterator, isString, METH_NOARGS),
+    DECLARE_METHOD(t_unicodesetiterator, getCodepoint, METH_NOARGS),
+    DECLARE_METHOD(t_unicodesetiterator, getCodepointEnd, METH_NOARGS),
+    DECLARE_METHOD(t_unicodesetiterator, getString, METH_NOARGS),
+    DECLARE_METHOD(t_unicodesetiterator, next, METH_NOARGS),
+    DECLARE_METHOD(t_unicodesetiterator, nextRange, METH_NOARGS),
+    { NULL, NULL, 0, NULL }
+};
+
+DECLARE_TYPE(UnicodeSetIterator, t_unicodesetiterator, UObject,
+             UnicodeSetIterator, t_unicodesetiterator_init);
+
+
 /* UnicodeFunctor */
 
 static PyObject *t_unicodefunctor_toMatcher(t_unicodefunctor *self)
@@ -1189,12 +1220,125 @@ static PySequenceMethods t_unicodeset_as_sequence = {
 };
 
 
+/* UnicodeSetIterator */
+
+static int t_unicodesetiterator_init(t_unicodesetiterator *self,
+                                     PyObject *args, PyObject *kwds)
+{
+    UnicodeSet *set;
+
+    switch (PyTuple_Size(args)) {
+      case 0:
+        self->object = new UnicodeSetIterator();
+        self->flags = T_OWNED;
+        break;
+      case 1:
+        if (!parseArgs(args, "P", TYPE_CLASSID(UnicodeSet), &set))
+        {
+            self->object = new UnicodeSetIterator(*set);
+            self->flags = 0;
+            self->set = PyTuple_GetItem(args, 0); Py_INCREF(self->set);
+            break;
+        }
+        PyErr_SetArgsError((PyObject *) self, "__init__", args);
+        return -1;
+      default:
+        PyErr_SetArgsError((PyObject *) self, "__init__", args);
+        return -1;
+    }
+
+    if (self->object)
+        return 0;
+
+    return -1;
+}
+
+static void t_unicodesetiterator_dealloc(t_unicodesetiterator *self)
+{
+    if (self->object)
+    {
+        if (self->flags & T_OWNED)
+            delete self->object;
+            
+        self->object = NULL;
+
+        Py_XDECREF(self->set);
+        self->set = NULL;
+    }
+
+    self->ob_type->tp_free((PyObject *) self);
+}
+
+
+static PyObject *t_unicodesetiterator_isString(t_unicodesetiterator *self)
+{
+    UBool b = self->object->isString();
+    Py_RETURN_BOOL(b);
+}
+
+static PyObject *t_unicodesetiterator_getCodepoint(t_unicodesetiterator *self)
+{
+    UChar32 c = self->object->getCodepoint();
+    UnicodeString u = UnicodeString::fromUTF32(&c, 1);
+
+    return PyUnicode_FromUnicodeString(&u);
+}
+
+static PyObject *t_unicodesetiterator_getCodepointEnd(t_unicodesetiterator *self)
+{
+    UChar32 c = self->object->getCodepointEnd();
+    UnicodeString u = UnicodeString::fromUTF32(&c, 1);
+
+    return PyUnicode_FromUnicodeString(&u);
+}
+
+static PyObject *t_unicodesetiterator_getString(t_unicodesetiterator *self)
+{
+    UnicodeString u = self->object->getString();
+    return PyUnicode_FromUnicodeString(&u);
+}
+
+static PyObject *t_unicodesetiterator_next(t_unicodesetiterator *self)
+{
+    UBool b = self->object->next();
+    Py_RETURN_BOOL(b);
+}
+
+static PyObject *t_unicodesetiterator_nextRange(t_unicodesetiterator *self)
+{
+    UBool b = self->object->nextRange();
+    Py_RETURN_BOOL(b);
+}
+
+static PyObject *t_unicodesetiterator_iter(t_unicodesetiterator *self)
+{
+    Py_RETURN_SELF();
+}
+
+static PyObject *t_unicodesetiterator_iter_next(t_unicodesetiterator *self)
+{
+    if (!self->object->next())
+    {
+        PyErr_SetNone(PyExc_StopIteration);
+        return NULL;
+    }
+
+    return t_unicodesetiterator_getString(self);
+}
+
+
 void _init_unicodeset(PyObject *m)
 {
     UnicodeSetType.tp_str = (reprfunc) t_unicodeset_str;
     UnicodeSetType.tp_richcompare = (richcmpfunc) t_unicodeset_richcmp;
     UnicodeSetType.tp_hash = (hashfunc) t_unicodeset_hash;
     UnicodeSetType.tp_as_sequence = &t_unicodeset_as_sequence;
+    UnicodeSetIteratorType.tp_dealloc =
+        (destructor) t_unicodesetiterator_dealloc;
+    UnicodeSetIteratorType.tp_iter =
+        (getiterfunc) t_unicodesetiterator_iter;
+    UnicodeSetIteratorType.tp_iternext =
+        (iternextfunc) t_unicodesetiterator_iter_next;
 
     INSTALL_CONSTANTS_TYPE(UMatchDegree, m);
     INSTALL_CONSTANTS_TYPE(UProperty, m);
@@ -1204,6 +1348,7 @@ void _init_unicodeset(PyObject *m)
     INSTALL_TYPE(UnicodeMatcher, m);
     REGISTER_TYPE(UnicodeFilter, m);
     REGISTER_TYPE(UnicodeSet, m);
+    REGISTER_TYPE(UnicodeSetIterator, m);
 
     INSTALL_ENUM(UMatchDegree, U_MISMATCH);
     INSTALL_ENUM(UMatchDegree, U_PARTIAL_MATCH);
