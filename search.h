@@ -21,14 +21,10 @@
  * ====================================================================
  */
 
-#ifndef _collator_h
-#define _collator_h
+#ifndef _search_h
+#define _search_h
 
-extern PyTypeObject RuleBasedCollatorType;
-
-PyObject *wrap_RuleBasedCollator(RuleBasedCollator *collator, int flag);
-
-void _init_collator(PyObject *m);
+void _init_search(PyObject *m);
 
 
-#endif /* _collator_h */
+#endif /* _search_h */

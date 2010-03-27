@@ -92,6 +92,8 @@ typedef intintobjargproc ssizessizeobjargproc;
 #include <unicode/usetiter.h>
 #include <unicode/regex.h>
 #include <unicode/normlzr.h>
+#include <unicode/search.h>
+#include <unicode/stsearch.h>
 
 #define U_ICU_VERSION_HEX ((U_ICU_VERSION_MAJOR_NUM << 24) +    \
                            (U_ICU_VERSION_MINOR_NUM << 16) +    \
@@ -150,7 +152,8 @@ enum {
     DateFormat_ID,
     Calendar_ID,
     Collator_ID,
-    UnicodeMatcher_ID
+    UnicodeMatcher_ID,
+    SearchIterator_ID
 };
 
 void _init_common(PyObject *m);

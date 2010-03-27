@@ -40,6 +40,7 @@
 #include "unicodeset.h"
 #include "regex.h"
 #include "normalizer.h"
+#include "search.h"
 
 
 /* const variable descriptor */
@@ -241,5 +242,6 @@ extern "C" {
         _init_unicodeset(m);
         _init_regex(m);
         _init_normalizer(m);
+        _init_search(m);
     }
 }
