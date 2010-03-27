@@ -214,6 +214,8 @@ static PyObject *t_unicodesetiterator_getCodepointEnd(t_unicodesetiterator *self
 static PyObject *t_unicodesetiterator_getString(t_unicodesetiterator *self);
 static PyObject *t_unicodesetiterator_next(t_unicodesetiterator *self);
 static PyObject *t_unicodesetiterator_nextRange(t_unicodesetiterator *self);
+static PyObject *t_unicodesetiterator_reset(t_unicodesetiterator *self,
+                                            PyObject *args);
 
 static PyMethodDef t_unicodesetiterator_methods[] = {
     DECLARE_METHOD(t_unicodesetiterator, isString, METH_NOARGS),
@@ -222,6 +224,7 @@ static PyMethodDef t_unicodesetiterator_methods[] = {
     DECLARE_METHOD(t_unicodesetiterator, getString, METH_NOARGS),
     DECLARE_METHOD(t_unicodesetiterator, next, METH_NOARGS),
     DECLARE_METHOD(t_unicodesetiterator, nextRange, METH_NOARGS),
+    DECLARE_METHOD(t_unicodesetiterator, reset, METH_VARARGS),
     { NULL, NULL, 0, NULL }
 };
 
@@ -1309,6 +1312,32 @@ static PyObject *t_unicodesetiterator_nextRange(t_unicodesetiterator *self)
     UBool b = self->object->nextRange();
     Py_RETURN_BOOL(b);
 }
+
+static PyObject *t_unicodesetiterator_reset(t_unicodesetiterator *self,
+                                            PyObject *args)
+{
+    UnicodeSet *set;
+
+    switch (PyTuple_Size(args)) {
+      case 0:
+        self->object->reset();
+        Py_RETURN_NONE;
+      case 1:
+        if (!parseArgs(args, "P", TYPE_CLASSID(UnicodeSet), &set))
+        {
+            PyObject *setObject = PyTuple_GetItem(args, 1);
+
+            Py_INCREF(setObject); Py_XDECREF(self->set); self->set = setObject;
+            self->object->reset(*set);
+
+            Py_RETURN_NONE;
+        }
+        break;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "reset", args);
+}
+
 
 static PyObject *t_unicodesetiterator_iter(t_unicodesetiterator *self)
 {
