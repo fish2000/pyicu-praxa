@@ -21,6 +21,7 @@ Version 0.9 ->
   - added support for CurrencyPluralInfo if ICU version >= 4.2
   - added support for UnicodeSetIterator
   - added support for SearchIterator and StringSearch
+  - added some missing Collator and RuleBasedCollator methods
   - 
 
 Version 0.8 -> 0.9

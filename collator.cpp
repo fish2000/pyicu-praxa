@@ -612,7 +612,6 @@ void _init_collator(PyObject *m)
     INSTALL_CONSTANTS_TYPE(UCollAttributeValue, m);
     REGISTER_TYPE(CollationKey, m);
     INSTALL_TYPE(Collator, m);
-    REGISTER_TYPE(CollationElementIterator, m);
     REGISTER_TYPE(RuleBasedCollator, m);
 
     INSTALL_ENUM(UCollationResult, UCOL_LESS);
