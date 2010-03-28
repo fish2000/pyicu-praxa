@@ -1338,7 +1338,6 @@ static PyObject *t_unicodesetiterator_reset(t_unicodesetiterator *self,
     return PyErr_SetArgsError((PyObject *) self, "reset", args);
 }
 
-
 static PyObject *t_unicodesetiterator_iter(t_unicodesetiterator *self)
 {
     Py_RETURN_SELF();

@@ -26,6 +26,9 @@
 
 extern PyTypeObject BreakIteratorType;
 extern PyTypeObject CharacterIteratorType;
+extern PyTypeObject CollationElementIteratorType;
+
+PyObject *wrap_CollationElementIterator(CollationElementIterator *, int);
 
 void _init_iterators(PyObject *m);
 
