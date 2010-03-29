@@ -22,6 +22,8 @@ Version 0.9 ->
   - added support for UnicodeSetIterator
   - added support for SearchIterator and StringSearch
   - added some missing Collator and RuleBasedCollator methods
+  - refreshed README
+  - fixed bugs with UnicodeString-converted text arg ownership in iterators
   - 
 
 Version 0.8 -> 0.9

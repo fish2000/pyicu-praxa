@@ -532,9 +532,10 @@ static PyObject *t_replaceable_hasMetaData(t_replaceable *self)
 static int t_unicodestring_init(t_unicodestring *self,
                                 PyObject *args, PyObject *kwds)
 {
-    UnicodeString *u;
+    UnicodeString *u, _u;
     PyObject *obj;
     char *encoding, *mode;
+    int32_t start, length;
     int i;
 
     switch (PyTuple_Size(args)) {
@@ -578,21 +579,31 @@ static int t_unicodestring_init(t_unicodestring *self,
             }
             break;
         }
+        if (!parseArgs(args, "Si", &u, &_u, &start))
+        {
+            self->object = new UnicodeString(*u, start);
+            self->flags = T_OWNED;
+            break;
+        }
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 3:
         if (!parseArgs(args, "Ccc", &obj, &encoding, &mode))
         {
-            UnicodeString u;
-
             try {
-                PyObject_AsUnicodeString(obj, encoding, mode, u);
-                self->object = new UnicodeString(u);
+                PyObject_AsUnicodeString(obj, encoding, mode, _u);
+                self->object = new UnicodeString(_u);
                 self->flags = T_OWNED;
             } catch (ICUException e) {
                 e.reportError();
                 return -1;
             }
+            break;
+        }
+        if (!parseArgs(args, "Sii", &u, &_u, &start, &length))
+        {
+            self->object = new UnicodeString(*u, start, length);
+            self->flags = T_OWNED;
             break;
         }
         PyErr_SetArgsError((PyObject *) self, "__init__", args);

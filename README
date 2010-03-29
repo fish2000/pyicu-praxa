@@ -57,10 +57,6 @@
   What's available
   ----------------
 
-  PyICU is under development. Currently, the string, locale, format,
-  calendar, timezone, charset and various iterator classes are available.
-  Support for more classes is being added over time and patches are welcome.
-
   See the CHANGES file for an up to date log of changes and additions.
 
 
@@ -89,9 +85,9 @@
 
     ICU's C++ APIs accept and return UnicodeString arguments in several
     ways: by value, by pointer or by reference.
-    When an ICU C++ API is documented to accept a UnicodeString & parameter,
-    it is safe to assume that there are several corresponding PyICU python
-    APIs making it accessible in simpler ways:
+    When an ICU C++ API is documented to accept a UnicodeString reference
+    parameter, it is safe to assume that there are several corresponding
+    PyICU python APIs making it accessible in simpler ways:
     For example, the 'UnicodeString &Locale::getDisplayName(UnicodeString &)'
     API, documented here:
         http://icu-project.org/apiref/icu4c/classLocale.html
@@ -114,9 +110,10 @@
         >>> locale = Locale('pt_BR')
         >>> name = locale.getDisplayName()
         >>> name
-        <UnicodeString: Portuguese (Brazil)>
+        u'Portuguese (Brazil)'
 
-        A UnicodeString object was allocated for Python and returned.
+        A UnicodeString object was allocated and converted to a Python
+        unicode object.
 
     A UnicodeString can be coerced to a Python unicode string with Python's
     unicode() constructor. The usual len(), str(), comparison, [] and [:]
@@ -125,6 +122,9 @@
     mutable. For example:
 
         >>> name = locale.getDisplayName()
+        u'Portuguese (Brazil)'
+        >>> name = UnicodeString(name)
+        >>> name
         <UnicodeString: Portuguese (Brazil)>
         >>> unicode(name)
         u'Portuguese (Brazil)'
@@ -162,7 +162,7 @@
         <SimpleDateFormat: M/d/yy h:mm a>
         >>> f = Formattable(940284258.0, Formattable.kIsDate)
         >>> df.format(f)
-        <UnicodeString: 10/18/99 3:04 PM>
+        u'10/18/99 3:04 PM'
      
     Of course, the simpler 'UnicodeString &DateFormat::format(UDate,
     UnicodeString &)' documented here:
@@ -174,7 +174,7 @@
         >>> df
         <SimpleDateFormat: M/d/yy h:mm a>
         >>> df.format(940284258.0)
-        <UnicodeString: 10/18/99 3:04 PM>
+        u'10/18/99 3:04 PM'
 
     - dates
 

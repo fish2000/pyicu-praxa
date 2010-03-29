@@ -686,7 +686,7 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
 {
     va_list list;
 
-    if (count != (int)strlen(types))
+    if (count != (int) strlen(types))
         return -1;
 
     va_start(list, types);
@@ -734,11 +734,12 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
             return -1;
 
           case 'U':           /* UnicodeString */
+          case 'V':           /* UnicodeString and raw arg object */
             if (isUnicodeString(arg))
                 break;
             return -1;
 
-          case 'O':           /* python object of give type */
+          case 'O':           /* python object of given type */
           {
               PyTypeObject *type = va_arg(list, PyTypeObject *);
 
@@ -850,6 +851,13 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
         PyObject *arg = args[j];
         
         switch (types[j]) {
+          case 'A':           /* previous Python arg object */
+          {
+              PyObject **obj = va_arg(list, PyObject **);
+              *obj = args[j - 1];
+              break;
+          }
+            
           case 'c':           /* string */
           {
               char **c = va_arg(list, char **);
@@ -930,6 +938,15 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
           {
               UnicodeString **u = va_arg(list, UnicodeString **);
               *u = (UnicodeString *) ((t_uobject *) arg)->object;
+              break;
+          }
+
+          case 'V':           /* UnicodeString and raw arg object */
+          {
+              UnicodeString **u = va_arg(list, UnicodeString **);
+              PyObject **obj = va_arg(list, PyObject **);
+              *u = (UnicodeString *) ((t_uobject *) arg)->object;
+              *obj = arg;
               break;
           }
 
