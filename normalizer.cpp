@@ -604,7 +604,7 @@ static PyObject *t_normalizer2_hasBoundaryBefore(t_normalizer2 *self,
         int32_t len;
         UBool b;
 
-        STATUS_CALL(len = u->toUTF32(&c, 1, status));
+        STATUS_CALL(len = toUChar32(*u, &c, status));
         if (len == 1)
         {
             b = self->object->hasBoundaryBefore(c);
@@ -626,7 +626,7 @@ static PyObject *t_normalizer2_hasBoundaryAfter(t_normalizer2 *self,
         int32_t len;
         UBool b;
 
-        STATUS_CALL(len = u->toUTF32(&c, 1, status));
+        STATUS_CALL(len = toUChar32(*u, &c, status));
         if (len == 1)
         {
             b = self->object->hasBoundaryAfter(c);
@@ -647,7 +647,7 @@ static PyObject *t_normalizer2_isInert(t_normalizer2 *self, PyObject *arg)
         int32_t len;
         UBool b;
 
-        STATUS_CALL(len = u->toUTF32(&c, 1, status));
+        STATUS_CALL(len = toUChar32(*u, &c, status));
         if (len == 1)
         {
             b = self->object->isInert(c);

@@ -1102,6 +1102,28 @@ int isUnicodeString(PyObject *arg)
              UnicodeString::getStaticClassID()));
 }
 
+int32_t toUChar32(UnicodeString& u, UChar32 *c, UErrorCode& status)
+{
+#if U_ICU_VERSION_HEX >= 0x04020000
+    return u.toUTF32(c, 1, status);
+#else
+    int32_t len = u.length();
+    if (len >= 1)
+        *c = u.char32At(0);
+    return len;
+#endif
+}
+
+UnicodeString fromUChar32(UChar32 c)
+{
+#if U_ICU_VERSION_HEX >= 0x04020000
+    return UnicodeString::fromUTF32(&c, 1);
+#else
+    return UnicodeString(c);
+#endif
+}
+    
+
 void _init_common(PyObject *m)
 {
     types = PyDict_New();

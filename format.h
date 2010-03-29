@@ -32,11 +32,15 @@ public:
 extern PyTypeObject FormatType;
 extern PyTypeObject FieldPositionType;
 extern PyTypeObject ParsePositionType;
+#if U_ICU_VERSION_HEX >= 0x04000000
 extern PyTypeObject PluralRulesType;
+#endif
 
 PyObject *t_format_format(t_format *self, PyObject *args);
 PyObject *wrap_Format(Format *format);
+#if U_ICU_VERSION_HEX >= 0x04000000
 PyObject *wrap_PluralRules(PluralRules *rules, int flag);
+#endif
 
 void _init_format(PyObject *m);
 

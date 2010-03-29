@@ -120,8 +120,10 @@ public:
 
 static int t_unicodeset_init(t_unicodeset *self,
                              PyObject *args, PyObject *kwds);
+#if U_ICU_VERSION_HEX >= 0x04000000
 static PyObject *t_unicodeset_isBogus(t_unicodeset *self);
 static PyObject *t_unicodeset_setToBogus(t_unicodeset *self);
+#endif
 static PyObject *t_unicodeset_isEmpty(t_unicodeset *self);
 static PyObject *t_unicodeset_isFrozen(t_unicodeset *self);
 static PyObject *t_unicodeset_freeze(t_unicodeset *self);
@@ -147,7 +149,9 @@ static PyObject *t_unicodeset_remove(t_unicodeset *self, PyObject *args);
 static PyObject *t_unicodeset_complement(t_unicodeset *self, PyObject *args);
 static PyObject *t_unicodeset_clear(t_unicodeset *self);
 static PyObject *t_unicodeset_closeOver(t_unicodeset *self, PyObject *arg);
+#if U_ICU_VERSION_HEX >= 0x04020000
 static PyObject *t_unicodeset_removeAllStrings(t_unicodeset *self);
+#endif
 static PyObject *t_unicodeset_compact(t_unicodeset *self);
 static PyObject *t_unicodeset_getRangeCount(t_unicodeset *self);
 static PyObject *t_unicodeset_getRangeStart(t_unicodeset *self, PyObject *arg);
@@ -158,8 +162,10 @@ static PyObject *t_unicodeset_createFrom(PyTypeObject *type, PyObject *arg);
 static PyObject *t_unicodeset_createFromAll(PyTypeObject *type, PyObject *arg);
 
 static PyMethodDef t_unicodeset_methods[] = {
+#if U_ICU_VERSION_HEX >= 0x04000000
     DECLARE_METHOD(t_unicodeset, isBogus, METH_NOARGS),
     DECLARE_METHOD(t_unicodeset, setToBogus, METH_NOARGS),
+#endif
     DECLARE_METHOD(t_unicodeset, isEmpty, METH_NOARGS),
     DECLARE_METHOD(t_unicodeset, isFrozen, METH_NOARGS),
     DECLARE_METHOD(t_unicodeset, freeze, METH_NOARGS),
@@ -183,7 +189,9 @@ static PyMethodDef t_unicodeset_methods[] = {
     DECLARE_METHOD(t_unicodeset, complement, METH_VARARGS),
     DECLARE_METHOD(t_unicodeset, clear, METH_NOARGS),
     DECLARE_METHOD(t_unicodeset, closeOver, METH_O),
+#if U_ICU_VERSION_HEX >= 0x04020000
     DECLARE_METHOD(t_unicodeset, removeAllStrings, METH_NOARGS),
+#endif
     DECLARE_METHOD(t_unicodeset, compact, METH_NOARGS),
     DECLARE_METHOD(t_unicodeset, getRangeCount, METH_NOARGS),
     DECLARE_METHOD(t_unicodeset, getRangeStart, METH_O),
@@ -407,7 +415,7 @@ static PyObject *t_unicodefilter_contains(t_unicodefilter *self, PyObject *arg)
         UChar32 c;
         int32_t len;
 
-        STATUS_CALL(len = u->toUTF32(&c, 1, status));
+        STATUS_CALL(len = toUChar32(*u, &c, status));
         if (len == 1)
         {
             UBool b = self->object->contains(c);
@@ -455,8 +463,8 @@ static int t_unicodeset_init(t_unicodeset *self,
             UChar32 c0, c1;
             int32_t l0, l1;
 
-            INT_STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
-            INT_STATUS_CALL(l1 = u1->toUTF32(&c1, 1, status));
+            INT_STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
+            INT_STATUS_CALL(l1 = toUChar32(*u1, &c1, status));
             if (l0 == 1 && l1 == 1)
             {
                 self->object = new UnicodeSet(c0, c1);
@@ -477,6 +485,8 @@ static int t_unicodeset_init(t_unicodeset *self,
     return -1;
 }
 
+#if U_ICU_VERSION_HEX >= 0x04000000
+
 static PyObject *t_unicodeset_isBogus(t_unicodeset *self)
 {
     UBool b = self->object->isBogus();
@@ -488,6 +498,8 @@ static PyObject *t_unicodeset_setToBogus(t_unicodeset *self)
     self->object->setToBogus();
     Py_RETURN_NONE;
 }
+
+#endif
 
 static PyObject *t_unicodeset_isEmpty(t_unicodeset *self)
 {
@@ -517,8 +529,8 @@ static PyObject *t_unicodeset_set(t_unicodeset *self, PyObject *args)
         UChar32 c0, c1;
         int32_t l0, l1;
 
-        STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
-        STATUS_CALL(l1 = u1->toUTF32(&c1, 1, status));
+        STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
+        STATUS_CALL(l1 = toUChar32(*u1, &c1, status));
         if (l0 == 1 && l1 == 1)
         {
             self->object->set(c0, c1);
@@ -544,7 +556,7 @@ static PyObject *t_unicodeset_add(t_unicodeset *self, PyObject *args)
 
             if (u0->length() == 1)
             {
-                STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
+                STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
                 if (l0 == 1)
                 {
                     self->object->add(c0);
@@ -564,8 +576,8 @@ static PyObject *t_unicodeset_add(t_unicodeset *self, PyObject *args)
             UChar32 c0, c1;
             int32_t l0, l1;
 
-            STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
-            STATUS_CALL(l1 = u1->toUTF32(&c1, 1, status));
+            STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
+            STATUS_CALL(l1 = toUChar32(*u1, &c1, status));
             if (l0 == 1 && l1 == 1)
             {
                 self->object->add(c0, c1);
@@ -613,7 +625,7 @@ static PyObject *t_unicodeset_retain(t_unicodeset *self, PyObject *args)
 
             if (u0->length() == 1)
             {
-                STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
+                STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
                 if (l0 == 1)
                 {
                     self->object->retain(c0);
@@ -628,8 +640,8 @@ static PyObject *t_unicodeset_retain(t_unicodeset *self, PyObject *args)
             UChar32 c0, c1;
             int32_t l0, l1;
 
-            STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
-            STATUS_CALL(l1 = u1->toUTF32(&c1, 1, status));
+            STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
+            STATUS_CALL(l1 = toUChar32(*u1, &c1, status));
             if (l0 == 1 && l1 == 1)
             {
                 self->object->retain(c0, c1);
@@ -681,7 +693,7 @@ static PyObject *t_unicodeset_complement(t_unicodeset *self, PyObject *args)
 
             if (u0->length() == 1)
             {
-                STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
+                STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
                 if (l0 == 1)
                 {
                     self->object->complement(c0);
@@ -701,8 +713,8 @@ static PyObject *t_unicodeset_complement(t_unicodeset *self, PyObject *args)
             UChar32 c0, c1;
             int32_t l0, l1;
 
-            STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
-            STATUS_CALL(l1 = u1->toUTF32(&c1, 1, status));
+            STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
+            STATUS_CALL(l1 = toUChar32(*u1, &c1, status));
             if (l0 == 1 && l1 == 1)
             {
                 self->object->complement(c0, c1);
@@ -750,7 +762,7 @@ static PyObject *t_unicodeset_remove(t_unicodeset *self, PyObject *args)
 
             if (u0->length() == 1)
             {
-                STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
+                STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
                 if (l0 == 1)
                 {
                     self->object->remove(c0);
@@ -770,8 +782,8 @@ static PyObject *t_unicodeset_remove(t_unicodeset *self, PyObject *args)
             UChar32 c0, c1;
             int32_t l0, l1;
 
-            STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
-            STATUS_CALL(l1 = u1->toUTF32(&c1, 1, status));
+            STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
+            STATUS_CALL(l1 = toUChar32(*u1, &c1, status));
             if (l0 == 1 && l1 == 1)
             {
                 self->object->remove(c0, c1);
@@ -866,7 +878,7 @@ static PyObject *t_unicodeset_contains(t_unicodeset *self, PyObject *args)
 
             if (u0->length() == 1)
             {
-                STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
+                STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
                 if (l0 == 1)
                 {
                     UBool b = self->object->contains(c0);
@@ -886,8 +898,8 @@ static PyObject *t_unicodeset_contains(t_unicodeset *self, PyObject *args)
             UChar32 c0, c1;
             int32_t l0, l1;
 
-            STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
-            STATUS_CALL(l1 = u1->toUTF32(&c1, 1, status));
+            STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
+            STATUS_CALL(l1 = toUChar32(*u1, &c1, status));
             if (l0 == 1 && l1 == 1)
             {
                 UBool b = self->object->contains(c0, c1);
@@ -941,8 +953,8 @@ static PyObject *t_unicodeset_containsNone(t_unicodeset *self, PyObject *args)
             UChar32 c0, c1;
             int32_t l0, l1;
 
-            STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
-            STATUS_CALL(l1 = u1->toUTF32(&c1, 1, status));
+            STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
+            STATUS_CALL(l1 = toUChar32(*u1, &c1, status));
             if (l0 == 1 && l1 == 1)
             {
                 UBool b = self->object->containsNone(c0, c1);
@@ -980,8 +992,8 @@ static PyObject *t_unicodeset_containsSome(t_unicodeset *self, PyObject *args)
             UChar32 c0, c1;
             int32_t l0, l1;
 
-            STATUS_CALL(l0 = u0->toUTF32(&c0, 1, status));
-            STATUS_CALL(l1 = u1->toUTF32(&c1, 1, status));
+            STATUS_CALL(l0 = toUChar32(*u0, &c0, status));
+            STATUS_CALL(l1 = toUChar32(*u1, &c1, status));
             if (l0 == 1 && l1 == 1)
             {
                 UBool b = self->object->containsSome(c0, c1);
@@ -1031,11 +1043,15 @@ static PyObject *t_unicodeset_clear(t_unicodeset *self)
     Py_RETURN_SELF();
 }
 
+#if U_ICU_VERSION_HEX >= 0x04020000
+
 static PyObject *t_unicodeset_removeAllStrings(t_unicodeset *self)
 {
     self->object->removeAllStrings();
     Py_RETURN_SELF();
 }
+
+#endif
 
 static PyObject *t_unicodeset_closeOver(t_unicodeset *self, PyObject *arg)
 {
@@ -1180,7 +1196,7 @@ static int _t_unicodeset_contains(t_unicodeset *self, PyObject *arg)
 
         if (u->length() == 1)
         {
-            INT_STATUS_CALL(l = u->toUTF32(&c, 1, status));
+            INT_STATUS_CALL(l = toUChar32(*u, &c, status));
             if (l == 1)
                 return self->object->contains(c);
         }
@@ -1282,7 +1298,7 @@ static PyObject *t_unicodesetiterator_isString(t_unicodesetiterator *self)
 static PyObject *t_unicodesetiterator_getCodepoint(t_unicodesetiterator *self)
 {
     UChar32 c = self->object->getCodepoint();
-    UnicodeString u = UnicodeString::fromUTF32(&c, 1);
+    UnicodeString u = fromUChar32(c);
 
     return PyUnicode_FromUnicodeString(&u);
 }
@@ -1290,7 +1306,7 @@ static PyObject *t_unicodesetiterator_getCodepoint(t_unicodesetiterator *self)
 static PyObject *t_unicodesetiterator_getCodepointEnd(t_unicodesetiterator *self)
 {
     UChar32 c = self->object->getCodepointEnd();
-    UnicodeString u = UnicodeString::fromUTF32(&c, 1);
+    UnicodeString u = fromUChar32(c);
 
     return PyUnicode_FromUnicodeString(&u);
 }

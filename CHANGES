@@ -24,6 +24,7 @@ Version 0.9 ->
   - added some missing Collator and RuleBasedCollator methods
   - refreshed README
   - fixed bugs with UnicodeString-converted text arg ownership in iterators
+  - added missing conditionals for features in ICU versions >= 4.0
   - 
 
 Version 0.8 -> 0.9

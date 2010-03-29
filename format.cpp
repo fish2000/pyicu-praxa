@@ -1662,6 +1662,8 @@ void _init_format(PyObject *m)
 
     INSTALL_STATIC_INT(FieldPosition, DONT_CARE);
 
+#if U_ICU_VERSION_HEX >= 0x04020000
     INSTALL_STATIC_INT(TimeUnitFormat, kFull);
     INSTALL_STATIC_INT(TimeUnitFormat, kAbbreviate);
+#endif
 }

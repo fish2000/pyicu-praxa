@@ -211,6 +211,9 @@ int _parseArgs(PyObject **args, int count, char *types, ...);
 #endif
 
 int isUnicodeString(PyObject *arg);
+int32_t toUChar32(UnicodeString& u, UChar32 *c, UErrorCode& status);
+UnicodeString fromUChar32(UChar32 c);
+
 int isInstance(PyObject *arg, UClassID id, PyTypeObject *type);
 void registerType(PyTypeObject *type, UClassID id);
 

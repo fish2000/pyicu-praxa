@@ -395,7 +395,7 @@ static PyObject *t_transliterator_transliterate(t_transliterator *self,
         if (!parseArgs(args, "UOS", &u0,
                        &UTransPositionType, &utransposition, &u1, &_u1))
         {
-            STATUS_CALL(len = u1->toUTF32(&c, 1, status));
+            STATUS_CALL(len = toUChar32(*u1, &c, status));
             if (len == 1)
             {
                 STATUS_PYTHON_CALL(self->object->transliterate(*u0, *utransposition->object, c, status));
@@ -409,7 +409,7 @@ static PyObject *t_transliterator_transliterate(t_transliterator *self,
         if (!parseArgs(args, "sOS", &_u0,
                        &UTransPositionType, &utransposition, &u1, &_u1))
         {
-            STATUS_CALL(len = u1->toUTF32(&c, 1, status));
+            STATUS_CALL(len = toUChar32(*u1, &c, status));
             if (len == 1)
             {
                 STATUS_PYTHON_CALL(self->object->transliterate(_u0, *utransposition->object, c, status));

@@ -67,7 +67,9 @@ class t_regexmatcher : public _wrapper {
 public:
     RegexMatcher *object;
     UnicodeString *input;
+#if U_ICU_VERSION_HEX >= 0x04000000
     PyObject *callable;
+#endif
 };
 
 static int t_regexmatcher_init(t_regexmatcher *self,
@@ -81,8 +83,8 @@ static PyObject *t_regexmatcher_groupCount(t_regexmatcher *self);
 static PyObject *t_regexmatcher_start(t_regexmatcher *self, PyObject *args);
 static PyObject *t_regexmatcher_end(t_regexmatcher *self, PyObject *args);
 static PyObject *t_regexmatcher_reset(t_regexmatcher *self, PyObject *args);
-static PyObject *t_regexmatcher_resetPreserveRegion(t_regexmatcher *self);
 static PyObject *t_regexmatcher_input(t_regexmatcher *self);
+#if U_ICU_VERSION_HEX >= 0x04000000
 static PyObject *t_regexmatcher_region(t_regexmatcher *self, PyObject *args);
 static PyObject *t_regexmatcher_regionStart(t_regexmatcher *self);
 static PyObject *t_regexmatcher_regionEnd(t_regexmatcher *self);
@@ -94,6 +96,7 @@ static PyObject *t_regexmatcher_useAnchoringBounds(t_regexmatcher *self,
                                                    PyObject *arg);
 static PyObject *t_regexmatcher_hitEnd(t_regexmatcher *self);
 static PyObject *t_regexmatcher_requireEnd(t_regexmatcher *self);
+#endif
 static PyObject *t_regexmatcher_replaceAll(t_regexmatcher *self, PyObject *arg);
 static PyObject *t_regexmatcher_replaceFirst(t_regexmatcher *self,
                                              PyObject *arg);
@@ -101,6 +104,7 @@ static PyObject *t_regexmatcher_appendReplacement(t_regexmatcher *self,
                                                   PyObject *args);
 static PyObject *t_regexmatcher_appendTail(t_regexmatcher *self, PyObject *arg);
 static PyObject *t_regexmatcher_split(t_regexmatcher *self, PyObject *args);
+#if U_ICU_VERSION_HEX >= 0x04000000
 static PyObject *t_regexmatcher_setTimeLimit(t_regexmatcher *self,
                                              PyObject *arg);
 static PyObject *t_regexmatcher_getTimeLimit(t_regexmatcher *self);
@@ -110,6 +114,7 @@ static PyObject *t_regexmatcher_getStackLimit(t_regexmatcher *self);
 static PyObject *t_regexmatcher_setMatchCallback(t_regexmatcher *self,
                                                  PyObject *arg);
 static PyObject *t_regexmatcher_getMatchCallback(t_regexmatcher *self);
+#endif
 
 static PyMethodDef t_regexmatcher_methods[] = {
     DECLARE_METHOD(t_regexmatcher, matches, METH_VARARGS),
@@ -121,8 +126,8 @@ static PyMethodDef t_regexmatcher_methods[] = {
     DECLARE_METHOD(t_regexmatcher, start, METH_VARARGS),
     DECLARE_METHOD(t_regexmatcher, end, METH_VARARGS),
     DECLARE_METHOD(t_regexmatcher, reset, METH_VARARGS),
-    DECLARE_METHOD(t_regexmatcher, resetPreserveRegion, METH_NOARGS),
     DECLARE_METHOD(t_regexmatcher, input, METH_NOARGS),
+#if U_ICU_VERSION_HEX >= 0x04000000
     DECLARE_METHOD(t_regexmatcher, region, METH_VARARGS),
     DECLARE_METHOD(t_regexmatcher, regionStart, METH_NOARGS),
     DECLARE_METHOD(t_regexmatcher, regionEnd, METH_NOARGS),
@@ -132,17 +137,20 @@ static PyMethodDef t_regexmatcher_methods[] = {
     DECLARE_METHOD(t_regexmatcher, useAnchoringBounds, METH_O),
     DECLARE_METHOD(t_regexmatcher, hitEnd, METH_NOARGS),
     DECLARE_METHOD(t_regexmatcher, requireEnd, METH_NOARGS),
+#endif
     DECLARE_METHOD(t_regexmatcher, replaceAll, METH_O),
     DECLARE_METHOD(t_regexmatcher, replaceFirst, METH_O),
     DECLARE_METHOD(t_regexmatcher, appendReplacement, METH_VARARGS),
     DECLARE_METHOD(t_regexmatcher, appendTail, METH_O),
     DECLARE_METHOD(t_regexmatcher, split, METH_VARARGS),
+#if U_ICU_VERSION_HEX >= 0x04000000
     DECLARE_METHOD(t_regexmatcher, setTimeLimit, METH_O),
     DECLARE_METHOD(t_regexmatcher, getTimeLimit, METH_NOARGS),
     DECLARE_METHOD(t_regexmatcher, setStackLimit, METH_O),
     DECLARE_METHOD(t_regexmatcher, getStackLimit, METH_NOARGS),
     DECLARE_METHOD(t_regexmatcher, setMatchCallback, METH_O),
     DECLARE_METHOD(t_regexmatcher, getMatchCallback, METH_NOARGS),
+#endif
     { NULL, NULL, 0, NULL }
 };
 
@@ -561,17 +569,13 @@ static PyObject *t_regexmatcher_reset(t_regexmatcher *self, PyObject *args)
     return PyErr_SetArgsError((PyObject *) self, "reset", args);
 }
 
-static PyObject *t_regexmatcher_resetPreserveRegion(t_regexmatcher *self)
-{
-    self->object->resetPreserveRegion();
-    Py_RETURN_NONE;
-}
-
 static PyObject *t_regexmatcher_input(t_regexmatcher *self)
 {
     UnicodeString u = self->object->input();
     return PyUnicode_FromUnicodeString(&u);
 }
+
+#if U_ICU_VERSION_HEX >= 0x04000000
 
 static PyObject *t_regexmatcher_region(t_regexmatcher *self, PyObject *args)
 {
@@ -649,6 +653,8 @@ static PyObject *t_regexmatcher_requireEnd(t_regexmatcher *self)
     UBool b = self->object->requireEnd();
     Py_RETURN_BOOL(b);
 }
+
+#endif
 
 static PyObject *t_regexmatcher_replaceAll(t_regexmatcher *self, PyObject *arg)
 {
@@ -757,6 +763,8 @@ static PyObject *t_regexmatcher_split(t_regexmatcher *self, PyObject *args)
     return PyErr_SetArgsError((PyObject *) self, "split", args);
 }
 
+#if U_ICU_VERSION_HEX >= 0x04000000
+
 static PyObject *t_regexmatcher_setTimeLimit(t_regexmatcher *self,
                                              PyObject *arg)
 {
@@ -847,12 +855,15 @@ static PyObject *t_regexmatcher_getMatchCallback(t_regexmatcher *self)
     Py_RETURN_NONE;
 }
 
+#endif
 
 static PyObject *t_regexmatcher_str(t_regexmatcher *self)
 {
     UnicodeString u = self->object->pattern().pattern();
     return PyUnicode_FromUnicodeString(&u);
 }
+
+#if U_ICU_VERSION_HEX >= 0x04000000
 
 static void t_regexmatcher_dealloc(t_regexmatcher *self)
 {
@@ -879,16 +890,19 @@ static int t_regexmatcher_clear(t_regexmatcher *self)
     return 0;
 }
 
+#endif
 
 void _init_regex(PyObject *m)
 {
     RegexPatternType.tp_str = (reprfunc) t_regexpattern_str;
     RegexPatternType.tp_richcompare = (richcmpfunc) t_regexpattern_richcmp;
 
+#if U_ICU_VERSION_HEX >= 0x04000000
     RegexMatcherType.tp_dealloc = (destructor) t_regexmatcher_dealloc;
     RegexMatcherType.tp_traverse = (traverseproc) t_regexmatcher_traverse;
     RegexMatcherType.tp_clear = (inquiry) t_regexmatcher_clear;
     RegexMatcherType.tp_flags |= Py_TPFLAGS_HAVE_GC;
+#endif
     RegexMatcherType.tp_str = (reprfunc) t_regexmatcher_str;
 
     INSTALL_CONSTANTS_TYPE(URegexpFlag, m);
@@ -900,9 +914,11 @@ void _init_regex(PyObject *m)
     INSTALL_ENUM(URegexpFlag, UREGEX_CASE_INSENSITIVE);
     INSTALL_ENUM(URegexpFlag, UREGEX_COMMENTS);
     INSTALL_ENUM(URegexpFlag, UREGEX_DOTALL);
-    INSTALL_ENUM(URegexpFlag, UREGEX_LITERAL);
     INSTALL_ENUM(URegexpFlag, UREGEX_MULTILINE);
-    INSTALL_ENUM(URegexpFlag, UREGEX_UNIX_LINES);
     INSTALL_ENUM(URegexpFlag, UREGEX_UWORD);
+#if U_ICU_VERSION_HEX >= 0x04000000
+    INSTALL_ENUM(URegexpFlag, UREGEX_LITERAL);
+    INSTALL_ENUM(URegexpFlag, UREGEX_UNIX_LINES);
     INSTALL_ENUM(URegexpFlag, UREGEX_ERROR_ON_UNKNOWN_ESCAPES);
+#endif
 }
