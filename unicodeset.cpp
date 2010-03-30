@@ -260,8 +260,7 @@ static PyObject *t_unicodefunctor_toMatcher(t_unicodefunctor *self)
 static PyObject *t_unicodematcher_matches(t_unicodematcher *self,
                                           PyObject *args)
 {
-    UnicodeString *u;
-    UnicodeString _u;
+    UnicodeString *u, _u;
     int32_t offset, limit, incremental;
 
     if (!parseArgs(args, "SiiB", &u, &_u, &offset, &limit, &incremental))
@@ -1181,6 +1180,12 @@ static PyObject *t_unicodeset_richcmp(t_unicodeset *self, PyObject *arg, int op)
     return PyErr_SetArgsError((PyObject *) self, "__richcmp__", arg);
 }
 
+static PyObject *t_unicodeset_iter(t_unicodeset *self)
+{
+    return PyObject_CallFunctionObjArgs((PyObject *) &UnicodeSetIteratorType,
+                                        (PyObject *) self, NULL);
+}
+
 static int t_unicodeset_hash(t_unicodeset *self)
 {
     return self->object->hashCode();
@@ -1259,11 +1264,10 @@ static int t_unicodesetiterator_init(t_unicodesetiterator *self,
         self->flags = T_OWNED;
         break;
       case 1:
-        if (!parseArgs(args, "P", TYPE_CLASSID(UnicodeSet), &set))
+        if (!parseArgs(args, "p", TYPE_CLASSID(UnicodeSet), &set, &self->set))
         {
             self->object = new UnicodeSetIterator(*set);
             self->flags = T_OWNED;
-            self->set = PyTuple_GetItem(args, 0); Py_INCREF(self->set);
             break;
         }
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
@@ -1366,6 +1370,7 @@ void _init_unicodeset(PyObject *m)
     UnicodeSetType.tp_str = (reprfunc) t_unicodeset_str;
     UnicodeSetType.tp_richcompare = (richcmpfunc) t_unicodeset_richcmp;
     UnicodeSetType.tp_hash = (hashfunc) t_unicodeset_hash;
+    UnicodeSetType.tp_iter = (getiterfunc) t_unicodeset_iter;
     UnicodeSetType.tp_as_sequence = &t_unicodeset_as_sequence;
     UnicodeSetIteratorType.tp_iter =
         (getiterfunc) t_unicodesetiterator_iter;
