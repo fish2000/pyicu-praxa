@@ -510,12 +510,12 @@ static void t_stringsearch_dealloc(t_stringsearch *self)
             delete self->object;
             
         self->object = NULL;
-
-        Py_XDECREF(self->text); self->text = NULL;
-        Py_XDECREF(self->iterator); self->iterator = NULL;
-        Py_XDECREF(self->pattern); self->pattern = NULL;
-        Py_XDECREF(self->collator); self->collator = NULL;
     }
+     
+    Py_XDECREF(self->text); self->text = NULL;
+    Py_XDECREF(self->iterator); self->iterator = NULL;
+    Py_XDECREF(self->pattern); self->pattern = NULL;
+    Py_XDECREF(self->collator); self->collator = NULL;
 
     self->ob_type->tp_free((PyObject *) self);
 }
