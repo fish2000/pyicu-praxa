@@ -40,6 +40,7 @@ DECLARE_CONSTANTS_TYPE(USearchAttributeValue);
 class t_searchiterator : public _wrapper {
 public:
     SearchIterator *object;
+    PyObject *text;
     PyObject *iterator;
 };
 
@@ -57,7 +58,8 @@ static PyObject *t_searchiterator_getMatchedText(t_searchiterator *self,
 static PyObject *t_searchiterator_getBreakIterator(t_searchiterator *self);
 static PyObject *t_searchiterator_setBreakIterator(t_searchiterator *self,
                                                    PyObject *arg);
-static PyObject *t_searchiterator_getText(t_searchiterator *self);
+static PyObject *t_searchiterator_getText(t_searchiterator *self,
+                                          PyObject *args);
 static PyObject *t_searchiterator_setText(t_searchiterator *self,
                                           PyObject *arg);
 static PyObject *t_searchiterator_first(t_searchiterator *self);
@@ -79,7 +81,7 @@ static PyMethodDef t_searchiterator_methods[] = {
     DECLARE_METHOD(t_searchiterator, getMatchedText, METH_VARARGS),
     DECLARE_METHOD(t_searchiterator, getBreakIterator, METH_NOARGS),
     DECLARE_METHOD(t_searchiterator, setBreakIterator, METH_O),
-    DECLARE_METHOD(t_searchiterator, getText, METH_NOARGS),
+    DECLARE_METHOD(t_searchiterator, getText, METH_VARARGS),
     DECLARE_METHOD(t_searchiterator, setText, METH_O),
     DECLARE_METHOD(t_searchiterator, first, METH_NOARGS),
     DECLARE_METHOD(t_searchiterator, last, METH_NOARGS),
@@ -98,7 +100,9 @@ DECLARE_TYPE(SearchIterator, t_searchiterator, UObject, SearchIterator,
 class t_stringsearch : public _wrapper {
 public:
     StringSearch *object;
+    PyObject *text;
     PyObject *iterator;
+    PyObject *pattern;
     PyObject *collator;
 };
 
@@ -107,14 +111,15 @@ static int t_stringsearch_init(t_stringsearch *self,
 static PyObject *t_stringsearch_getCollator(t_stringsearch *self);
 static PyObject *t_stringsearch_setCollator(t_stringsearch *self,
                                             PyObject *arg);
-static PyObject *t_stringsearch_getPattern(t_stringsearch *self);
+static PyObject *t_stringsearch_getPattern(t_stringsearch *self,
+                                           PyObject *args);
 static PyObject *t_stringsearch_setPattern(t_stringsearch *self, PyObject *arg);
 
 static PyMethodDef t_stringsearch_methods[] = {
     DECLARE_METHOD(t_stringsearch, getCollator, METH_NOARGS),
     DECLARE_METHOD(t_stringsearch, setCollator, METH_O),
     DECLARE_METHOD(t_stringsearch, getPattern, METH_NOARGS),
-    DECLARE_METHOD(t_stringsearch, setPattern, METH_O),
+    DECLARE_METHOD(t_stringsearch, setPattern, METH_VARARGS),
     { NULL, NULL, 0, NULL }
 };
 
@@ -133,6 +138,7 @@ static void t_searchiterator_dealloc(t_searchiterator *self)
             
         self->object = NULL;
 
+        Py_XDECREF(self->text); self->text = NULL;
         Py_XDECREF(self->iterator); self->iterator = NULL;
     }
 
@@ -243,33 +249,51 @@ static PyObject *t_searchiterator_setBreakIterator(t_searchiterator *self,
         Py_XDECREF(self->iterator); self->iterator = NULL;
         Py_RETURN_NONE;
     }
-    if (!parseArg(arg, "P", TYPE_ID(BreakIterator), &iterator))
+    if (!parseArg(arg, "p", TYPE_ID(BreakIterator), &iterator, &self->iterator))
     {
         STATUS_CALL(self->object->setBreakIterator(iterator, status));
-        Py_INCREF(arg); Py_XDECREF(self->iterator); self->iterator = arg;
         Py_RETURN_NONE;
     }
 
     return PyErr_SetArgsError((PyObject *) self, "setBreakIterator", arg);
 }
 
-static PyObject *t_searchiterator_getText(t_searchiterator *self)
+static PyObject *t_searchiterator_getText(t_searchiterator *self,
+                                          PyObject *args)
 {
-    UnicodeString u = self->object->getText();
-    return PyUnicode_FromUnicodeString(&u);
+    switch (PyTuple_Size(args)) {
+      case 0:
+      {
+          UnicodeString u = self->object->getText();
+          return PyUnicode_FromUnicodeString(&u);
+      }
+      case 1:
+      {
+          UnicodeString *u;
+          if (!parseArgs(args, "U", &u))
+          {
+              u->setTo(self->object->getText());
+              Py_RETURN_ARG(args, 0);
+          }
+          break;
+      }
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "getText", args);
 }
 
 static PyObject *t_searchiterator_setText(t_searchiterator *self, PyObject *arg)
 {
-    UnicodeString *u, _u;
+    UnicodeString *u;
     CharacterIterator *chars;
 
-    if (!parseArg(arg, "S", &u, &_u))
+    if (!parseArg(arg, "W", &u, &self->text))
     {
         STATUS_CALL(self->object->setText(*u, status));
         Py_RETURN_NONE;
     }
-    else if (!parseArg(arg, "P", TYPE_ID(CharacterIterator), &chars))
+    else if (!parseArg(arg, "p", TYPE_ID(CharacterIterator),
+                       &chars, &self->text))
     {
         STATUS_CALL(self->object->setText(*chars, status));
         Py_RETURN_NONE;
@@ -362,8 +386,7 @@ static PyObject *t_searchiterator_iter_next(t_searchiterator *self)
 static int t_stringsearch_init(t_stringsearch *self,
                                PyObject *args, PyObject *kwds)
 {
-    UnicodeString *u0, _u0;
-    UnicodeString *u1, _u1;
+    UnicodeString *u0, *u1;
     Locale *locale;
     BreakIterator *iterator;
     RuleBasedCollator *collator;
@@ -371,114 +394,99 @@ static int t_stringsearch_init(t_stringsearch *self,
 
     switch (PyTuple_Size(args)) {
       case 3:
-        if (!parseArgs(args, "SSP",
+        if (!parseArgs(args, "WWP",
                        TYPE_CLASSID(Locale),
-                       &u0, &_u0, &u1, &_u1, &locale))
+                       &u0, &self->pattern, &u1, &self->text, &locale))
         {
             INT_STATUS_CALL(self->object = new StringSearch(*u0, *u1, *locale,
                                                             NULL, status));
             self->flags = T_OWNED;
-            self->collator = NULL;
-            self->iterator = NULL;
             break;
         }
-        if (!parseArgs(args, "SSP",
+        if (!parseArgs(args, "WWp",
                        TYPE_CLASSID(RuleBasedCollator),
-                       &u0, &_u0, &u1, &_u1, &collator))
+                       &u0, &self->pattern, &self->text,
+                       &collator, &self->collator))
         {
             INT_STATUS_CALL(self->object = new StringSearch(*u0, *u1, collator,
                                                             NULL, status));
             self->flags = T_OWNED;
-            self->collator = PyTuple_GetItem(args, 2);
-            Py_INCREF(self->collator);
-            self->iterator = NULL;
             break;
         }
-        if (!parseArgs(args, "SPP",
+        if (!parseArgs(args, "WpP",
                        TYPE_ID(CharacterIterator),
                        TYPE_CLASSID(Locale),
-                       &u0, &_u0, &chars, &locale))
+                       &u0, &self->pattern, &chars, &self->text, &locale))
         {
             INT_STATUS_CALL(self->object =
                             new StringSearch(*u0, *chars, *locale,
                                              NULL, status));
             self->flags = T_OWNED;
-            self->collator = NULL;
-            self->iterator = NULL;
             break;
         }
-        if (!parseArgs(args, "SPP",
+        if (!parseArgs(args, "Wpp",
                        TYPE_ID(CharacterIterator),
                        TYPE_CLASSID(RuleBasedCollator),
-                       &u0, &_u0, &chars, &collator))
+                       &u0, &self->pattern, &chars, &self->text,
+                       &collator, &self->collator))
         {
             INT_STATUS_CALL(self->object =
                             new StringSearch(*u0, *chars, collator,
                                              NULL, status));
             self->flags = T_OWNED;
-            self->collator = PyTuple_GetItem(args, 2);
-            Py_INCREF(self->collator);
-            self->iterator = NULL;
             break;
         }
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 4:
-        if (!parseArgs(args, "SSPP",
+        if (!parseArgs(args, "WWPp",
                        TYPE_CLASSID(Locale),
                        TYPE_ID(BreakIterator),
-                       &u0, &_u0, &u1, &_u1, &locale, &iterator))
+                       &u0, &self->pattern, &u1, &self->text,
+                       &locale, &iterator, &self->iterator))
         {
             INT_STATUS_CALL(self->object = new StringSearch(*u0, *u1, *locale,
                                                             iterator, status));
             self->flags = T_OWNED;
-            self->iterator = PyTuple_GetItem(args, 3);
-            Py_INCREF(self->iterator);
             break;
         }
-        if (!parseArgs(args, "SSPP",
+        if (!parseArgs(args, "WWpp",
                        TYPE_CLASSID(RuleBasedCollator),
                        TYPE_ID(BreakIterator),
-                       &u0, &_u0, &u1, &_u1, &collator, &iterator))
+                       &u0, &self->pattern, &u1, &self->text,
+                       &collator, &self->collator,
+                       &iterator, &self->iterator))
         {
             INT_STATUS_CALL(self->object = new StringSearch(*u0, *u1, collator,
                                                             NULL, status));
             self->flags = T_OWNED;
-            self->collator = PyTuple_GetItem(args, 2);
-            Py_INCREF(self->collator);
-            self->iterator = PyTuple_GetItem(args, 3);
-            Py_INCREF(self->iterator);
             break;
         }
-        if (!parseArgs(args, "SPPP",
+        if (!parseArgs(args, "WpPp",
                        TYPE_ID(CharacterIterator),
                        TYPE_CLASSID(Locale),
                        TYPE_ID(BreakIterator),
-                       &u0, &_u0, &chars, &locale, &iterator))
+                       &u0, &self->pattern, &chars, &self->text, &locale,
+                       &iterator, &self->iterator))
         {
             INT_STATUS_CALL(self->object =
                             new StringSearch(*u0, *chars, *locale,
                                              iterator, status));
             self->flags = T_OWNED;
-            self->collator = NULL;
-            self->iterator = PyTuple_GetItem(args, 3);
-            Py_INCREF(self->iterator);
             break;
         }
-        if (!parseArgs(args, "SPPP",
+        if (!parseArgs(args, "Wppp",
                        TYPE_ID(CharacterIterator),
                        TYPE_CLASSID(RuleBasedCollator),
                        TYPE_ID(BreakIterator),
-                       &u0, &_u0, &chars, &collator, &iterator))
+                       &u0, &self->pattern, &chars, &self->text,
+                       &collator, &self->collator,
+                       &iterator, &self->iterator))
         {
             INT_STATUS_CALL(self->object =
                             new StringSearch(*u0, *chars, collator,
                                              iterator, status));
             self->flags = T_OWNED;
-            self->collator = PyTuple_GetItem(args, 2);
-            Py_INCREF(self->collator);
-            self->iterator = PyTuple_GetItem(args, 3);
-            Py_INCREF(self->iterator);
             break;
         }
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
@@ -503,7 +511,9 @@ static void t_stringsearch_dealloc(t_stringsearch *self)
             
         self->object = NULL;
 
+        Py_XDECREF(self->text); self->text = NULL;
         Py_XDECREF(self->iterator); self->iterator = NULL;
+        Py_XDECREF(self->pattern); self->pattern = NULL;
         Py_XDECREF(self->collator); self->collator = NULL;
     }
 
@@ -526,9 +536,9 @@ static PyObject *t_stringsearch_setCollator(t_stringsearch *self,
 {
     RuleBasedCollator *collator;
 
-    if (!parseArg(arg, "P", TYPE_CLASSID(RuleBasedCollator), &collator))
+    if (!parseArg(arg, "p", TYPE_CLASSID(RuleBasedCollator),
+                  &collator, &self->collator))
     {
-        Py_INCREF(arg); Py_XDECREF(self->collator); self->collator = arg;
         STATUS_CALL(self->object->setCollator(collator, status));
         Py_RETURN_NONE;
     }
@@ -536,17 +546,34 @@ static PyObject *t_stringsearch_setCollator(t_stringsearch *self,
     return PyErr_SetArgsError((PyObject *) self, "setCollator", arg);
 }
 
-static PyObject *t_stringsearch_getPattern(t_stringsearch *self)
+static PyObject *t_stringsearch_getPattern(t_stringsearch *self, PyObject *args)
 {
-    UnicodeString u = self->object->getPattern();
-    return PyUnicode_FromUnicodeString(&u);
+    switch (PyTuple_Size(args)) {
+      case 0:
+      {
+          UnicodeString u = self->object->getPattern();
+          return PyUnicode_FromUnicodeString(&u);
+      }
+      case 1:
+      {
+          UnicodeString *u;
+          if (!parseArgs(args, "U", &u))
+          {
+              *u = self->object->getPattern();
+              Py_RETURN_ARG(args, 0);
+          }
+          break;
+      }
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "getPattern", args);
 }
 
 static PyObject *t_stringsearch_setPattern(t_stringsearch *self, PyObject *arg)
 {
-    UnicodeString *u, _u;
+    UnicodeString *u;
 
-    if (!parseArg(arg, "S", &u, &_u))
+    if (!parseArg(arg, "W", &u, &self->pattern))
     {
         STATUS_CALL(self->object->setPattern(*u, status));
         Py_RETURN_NONE;

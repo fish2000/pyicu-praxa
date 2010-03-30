@@ -560,21 +560,12 @@ static int t_ucharcharacteriterator_init(t_ucharcharacteriterator *self,
                                          PyObject *args, PyObject *kwds)
 {
     UnicodeString *u;
-    PyObject *arg;
     int len, start, end, pos;
 
     switch (PyTuple_Size(args)) {
       case 2:
-        if (!parseArgs(args, "Vi", &u, &arg, &len))
+        if (!parseArgs(args, "Wi", &u, &self->text, &len))
         {
-            Py_INCREF(arg); self->text = arg;
-            self->object = new UCharCharacterIterator(u->getTerminatedBuffer(), len);
-            self->flags = T_OWNED;
-            break;
-        }
-        if (!parseArgs(args, "ui", &u, &len))
-        {
-            self->text = wrap_UnicodeString(u, T_OWNED);
             self->object = new UCharCharacterIterator(u->getTerminatedBuffer(), len);
             self->flags = T_OWNED;
             break;
@@ -582,16 +573,8 @@ static int t_ucharcharacteriterator_init(t_ucharcharacteriterator *self,
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 3:
-        if (!parseArgs(args, "Vii", &u, &arg, &len, &pos))
+        if (!parseArgs(args, "Wii", &u, &self->text, &len, &pos))
         {
-            Py_INCREF(arg); self->text = arg;
-            self->object = new UCharCharacterIterator(u->getTerminatedBuffer(), len, pos);
-            self->flags = T_OWNED;
-            break;
-        }
-        if (!parseArgs(args, "uii", &u, &len, &pos))
-        {
-            self->text = wrap_UnicodeString(u, T_OWNED);
             self->object = new UCharCharacterIterator(u->getTerminatedBuffer(), len, pos);
             self->flags = T_OWNED;
             break;
@@ -599,16 +582,8 @@ static int t_ucharcharacteriterator_init(t_ucharcharacteriterator *self,
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 5:
-        if (!parseArgs(args, "Viiii", &u, &arg, &len, &start, &end, &pos))
+        if (!parseArgs(args, "Wiiii", &u, &self->text, &len, &start, &end, &pos))
         {
-            Py_INCREF(arg); self->text = arg;
-            self->object = new UCharCharacterIterator(u->getTerminatedBuffer(), len, start, end, pos);
-            self->flags = T_OWNED;
-            break;
-        }
-        if (!parseArgs(args, "uiiii", &u, &len, &start, &end, &pos))
-        {
-            self->text = wrap_UnicodeString(u, T_OWNED);
             self->object = new UCharCharacterIterator(u->getTerminatedBuffer(), len, start, end, pos);
             self->flags = T_OWNED;
             break;
@@ -643,18 +618,10 @@ static void t_ucharcharacteriterator_dealloc(t_ucharcharacteriterator *self)
 static PyObject *t_ucharcharacteriterator_setText(t_ucharcharacteriterator *self, PyObject *args)
 {
     UnicodeString *u;
-    PyObject *arg;
     int32_t length;
 
-    if (!parseArgs(args, "Vi", &u, &arg, &length))
+    if (!parseArgs(args, "Wi", &u, &self->text, &length))
     {
-        Py_INCREF(arg); Py_XDECREF(self->text); self->text = arg;
-        self->object->setText(u->getTerminatedBuffer(), length);
-        Py_RETURN_NONE;
-    }
-    else if (!parseArgs(args, "ui", &u, &length))
-    {
-        Py_XDECREF(self->text); self->text = wrap_UnicodeString(u, T_OWNED);
         self->object->setText(u->getTerminatedBuffer(), length);
         Py_RETURN_NONE;
     }
@@ -669,21 +636,12 @@ static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
                                           PyObject *args, PyObject *kwds)
 {
     UnicodeString *u;
-    PyObject *arg;
     int start, end, pos;
 
     switch (PyTuple_Size(args)) {
       case 1:
-        if (!parseArgs(args, "V", &u, &arg))
+        if (!parseArgs(args, "W", &u, &self->text))
         {
-            Py_INCREF(arg); self->text = arg;
-            self->object = new StringCharacterIterator(*u);
-            self->flags = T_OWNED;
-            break;
-        }
-        if (!parseArgs(args, "u", &u))
-        {
-            self->text = wrap_UnicodeString(u, T_OWNED);
             self->object = new StringCharacterIterator(*u);
             self->flags = T_OWNED;
             break;
@@ -691,16 +649,8 @@ static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 2:
-        if (!parseArgs(args, "Vi", &u, &arg, &pos))
+        if (!parseArgs(args, "Wi", &u, &self->text, &pos))
         {
-            Py_INCREF(arg); self->text = arg;
-            self->object = new StringCharacterIterator(*u, pos);
-            self->flags = T_OWNED;
-            break;
-        }
-        if (!parseArgs(args, "ui", &u, &pos))
-        {
-            self->text = wrap_UnicodeString(u, T_OWNED);
             self->object = new StringCharacterIterator(*u, pos);
             self->flags = T_OWNED;
             break;
@@ -708,16 +658,8 @@ static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 4:
-        if (!parseArgs(args, "Viii", &u, &arg, &start, &end, &pos))
+        if (!parseArgs(args, "Wiii", &u, &self->text, &start, &end, &pos))
         {
-            Py_INCREF(arg); self->text = arg;
-            self->object = new StringCharacterIterator(*u, start, end, pos);
-            self->flags = T_OWNED;
-            break;
-        }
-        if (!parseArgs(args, "uiii", &u, &start, &end, &pos))
-        {
-            self->text = wrap_UnicodeString(u, T_OWNED);
             self->object = new StringCharacterIterator(*u, start, end, pos);
             self->flags = T_OWNED;
             break;
@@ -738,17 +680,9 @@ static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
 static PyObject *t_stringcharacteriterator_setText(t_stringcharacteriterator *self, PyObject *args)
 {
     UnicodeString *u;
-    PyObject *arg;
 
-    if (!parseArgs(args, "V", &u, &arg))
+    if (!parseArgs(args, "W", &u, &self->text))
     {
-        Py_INCREF(arg); Py_XDECREF(self->text); self->text = arg;
-        self->object->setText(*u);
-        Py_RETURN_NONE;
-    }
-    else if (!parseArgs(args, "u", &u))
-    {
-        Py_XDECREF(self->text); self->text = wrap_UnicodeString(u, T_OWNED);
         self->object->setText(*u);
         Py_RETURN_NONE;
     }
@@ -783,15 +717,8 @@ static PyObject *t_breakiterator_setText(t_breakiterator *self, PyObject *arg)
 {
     UnicodeString *u;
 
-    if (!parseArg(arg, "U", &u))
+    if (!parseArg(arg, "W", &u, &self->text))
     {
-        Py_INCREF(arg); Py_XDECREF(self->text); self->text = arg;
-        self->object->setText(*u);
-        Py_RETURN_NONE;
-    }
-    else if (!parseArg(arg, "u", &u))
-    {
-        Py_XDECREF(self->text); self->text = wrap_UnicodeString(u, T_OWNED);
         self->object->setText(*u);
         Py_RETURN_NONE;
     }
@@ -1111,7 +1038,6 @@ static int t_rulebasedbreakiterator_init(t_rulebasedbreakiterator *self,
                                          PyObject *args, PyObject *kwds)
 {
     UnicodeString *u;
-    PyObject *arg;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1119,22 +1045,11 @@ static int t_rulebasedbreakiterator_init(t_rulebasedbreakiterator *self,
         self->flags = T_OWNED;
         break;
       case 1:
-        if (!parseArgs(args, "V", &u, &arg))
+        if (!parseArgs(args, "W", &u, &self->text))
         {
             RuleBasedBreakIterator *iterator;
 
             INT_STATUS_PARSER_CALL(iterator = new RuleBasedBreakIterator(*u, parseError, status));
-            Py_INCREF(arg); self->text = arg;
-            self->object = iterator;
-            self->flags = T_OWNED;
-            break;
-        }
-        if (!parseArgs(args, "u", &u))
-        {
-            RuleBasedBreakIterator *iterator;
-
-            INT_STATUS_PARSER_CALL(iterator = new RuleBasedBreakIterator(*u, parseError, status));
-            self->text = wrap_UnicodeString(u, T_OWNED);
             self->object = iterator;
             self->flags = T_OWNED;
             break;
@@ -1154,20 +1069,22 @@ static int t_rulebasedbreakiterator_init(t_rulebasedbreakiterator *self,
 
 static PyObject *t_rulebasedbreakiterator_getRules(t_rulebasedbreakiterator *self, PyObject *args)
 {
-    UnicodeString *u;
-    UnicodeString _u;
-
     switch (PyTuple_Size(args)) {
       case 0:
-        _u = self->object->getRules();
-        return PyUnicode_FromUnicodeString(&_u);
+      {
+          UnicodeString u = self->object->getRules();
+          return PyUnicode_FromUnicodeString(&u);
+      }
       case 1:
-        if (!parseArgs(args, "U", &u))
-        {
-            u->setTo(self->object->getRules());
-            Py_RETURN_ARG(args, 0);
-        }
-        break;
+      {
+          UnicodeString *u;
+          if (!parseArgs(args, "U", &u))
+          {
+              u->setTo(self->object->getRules());
+              Py_RETURN_ARG(args, 0);
+          }
+          break;
+      }
     }
 
     return PyErr_SetArgsError((PyObject *) self, "getRules", args);
@@ -1350,16 +1267,9 @@ static PyObject *t_collationelementiterator_setText(t_collationelementiterator *
 {
     UnicodeString *u;
 
-    if (!parseArg(arg, "U", &u))
+    if (!parseArg(arg, "W", &u, &self->text))
     {
         STATUS_CALL(self->object->setText(*u, status));
-        Py_INCREF(arg); Py_XDECREF(self->text); self->text = arg;
-        Py_RETURN_NONE;
-    }
-    else if (!parseArg(arg, "u", &u))
-    {
-        STATUS_CALL(self->object->setText(*u, status));
-        self->text = wrap_UnicodeString(u, T_OWNED);
         Py_RETURN_NONE;
     }
 
