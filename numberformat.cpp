@@ -62,7 +62,7 @@ static PyMethodDef t_decimalformatsymbols_methods[] = {
 };
 
 DECLARE_TYPE(DecimalFormatSymbols, t_decimalformatsymbols, UObject,
-             DecimalFormatSymbols, t_decimalformatsymbols_init);
+             DecimalFormatSymbols, t_decimalformatsymbols_init, NULL);
 
 /* NumberFormat */
 
@@ -133,7 +133,7 @@ static PyMethodDef t_numberformat_methods[] = {
 };
 
 DECLARE_TYPE(NumberFormat, t_numberformat, Format, NumberFormat,
-             abstract_init);
+             abstract_init, NULL);
 
 #if U_ICU_VERSION_HEX >= 0x04020000
 
@@ -166,7 +166,7 @@ static PyMethodDef t_currencypluralinfo_methods[] = {
 };
 
 DECLARE_TYPE(CurrencyPluralInfo, t_currencypluralinfo, UObject,
-             CurrencyPluralInfo, t_currencypluralinfo_init);
+             CurrencyPluralInfo, t_currencypluralinfo_init, NULL);
 
 #endif
 
@@ -309,7 +309,7 @@ static PyMethodDef t_decimalformat_methods[] = {
 };
 
 DECLARE_TYPE(DecimalFormat, t_decimalformat, NumberFormat, DecimalFormat,
-             t_decimalformat_init);
+             t_decimalformat_init, NULL);
 
 /* RuleBasedNumberFormat */
 
@@ -348,7 +348,7 @@ static PyMethodDef t_rulebasednumberformat_methods[] = {
 };
 
 DECLARE_TYPE(RuleBasedNumberFormat, t_rulebasednumberformat, NumberFormat,
-             RuleBasedNumberFormat, t_rulebasednumberformat_init);
+             RuleBasedNumberFormat, t_rulebasednumberformat_init, NULL);
 
 PyObject *wrap_NumberFormat(NumberFormat *format)
 {
@@ -397,7 +397,7 @@ static PyMethodDef t_choiceformat_methods[] = {
 };
 
 DECLARE_TYPE(ChoiceFormat, t_choiceformat, NumberFormat, ChoiceFormat,
-             t_choiceformat_init);
+             t_choiceformat_init, NULL);
 
 
 /* DecimalFormatSymbols */

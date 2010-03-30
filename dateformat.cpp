@@ -86,7 +86,7 @@ static PyMethodDef t_dateformatsymbols_methods[] = {
 };
 
 DECLARE_TYPE(DateFormatSymbols, t_dateformatsymbols, UObject,
-             DateFormatSymbols, t_dateformatsymbols_init);
+             DateFormatSymbols, t_dateformatsymbols_init, NULL);
 
 /* DateFormat */
 
@@ -133,7 +133,7 @@ static PyMethodDef t_dateformat_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(DateFormat, t_dateformat, Format, DateFormat, abstract_init);
+DECLARE_TYPE(DateFormat, t_dateformat, Format, DateFormat, abstract_init, NULL);
 
 /* SimpleDateFormat */
 
@@ -171,7 +171,7 @@ static PyMethodDef t_simpledateformat_methods[] = {
 };
 
 DECLARE_TYPE(SimpleDateFormat, t_simpledateformat, DateFormat,
-             SimpleDateFormat, t_simpledateformat_init);
+             SimpleDateFormat, t_simpledateformat_init, NULL);
 
 PyObject *wrap_DateFormat(DateFormat *format)
 {
@@ -202,7 +202,7 @@ static PyMethodDef t_dateinterval_methods[] = {
 };
 
 DECLARE_TYPE(DateInterval, t_dateinterval, UObject, DateInterval,
-             t_dateinterval_init);
+             t_dateinterval_init, NULL);
 
 /* DateIntervalInfo */
 
@@ -231,7 +231,7 @@ static PyMethodDef t_dateintervalinfo_methods[] = {
 };
 
 DECLARE_TYPE(DateIntervalInfo, t_dateintervalinfo, UObject, DateIntervalInfo,
-             t_dateintervalinfo_init);
+             t_dateintervalinfo_init, NULL);
 
 /* DateIntervalFormat */
 
@@ -263,7 +263,7 @@ static PyMethodDef t_dateintervalformat_methods[] = {
 };
 
 DECLARE_TYPE(DateIntervalFormat, t_dateintervalformat, Format,
-             DateIntervalFormat, abstract_init);
+             DateIntervalFormat, abstract_init, NULL);
 
 #endif
 

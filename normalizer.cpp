@@ -92,7 +92,8 @@ static PyMethodDef t_normalizer_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Normalizer, t_normalizer, UObject, Normalizer, t_normalizer_init);
+DECLARE_TYPE(Normalizer, t_normalizer, UObject, Normalizer,
+             t_normalizer_init, NULL);
 
 
 #if U_ICU_VERSION_HEX >= 0x04040000
@@ -133,7 +134,8 @@ static PyMethodDef t_normalizer2_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Normalizer2, t_normalizer2, UObject, Normalizer2, abstract_init);
+DECLARE_TYPE(Normalizer2, t_normalizer2, UObject, Normalizer2,
+             abstract_init, NULL);
 
 
 /* FilteredNormalizer2 */
@@ -141,7 +143,8 @@ DECLARE_TYPE(Normalizer2, t_normalizer2, UObject, Normalizer2, abstract_init);
 class t_filterednormalizer2 : public _wrapper {
 public:
     FilteredNormalizer2 *object;
-    UnicodeSet *filter;
+    PyObject *normalizer;
+    PyObject *filter;
 };
 
 static PyMethodDef t_filterednormalizer2_methods[] = {
@@ -151,8 +154,16 @@ static PyMethodDef t_filterednormalizer2_methods[] = {
 static int t_filterednormalizer2_init(t_filterednormalizer2 *self,
                                       PyObject *args, PyObject *kwds);
 
+static void t_filterednormalizer2_dealloc(t_filterednormalizer2 *self)
+{
+    Py_CLEAR(self->normalizer);
+    Py_CLEAR(self->filter);
+    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+}
+
 DECLARE_TYPE(FilteredNormalizer2, t_filterednormalizer2, Normalizer2,
-             FilteredNormalizer2, t_filterednormalizer2_init);
+             FilteredNormalizer2, t_filterednormalizer2_init,
+             t_filterednormalizer2_dealloc);
 
 #endif
 
@@ -684,13 +695,11 @@ static int t_filterednormalizer2_init(t_filterednormalizer2 *self,
     Normalizer2 *normalizer;
     UnicodeSet *filter;
     
-    if (!parseArgs(args, "PP",
+    if (!parseArgs(args, "pp",
                    TYPE_CLASSID(Normalizer2), TYPE_CLASSID(UnicodeSet),
-                   &normalizer, &filter))
+                   &normalizer, &self->normalizer, &filter, &self->filter))
     {
-        self->filter = new UnicodeSet(*filter);
-        self->filter->freeze();
-        self->object = new FilteredNormalizer2(*normalizer, *self->filter);
+        self->object = new FilteredNormalizer2(*normalizer, *filter);
         self->flags = T_OWNED;
 
         return 0;
@@ -700,23 +709,6 @@ static int t_filterednormalizer2_init(t_filterednormalizer2 *self,
     return -1;
 }
 
-static void t_filterednormalizer2_dealloc(t_filterednormalizer2 *self)
-{
-    if (self->object)
-    {
-        if (self->flags & T_OWNED)
-        {
-            delete self->object;
-            delete self->filter;
-        }
-            
-        self->object = NULL;
-        self->filter = NULL;
-    }
-
-    self->ob_type->tp_free((PyObject *) self);
-}
-
 #endif
 
 
@@ -724,10 +716,6 @@ void _init_normalizer(PyObject *m)
 {
     NormalizerType.tp_richcompare = (richcmpfunc) t_normalizer_richcmp;
     NormalizerType.tp_hash = (hashfunc) t_normalizer_hash;
-#if U_ICU_VERSION_HEX >= 0x04040000
-    FilteredNormalizer2Type.tp_dealloc = (destructor)
-        t_filterednormalizer2_dealloc;
-#endif
 
     REGISTER_TYPE(Normalizer, m);
 #if U_ICU_VERSION_HEX >= 0x04040000

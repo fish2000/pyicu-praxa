@@ -76,7 +76,7 @@ static PyMethodDef t_timezone_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(TimeZone, t_timezone, UObject, TimeZone, abstract_init);
+DECLARE_TYPE(TimeZone, t_timezone, UObject, TimeZone, abstract_init, NULL);
 
 /* SimpleTimeZone */
 
@@ -108,7 +108,7 @@ static PyMethodDef t_simpletimezone_methods[] = {
 };
 
 DECLARE_TYPE(SimpleTimeZone, t_simpletimezone, TimeZone, SimpleTimeZone,
-             t_simpletimezone_init);
+             t_simpletimezone_init, NULL);
 
 
 /* Calendar */
@@ -197,7 +197,7 @@ static PyMethodDef t_calendar_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Calendar, t_calendar, UObject, Calendar, abstract_init);
+DECLARE_TYPE(Calendar, t_calendar, UObject, Calendar, abstract_init, NULL);
 
 /* GregorianCalendar */
 
@@ -220,7 +220,7 @@ static PyMethodDef t_gregoriancalendar_methods[] = {
 };
 
 DECLARE_TYPE(GregorianCalendar, t_gregoriancalendar, Calendar,
-             GregorianCalendar, t_gregoriancalendar_init);
+             GregorianCalendar, t_gregoriancalendar_init, NULL);
 
 
 /* TimeZone */

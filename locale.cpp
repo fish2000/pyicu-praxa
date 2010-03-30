@@ -132,7 +132,7 @@ static PyMethodDef t_locale_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Locale, t_locale, UObject, Locale, t_locale_init);
+DECLARE_TYPE(Locale, t_locale, UObject, Locale, t_locale_init, NULL);
 
 PyObject *wrap_Locale(const Locale &locale)
 {
@@ -195,7 +195,7 @@ static PyMethodDef t_resourcebundle_methods[] = {
 };
 
 DECLARE_TYPE(ResourceBundle, t_resourcebundle, UObject,
-             ResourceBundle, t_resourcebundle_init);
+             ResourceBundle, t_resourcebundle_init, NULL);
 
 static PyObject *wrap_ResourceBundle(const ResourceBundle &resourcebundle)
 {

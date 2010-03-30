@@ -60,7 +60,7 @@ static PyMethodDef t_fieldposition_methods[] = {
 };
 
 DECLARE_TYPE(FieldPosition, t_fieldposition, UObject, FieldPosition,
-             t_fieldposition_init);
+             t_fieldposition_init, NULL);
 
 /* ParsePosition */
 
@@ -86,7 +86,7 @@ static PyMethodDef t_parseposition_methods[] = {
 };
 
 DECLARE_TYPE(ParsePosition, t_parseposition, UObject, ParsePosition,
-             t_parseposition_init);
+             t_parseposition_init, NULL);
 
 /* Format */
 
@@ -103,7 +103,7 @@ static PyMethodDef t_format_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Format, t_format, UObject, Format, abstract_init);
+DECLARE_TYPE(Format, t_format, UObject, Format, abstract_init, NULL);
 
 /* MeasureFormat */
 
@@ -121,7 +121,7 @@ static PyMethodDef t_measureformat_methods[] = {
 };
 
 DECLARE_TYPE(MeasureFormat, t_measureformat, Format, MeasureFormat,
-             abstract_init);
+             abstract_init, NULL);
 
 #if U_ICU_VERSION_HEX >= 0x04020000
 
@@ -146,7 +146,7 @@ static PyMethodDef t_timeunitformat_methods[] = {
 };
 
 DECLARE_TYPE(TimeUnitFormat, t_timeunitformat, MeasureFormat, TimeUnitFormat,
-             t_timeunitformat_init);
+             t_timeunitformat_init, NULL);
 
 #endif
 
@@ -200,7 +200,7 @@ static PyMethodDef t_messageformat_methods[] = {
 };
 
 DECLARE_TYPE(MessageFormat, t_messageformat, Format, MessageFormat,
-             t_messageformat_init);
+             t_messageformat_init, NULL);
 
 #if U_ICU_VERSION_HEX >= 0x04000000
 
@@ -233,7 +233,7 @@ static PyMethodDef t_pluralrules_methods[] = {
 };
 
 DECLARE_TYPE(PluralRules, t_pluralrules, UObject, PluralRules,
-             t_pluralrules_init);
+             t_pluralrules_init, NULL);
 
 /* PluralFormat */
 
@@ -263,8 +263,14 @@ static PyMethodDef t_pluralformat_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
+static void t_pluralformat_dealloc(t_pluralformat *self)
+{
+    Py_CLEAR(self->format);
+    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+}
+
 DECLARE_TYPE(PluralFormat, t_pluralformat, Format, PluralFormat,
-             t_pluralformat_init);
+             t_pluralformat_init, t_pluralformat_dealloc);
 
 #endif
 
@@ -295,7 +301,7 @@ static PyMethodDef t_selectformat_methods[] = {
 };
 
 DECLARE_TYPE(SelectFormat, t_selectformat, Format, SelectFormat,
-             t_selectformat_init);
+             t_selectformat_init, NULL);
 
 #endif
 
@@ -1363,10 +1369,9 @@ static PyObject *t_pluralformat_setNumberFormat(t_pluralformat *self,
 {
     NumberFormat *format;
 
-    if (!parseArg(arg, "P", TYPE_CLASSID(NumberFormat), &format))
+    if (!parseArg(arg, "p", TYPE_CLASSID(NumberFormat), &format, &self->format))
     {
-        self->format = (NumberFormat *) format->clone();
-        STATUS_CALL(self->object->setNumberFormat(self->format, status));
+        STATUS_CALL(self->object->setNumberFormat(format, status));
         Py_RETURN_NONE;
     }
 
@@ -1464,23 +1469,6 @@ static PyObject *t_pluralformat_str(t_pluralformat *self)
 
     self->object->toPattern(u);
     return PyUnicode_FromUnicodeString(&u);
-}
-
-static void t_pluralformat_dealloc(t_pluralformat *self)
-{
-    if (self->object)
-    {
-        if (self->flags & T_OWNED)
-        {
-            delete self->object;
-            delete self->format;
-        }
-            
-        self->object = NULL;
-        self->format = NULL;
-    }
-
-    self->ob_type->tp_free((PyObject *) self);
 }
 
 #endif
@@ -1638,7 +1626,6 @@ void _init_format(PyObject *m)
 #if U_ICU_VERSION_HEX >= 0x04000000
     PluralRulesType.tp_richcompare = (richcmpfunc) t_pluralrules_richcmp;
     PluralFormatType.tp_str = (reprfunc) t_pluralformat_str;
-    PluralFormatType.tp_dealloc = (destructor) t_pluralformat_dealloc;
 #endif
 #if U_ICU_VERSION_HEX >= 0x04040000
     SelectFormatType.tp_str = (reprfunc) t_selectformat_str;

@@ -145,7 +145,8 @@ static PyMethodDef t_replaceable_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Replaceable, t_replaceable, UObject, Replaceable, abstract_init);
+DECLARE_TYPE(Replaceable, t_replaceable, UObject, Replaceable,
+             abstract_init, NULL);
 
 /* UnicodeString */
 
@@ -235,7 +236,7 @@ static PyMethodDef t_unicodestring_methods[] = {
 };
 
 DECLARE_TYPE(UnicodeString, t_unicodestring, Replaceable, UnicodeString,
-             t_unicodestring_init);
+             t_unicodestring_init, NULL);
 
 /* Formattable */
 
@@ -276,7 +277,7 @@ static PyMethodDef t_formattable_methods[] = {
 };
 
 DECLARE_TYPE(Formattable, t_formattable, UObject, Formattable,
-             t_formattable_init);
+             t_formattable_init, NULL);
 
 PyObject *wrap_Formattable(Formattable &formattable)
 {
@@ -295,7 +296,8 @@ static PyMethodDef t_measureunit_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(MeasureUnit, t_measureunit, UObject, MeasureUnit, abstract_init);
+DECLARE_TYPE(MeasureUnit, t_measureunit, UObject, MeasureUnit,
+             abstract_init, NULL);
 
 /* Measure */
 
@@ -313,7 +315,7 @@ static PyMethodDef t_measure_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Measure, t_measure, UObject, Measure, abstract_init);
+DECLARE_TYPE(Measure, t_measure, UObject, Measure, abstract_init, NULL);
 
 /* CurrencyUnit */
 
@@ -332,7 +334,7 @@ static PyMethodDef t_currencyunit_methods[] = {
 };
 
 DECLARE_TYPE(CurrencyUnit, t_currencyunit, MeasureUnit, CurrencyUnit,
-             t_currencyunit_init);
+             t_currencyunit_init, NULL);
 
 /* CurrencyAmount */
 
@@ -351,7 +353,7 @@ static PyMethodDef t_currencyamount_methods[] = {
 };
 
 DECLARE_TYPE(CurrencyAmount, t_currencyamount, Measure, CurrencyAmount,
-             t_currencyamount_init);
+             t_currencyamount_init, NULL);
 
 /* StringEnumeration */
 
@@ -376,7 +378,7 @@ static PyMethodDef t_stringenumeration_methods[] = {
 };
 
 DECLARE_TYPE(StringEnumeration, t_stringenumeration, UObject,
-             StringEnumeration, abstract_init);
+             StringEnumeration, abstract_init, NULL);
 
 
 /* UObject */

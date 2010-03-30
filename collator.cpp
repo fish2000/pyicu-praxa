@@ -56,7 +56,7 @@ static PyMethodDef t_collationkey_methods[] = {
 };
 
 DECLARE_TYPE(CollationKey, t_collationkey, UObject, CollationKey,
-             t_collationkey_init);
+             t_collationkey_init, NULL);
 
 /* Collator */
 
@@ -109,7 +109,7 @@ static PyMethodDef t_collator_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-DECLARE_TYPE(Collator, t_collator, UObject, Collator, abstract_init);
+DECLARE_TYPE(Collator, t_collator, UObject, Collator, abstract_init, NULL);
 
 /* RuleBasedCollator */
 
@@ -131,7 +131,7 @@ static PyMethodDef t_rulebasedcollator_methods[] = {
 };
 
 DECLARE_TYPE(RuleBasedCollator, t_rulebasedcollator, Collator,
-             RuleBasedCollator, t_rulebasedcollator_init);
+             RuleBasedCollator, t_rulebasedcollator_init, NULL);
 
 
 /* CollationKey */

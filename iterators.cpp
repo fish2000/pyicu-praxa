@@ -49,7 +49,7 @@ static PyMethodDef t_forwardcharacteriterator_methods[] = {
 };
 
 DECLARE_TYPE(ForwardCharacterIterator, t_forwardcharacteriterator, UObject,
-             ForwardCharacterIterator, abstract_init);
+             ForwardCharacterIterator, abstract_init, NULL);
 
 /* CharacterIterator */
 
@@ -114,7 +114,7 @@ static PyMethodDef t_characteriterator_methods[] = {
 };
 
 DECLARE_TYPE(CharacterIterator, t_characteriterator, ForwardCharacterIterator,
-             CharacterIterator, abstract_init);
+             CharacterIterator, abstract_init, NULL);
 
 /* UCharCharacterIterator */
 
@@ -133,9 +133,15 @@ static PyMethodDef t_ucharcharacteriterator_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
+static void t_ucharcharacteriterator_dealloc(t_ucharcharacteriterator *self)
+{
+    Py_CLEAR(self->text);
+    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+}
+
 DECLARE_TYPE(UCharCharacterIterator, t_ucharcharacteriterator,
              CharacterIterator, UCharCharacterIterator,
-             t_ucharcharacteriterator_init);
+             t_ucharcharacteriterator_init, t_ucharcharacteriterator_dealloc);
 
 /* StringCharacterIterator */
 
@@ -156,7 +162,7 @@ static PyMethodDef t_stringcharacteriterator_methods[] = {
 
 DECLARE_TYPE(StringCharacterIterator, t_stringcharacteriterator,
              UCharCharacterIterator, StringCharacterIterator,
-             t_stringcharacteriterator_init);
+             t_stringcharacteriterator_init, NULL);
 
 /* BreakIterator */
 
@@ -221,8 +227,14 @@ static PyMethodDef t_breakiterator_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
+static void t_breakiterator_dealloc(t_breakiterator *self)
+{
+    Py_CLEAR(self->text);
+    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+}
+
 DECLARE_TYPE(BreakIterator, t_breakiterator, UObject, BreakIterator,
-             abstract_init);
+             abstract_init, t_breakiterator_dealloc);
 
 /* RuleBasedBreakIterator */
 
@@ -245,7 +257,7 @@ static PyMethodDef t_rulebasedbreakiterator_methods[] = {
 
 DECLARE_TYPE(RuleBasedBreakIterator, t_rulebasedbreakiterator,
              BreakIterator, RuleBasedBreakIterator,
-             t_rulebasedbreakiterator_init);
+             t_rulebasedbreakiterator_init, NULL);
 
 /* DictionaryBasedBreakIterator */
 
@@ -262,7 +274,7 @@ static PyMethodDef t_dictionarybasedbreakiterator_methods[] = {
 
 DECLARE_TYPE(DictionaryBasedBreakIterator, t_dictionarybasedbreakiterator,
              RuleBasedBreakIterator, DictionaryBasedBreakIterator,
-             t_dictionarybasedbreakiterator_init);
+             t_dictionarybasedbreakiterator_init, NULL);
 
 /* CanonicalIterator */
 
@@ -290,7 +302,7 @@ static PyMethodDef t_canonicaliterator_methods[] = {
 };
 
 DECLARE_TYPE(CanonicalIterator, t_canonicaliterator, UObject,
-             CanonicalIterator, t_canonicaliterator_init);
+             CanonicalIterator, t_canonicaliterator_init, NULL);
 
 /* CollationElementIterator */
 
@@ -329,8 +341,15 @@ static PyMethodDef t_collationelementiterator_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
+static void t_collationelementiterator_dealloc(t_collationelementiterator *self)
+{
+    Py_CLEAR(self->text);
+    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+}
+
 DECLARE_TYPE(CollationElementIterator, t_collationelementiterator, UObject,
-             CollationElementIterator, abstract_init);
+             CollationElementIterator, abstract_init,
+             t_collationelementiterator_dealloc);
 
 
 /* ForwardCharacterIterator */
@@ -601,20 +620,6 @@ static int t_ucharcharacteriterator_init(t_ucharcharacteriterator *self,
     return -1;
 }
 
-static void t_ucharcharacteriterator_dealloc(t_ucharcharacteriterator *self)
-{
-    if (self->object)
-    {
-        if (self->flags & T_OWNED)
-            delete self->object;
-            
-        self->object = NULL;
-        Py_XDECREF(self->text); self->text = NULL;
-    }
-
-    self->ob_type->tp_free((PyObject *) self);
-}
-
 static PyObject *t_ucharcharacteriterator_setText(t_ucharcharacteriterator *self, PyObject *args)
 {
     UnicodeString *u;
@@ -692,20 +697,6 @@ static PyObject *t_stringcharacteriterator_setText(t_stringcharacteriterator *se
 
 
 /* BreakIterator */
-
-static void t_breakiterator_dealloc(t_breakiterator *self)
-{
-    if (self->object)
-    {
-        if (self->flags & T_OWNED)
-            delete self->object;
-            
-        self->object = NULL;
-        Py_XDECREF(self->text); self->text = NULL;
-    }
-
-    self->ob_type->tp_free((PyObject *) self);
-}
 
 static PyObject *t_breakiterator_getText(t_breakiterator *self)
 {
@@ -1229,20 +1220,6 @@ static PyObject *t_canonicaliterator_iter_next(t_canonicaliterator *self)
 
 /* CollationElementIterator */
 
-static void t_collationelementiterator_dealloc(t_collationelementiterator *self)
-{
-    if (self->object)
-    {
-        if (self->flags & T_OWNED)
-            delete self->object;
-            
-        self->object = NULL;
-        Py_XDECREF(self->text); self->text = NULL;
-    }
-
-    self->ob_type->tp_free((PyObject *) self);
-}
-
 static PyObject *t_collationelementiterator_reset(t_collationelementiterator *self)
 {
     self->object->reset();
@@ -1389,17 +1366,12 @@ void _init_iterators(PyObject *m)
         (iternextfunc) t_forwardcharacteriterator_nextPostInc;
     ForwardCharacterIteratorType.tp_richcompare =
         (richcmpfunc) t_forwardcharacteriterator_richcmp;
-    UCharCharacterIteratorType.tp_dealloc = 
-        (destructor) t_ucharcharacteriterator_dealloc;
-    BreakIteratorType.tp_dealloc = (destructor) t_breakiterator_dealloc;
     BreakIteratorType.tp_iter = (getiterfunc) t_breakiterator_iter;
     BreakIteratorType.tp_iternext = (iternextfunc) t_breakiterator_iter_next;
     BreakIteratorType.tp_richcompare = (richcmpfunc) t_breakiterator_richcmp;
     CanonicalIteratorType.tp_iter = (getiterfunc) t_canonicaliterator_iter;
     CanonicalIteratorType.tp_iternext =
         (iternextfunc) t_canonicaliterator_iter_next;
-    CollationElementIteratorType.tp_dealloc =
-        (destructor) t_collationelementiterator_dealloc;
     CollationElementIteratorType.tp_iter =
         (getiterfunc) t_collationelementiterator_iter;
     CollationElementIteratorType.tp_iternext =

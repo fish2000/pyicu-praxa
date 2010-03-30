@@ -135,14 +135,14 @@ PyObject *make_descriptor(PyObject *(*get)(PyObject *));
 #define DECLARE_METHOD(type, name, flags)                               \
     { #name, (PyCFunction) type##_##name, flags, "" }
 
-#define DECLARE_TYPE(name, t_name, base, icuClass, init)                    \
+#define DECLARE_TYPE(name, t_name, base, icuClass, init, dealloc)           \
 PyTypeObject name##Type = {                                                 \
     PyObject_HEAD_INIT(NULL)                                                \
     /* ob_size            */   0,                                           \
     /* tp_name            */   "PyICU."#name,                               \
     /* tp_basicsize       */   sizeof(t_name),                              \
     /* tp_itemsize        */   0,                                           \
-    /* tp_dealloc         */   0,                                           \
+    /* tp_dealloc         */   (destructor)dealloc,                         \
     /* tp_print           */   0,                                           \
     /* tp_getattr         */   0,                                           \
     /* tp_setattr         */   0,                                           \

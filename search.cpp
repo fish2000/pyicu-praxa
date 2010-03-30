@@ -92,8 +92,16 @@ static PyMethodDef t_searchiterator_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
+static void t_searchiterator_dealloc(t_searchiterator *self)
+{
+    Py_CLEAR(self->text);
+    Py_CLEAR(self->iterator);
+
+    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+}
+
 DECLARE_TYPE(SearchIterator, t_searchiterator, UObject, SearchIterator,
-             abstract_init);
+             abstract_init, t_searchiterator_dealloc);
 
 /* StringSearch */
 
@@ -123,27 +131,21 @@ static PyMethodDef t_stringsearch_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
+static void t_stringsearch_dealloc(t_stringsearch *self)
+{
+    Py_CLEAR(self->text);
+    Py_CLEAR(self->iterator);
+    Py_CLEAR(self->pattern);
+    Py_CLEAR(self->collator);
+
+    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+}
+
 DECLARE_TYPE(StringSearch, t_stringsearch, SearchIterator, StringSearch,
-             t_stringsearch_init);
+             t_stringsearch_init, t_stringsearch_dealloc);
 
 
 /* SearchIterator */
-
-static void t_searchiterator_dealloc(t_searchiterator *self)
-{
-    if (self->object)
-    {
-        if (self->flags & T_OWNED)
-            delete self->object;
-            
-        self->object = NULL;
-
-        Py_XDECREF(self->text); self->text = NULL;
-        Py_XDECREF(self->iterator); self->iterator = NULL;
-    }
-
-    self->ob_type->tp_free((PyObject *) self);
-}
 
 static PyObject *t_searchiterator_getOffset(t_searchiterator *self)
 {
@@ -502,24 +504,6 @@ static int t_stringsearch_init(t_stringsearch *self,
     return -1;
 }
 
-static void t_stringsearch_dealloc(t_stringsearch *self)
-{
-    if (self->object)
-    {
-        if (self->flags & T_OWNED)
-            delete self->object;
-            
-        self->object = NULL;
-    }
-     
-    Py_XDECREF(self->text); self->text = NULL;
-    Py_XDECREF(self->iterator); self->iterator = NULL;
-    Py_XDECREF(self->pattern); self->pattern = NULL;
-    Py_XDECREF(self->collator); self->collator = NULL;
-
-    self->ob_type->tp_free((PyObject *) self);
-}
-
 static PyObject *t_stringsearch_getCollator(t_stringsearch *self)
 {
     if (self->collator)
@@ -593,10 +577,8 @@ DECLARE_RICHCMP(StringSearch, t_stringsearch);
 
 void _init_search(PyObject *m)
 {
-    SearchIteratorType.tp_dealloc = (destructor) t_searchiterator_dealloc;
     SearchIteratorType.tp_iter = (getiterfunc) t_searchiterator_iter;
     SearchIteratorType.tp_iternext = (iternextfunc) t_searchiterator_iter_next;
-    StringSearchType.tp_dealloc = (destructor) t_stringsearch_dealloc;
     StringSearchType.tp_str = (reprfunc) t_stringsearch_str;
     StringSearchType.tp_richcompare = (richcmpfunc) t_stringsearch_richcmp;
 

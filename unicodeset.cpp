@@ -48,7 +48,7 @@ static PyMethodDef t_unicodefunctor_methods[] = {
 };
 
 DECLARE_TYPE(UnicodeFunctor, t_unicodefunctor, UObject, UnicodeFunctor,
-             abstract_init);
+             abstract_init, NULL);
 
 
 /* UnicodeMatcher */
@@ -76,7 +76,7 @@ static PyMethodDef t_unicodematcher_methods[] = {
 };
 
 DECLARE_TYPE(UnicodeMatcher, t_unicodematcher, UObject, UnicodeMatcher,
-             abstract_init);
+             abstract_init, NULL);
 
 
 /* UnicodeFilter */
@@ -108,7 +108,7 @@ static PyMethodDef t_unicodefilter_methods[] = {
 };
 
 DECLARE_TYPE(UnicodeFilter, t_unicodefilter, UObject, UnicodeFilter,
-             abstract_init);
+             abstract_init, NULL);
 
 
 /* UnicodeSet */
@@ -203,7 +203,7 @@ static PyMethodDef t_unicodeset_methods[] = {
 };
 
 DECLARE_TYPE(UnicodeSet, t_unicodeset, UnicodeFilter, UnicodeSet,
-             t_unicodeset_init);
+             t_unicodeset_init, NULL);
 
 
 /* UnicodeSetIterator */
@@ -236,8 +236,15 @@ static PyMethodDef t_unicodesetiterator_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
+static void t_unicodesetiterator_dealloc(t_unicodesetiterator *self)
+{
+    Py_CLEAR(self->set);
+    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+}
+
 DECLARE_TYPE(UnicodeSetIterator, t_unicodesetiterator, UObject,
-             UnicodeSetIterator, t_unicodesetiterator_init);
+             UnicodeSetIterator, t_unicodesetiterator_init,
+             t_unicodesetiterator_dealloc);
 
 
 /* UnicodeFunctor */
@@ -1272,23 +1279,6 @@ static int t_unicodesetiterator_init(t_unicodesetiterator *self,
     return -1;
 }
 
-static void t_unicodesetiterator_dealloc(t_unicodesetiterator *self)
-{
-    if (self->object)
-    {
-        if (self->flags & T_OWNED)
-            delete self->object;
-            
-        self->object = NULL;
-
-        Py_XDECREF(self->set);
-        self->set = NULL;
-    }
-
-    self->ob_type->tp_free((PyObject *) self);
-}
-
-
 static PyObject *t_unicodesetiterator_isString(t_unicodesetiterator *self)
 {
     UBool b = self->object->isString();
@@ -1377,8 +1367,6 @@ void _init_unicodeset(PyObject *m)
     UnicodeSetType.tp_richcompare = (richcmpfunc) t_unicodeset_richcmp;
     UnicodeSetType.tp_hash = (hashfunc) t_unicodeset_hash;
     UnicodeSetType.tp_as_sequence = &t_unicodeset_as_sequence;
-    UnicodeSetIteratorType.tp_dealloc =
-        (destructor) t_unicodesetiterator_dealloc;
     UnicodeSetIteratorType.tp_iter =
         (getiterfunc) t_unicodesetiterator_iter;
     UnicodeSetIteratorType.tp_iternext =
