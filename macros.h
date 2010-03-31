@@ -139,7 +139,7 @@ PyObject *make_descriptor(PyObject *(*get)(PyObject *));
 PyTypeObject name##Type = {                                                 \
     PyObject_HEAD_INIT(NULL)                                                \
     /* ob_size            */   0,                                           \
-    /* tp_name            */   "PyICU."#name,                               \
+    /* tp_name            */   "icu."#name,                                 \
     /* tp_basicsize       */   sizeof(t_name),                              \
     /* tp_itemsize        */   0,                                           \
     /* tp_dealloc         */   (destructor)dealloc,                         \
@@ -208,7 +208,7 @@ static PyObject *t_name##_new(PyTypeObject *type,                       \
 PyTypeObject name##Type = {                                                 \
     PyObject_HEAD_INIT(NULL)                                                \
     /* ob_size            */   0,                                           \
-    /* tp_name            */   "PyICU."#name,                               \
+    /* tp_name            */   "icu."#name,                                 \
     /* tp_basicsize       */   sizeof(t_name),                              \
     /* tp_itemsize        */   0,                                           \
     /* tp_dealloc         */   (destructor)t_name##_dealloc,                \
@@ -266,7 +266,7 @@ PyObject *wrap_##name(icuStruct *object, int flags)                     \
 PyTypeObject name##Type = {                                             \
     PyObject_HEAD_INIT(NULL)                                            \
     /* ob_size            */   0,                                       \
-    /* tp_name            */   "PyICU."#name,                           \
+    /* tp_name            */   "icu."#name,                             \
     /* tp_basicsize       */   0,                                       \
     /* tp_itemsize        */   0,                                       \
 };

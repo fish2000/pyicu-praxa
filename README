@@ -91,7 +91,7 @@ used to translate from the C++ APIs to the corresponding Python APIs.
 
     1. The ICU way
 
-        >>> from PyICU import UnicodeString, Locale
+        >>> from icu import UnicodeString, Locale
         >>> locale = Locale('pt_BR')
         >>> string = UnicodeString()
         >>> name = locale.getDisplayName(string)
@@ -102,7 +102,7 @@ used to translate from the C++ APIs to the corresponding Python APIs.
 
     2. The Python way
 
-        >>> from PyICU import Locale
+        >>> from icu import Locale
         >>> locale = Locale('pt_BR')
         >>> name = locale.getDisplayName()
         >>> name
@@ -153,7 +153,7 @@ used to translate from the C++ APIs to the corresponding Python APIs.
     http://icu-project.org/apiref/icu4c/classDateFormat.html
     is invoked from Python with:
 
-        >>> from PyICU import DateFormat, Formattable
+        >>> from icu import DateFormat, Formattable
         >>> df = DateFormat.createInstance()
         >>> df
         <SimpleDateFormat: M/d/yy h:mm a>
@@ -166,7 +166,7 @@ used to translate from the C++ APIs to the corresponding Python APIs.
     http://icu-project.org/apiref/icu4c/classDateFormat.html
     can be used too:
 
-        >>> from PyICU import DateFormat
+        >>> from icu import DateFormat
         >>> df = DateFormat.createInstance()
         >>> df
         <SimpleDateFormat: M/d/yy h:mm a>

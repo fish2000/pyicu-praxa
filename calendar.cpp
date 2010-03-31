@@ -542,7 +542,7 @@ static PyObject *t_timezone_setDefault(PyTypeObject *type, PyObject *arg)
     {
         TimeZone::setDefault(*tz);
 
-        PyObject *m = PyImport_ImportModule("PyICU");
+        PyObject *m = PyImport_ImportModule("icu");
         PyObject *cls = PyObject_GetAttrString(m, "ICUtzinfo");
         PyObject *result = PyObject_CallMethod(cls, "_resetDefault", "", NULL);
 

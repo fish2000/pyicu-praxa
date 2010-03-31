@@ -58,7 +58,7 @@ static PyGetSetDef t_uobject_properties[] = {
 PyTypeObject UObjectType = {
     PyObject_HEAD_INIT(NULL)
     0,                                   /* ob_size */
-    "PyICU.UObject",                     /* tp_name */
+    "icu.UObject",                       /* tp_name */
     sizeof(t_uobject),                   /* tp_basicsize */
     0,                                   /* tp_itemsize */
     (destructor)t_uobject_dealloc,       /* tp_dealloc */

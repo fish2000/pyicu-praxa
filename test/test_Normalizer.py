@@ -25,7 +25,7 @@
 import sys, os
 
 from unittest import TestCase, main
-from PyICU import *
+from icu import *
 
 
 class TestNormalizer2(TestCase):
@@ -33,7 +33,7 @@ class TestNormalizer2(TestCase):
     def testNormalize(self):
 
         try:
-            from PyICU import Normalizer2
+            from icu import Normalizer2
         except ImportError:
             return
 

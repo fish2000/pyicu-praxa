@@ -25,7 +25,7 @@
 import sys, os
 
 from unittest import TestCase, main
-from PyICU import *
+from icu import *
 
 
 class TestMessageFormat(TestCase):
@@ -76,7 +76,7 @@ class TestMessageFormat(TestCase):
     def testSelectFormat(self):
 
         try:
-            from PyICU import SelectFormat
+            from icu import SelectFormat
         except ImportError:
             return
 

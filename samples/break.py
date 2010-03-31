@@ -21,7 +21,7 @@
 # ====================================================================
 #
 
-from PyICU import UnicodeString, BreakIterator, Locale
+from icu import UnicodeString, BreakIterator, Locale
 
 
 def printTextRange(iterator, start, end):

@@ -348,7 +348,7 @@ EXPORT UDate PyObject_AsUDate(PyObject *object)
 
             if (tzinfo == Py_None)
             {
-                PyObject *m = PyImport_ImportModule("PyICU");
+                PyObject *m = PyImport_ImportModule("icu");
                 PyObject *cls = PyObject_GetAttrString(m, "ICUtzinfo");
 
                 tzinfo = PyObject_GetAttrString(cls, "default");

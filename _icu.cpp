@@ -73,7 +73,7 @@ static PyMethodDef t_descriptor_methods[] = {
 PyTypeObject ConstVariableDescriptorType = {
     PyObject_HEAD_INIT(NULL)
     0,                                   /* ob_size */
-    "PyICU.ConstVariableDescriptor",     /* tp_name */
+    "icu.ConstVariableDescriptor",       /* tp_name */
     sizeof(t_descriptor),                /* tp_basicsize */
     0,                                   /* tp_itemsize */
     (destructor)t_descriptor_dealloc,    /* tp_dealloc */
@@ -191,9 +191,9 @@ static PyMethodDef pyicu_funcs[] = {
 
 extern "C" {
 
-    void init_PyICU(void)
+    void init_icu(void)
     {
-        PyObject *m = Py_InitModule3("_PyICU", pyicu_funcs, "_PyICU");
+        PyObject *m = Py_InitModule3("_icu", pyicu_funcs, "_icu");
         PyObject *ver;
 
         PyType_Ready(&ConstVariableDescriptorType);
@@ -213,12 +213,12 @@ extern "C" {
         ver = PyString_FromString(U_UNICODE_VERSION);
         PyObject_SetAttrString(m, "UNICODE_VERSION", ver); Py_DECREF(ver);
 
-        PyObject *module = PyImport_ImportModule("PyICU");
+        PyObject *module = PyImport_ImportModule("icu");
 
         if (!module)
         {
             if (!PyErr_Occurred())
-                PyErr_SetString(PyExc_ImportError, "PyICU");
+                PyErr_SetString(PyExc_ImportError, "icu");
             return;
         }
 
