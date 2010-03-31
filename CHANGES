@@ -19,7 +19,7 @@ Version 0.9 ->
   - added support for PluralRules and PluralFormat if ICU version >= 4.0
   - added support for DateInterval, DateIntervalFormat if ICU version >= 4.0
   - added support for CurrencyPluralInfo if ICU version >= 4.2
-  - added support for UnicodeSetIterator
+  - added support for UnicodeSetIterator and UnicodeSet iterates via it
   - added support for SearchIterator and StringSearch
   - added some missing Collator and RuleBasedCollator methods
   - refreshed README
