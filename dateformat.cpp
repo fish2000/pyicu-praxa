@@ -1413,7 +1413,7 @@ void _init_dateformat(PyObject *m)
     INSTALL_STATIC_INT(DateFormat, HOUR0_FIELD);
     INSTALL_STATIC_INT(DateFormat, TIMEZONE_FIELD);
 
-#if U_ICU_VERSION_HEX >= 0x04000000
+#if U_ICU_VERSION_HEX >= 0x04040000
     INSTALL_STATIC_INT(DateIntervalInfo, kMaxIntervalPatternIndex);
 #endif    
 
