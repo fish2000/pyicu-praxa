@@ -156,9 +156,13 @@ static int t_filterednormalizer2_init(t_filterednormalizer2 *self,
 
 static void t_filterednormalizer2_dealloc(t_filterednormalizer2 *self)
 {
+    if (self->flags & T_OWNED)
+        delete self->object;
+    self->object = NULL;
+
     Py_CLEAR(self->normalizer);
     Py_CLEAR(self->filter);
-    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+    self->ob_type->tp_free((PyObject *) self);
 }
 
 DECLARE_TYPE(FilteredNormalizer2, t_filterednormalizer2, Normalizer2,

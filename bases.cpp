@@ -385,13 +385,9 @@ DECLARE_TYPE(StringEnumeration, t_stringenumeration, UObject,
 
 void t_uobject_dealloc(t_uobject *self)
 {
-    if (self->object)
-    {
-        if (self->flags & T_OWNED)
-            delete self->object;
-
-        self->object = NULL;
-    }
+    if (self->flags & T_OWNED)
+        delete self->object;
+    self->object = NULL;
 
     self->ob_type->tp_free((PyObject *) self);
 }

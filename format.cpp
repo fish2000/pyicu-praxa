@@ -265,8 +265,12 @@ static PyMethodDef t_pluralformat_methods[] = {
 
 static void t_pluralformat_dealloc(t_pluralformat *self)
 {
+    if (self->flags & T_OWNED)
+        delete self->object;
+    self->object = NULL;
+
     Py_CLEAR(self->format);
-    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+    self->ob_type->tp_free((PyObject *) self);
 }
 
 DECLARE_TYPE(PluralFormat, t_pluralformat, Format, PluralFormat,

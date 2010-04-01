@@ -20,8 +20,9 @@
  # DEALINGS IN THE SOFTWARE.
  # ====================================================================
 
-from _icu import _install__doc__
 from _icu import *
+from _icu import _install__doc__
+
 
 _install__doc__(BreakIterator, '''
 The BreakIterator class implements methods for finding the location of

@@ -157,13 +157,17 @@ static PyMethodDef t_regexmatcher_methods[] = {
 
 static void t_regexmatcher_dealloc(t_regexmatcher *self)
 {
+    if (self->flags & T_OWNED)
+        delete self->object;
+    self->object = NULL;
+
     Py_CLEAR(self->input);
     Py_CLEAR(self->pattern);
 #if U_ICU_VERSION_HEX >= 0x04000000
     Py_CLEAR(self->callable);
 #endif
 
-    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+    self->ob_type->tp_free((PyObject *) self);
 }
 
 DECLARE_TYPE(RegexMatcher, t_regexmatcher, UObject, RegexMatcher,

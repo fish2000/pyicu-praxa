@@ -64,7 +64,7 @@ static PyObject *t_searchiterator_setText(t_searchiterator *self,
                                           PyObject *arg);
 static PyObject *t_searchiterator_first(t_searchiterator *self);
 static PyObject *t_searchiterator_last(t_searchiterator *self);
-static PyObject *t_searchiterator_next(t_searchiterator *self);
+static PyObject *t_searchiterator_nextMatch(t_searchiterator *self);
 static PyObject *t_searchiterator_following(t_searchiterator *self,
                                             PyObject *arg);
 static PyObject *t_searchiterator_preceding(t_searchiterator *self,
@@ -85,7 +85,7 @@ static PyMethodDef t_searchiterator_methods[] = {
     DECLARE_METHOD(t_searchiterator, setText, METH_O),
     DECLARE_METHOD(t_searchiterator, first, METH_NOARGS),
     DECLARE_METHOD(t_searchiterator, last, METH_NOARGS),
-    DECLARE_METHOD(t_searchiterator, next, METH_NOARGS),
+    DECLARE_METHOD(t_searchiterator, nextMatch, METH_NOARGS),
     DECLARE_METHOD(t_searchiterator, following, METH_O),
     DECLARE_METHOD(t_searchiterator, preceding, METH_O),
     DECLARE_METHOD(t_searchiterator, reset, METH_NOARGS),
@@ -94,10 +94,14 @@ static PyMethodDef t_searchiterator_methods[] = {
 
 static void t_searchiterator_dealloc(t_searchiterator *self)
 {
+    if (self->flags & T_OWNED)
+        delete self->object;
+    self->object = NULL;
+
     Py_CLEAR(self->text);
     Py_CLEAR(self->iterator);
 
-    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+    self->ob_type->tp_free((PyObject *) self);
 }
 
 DECLARE_TYPE(SearchIterator, t_searchiterator, UObject, SearchIterator,
@@ -133,12 +137,16 @@ static PyMethodDef t_stringsearch_methods[] = {
 
 static void t_stringsearch_dealloc(t_stringsearch *self)
 {
+    if (self->flags & T_OWNED)
+        delete self->object;
+    self->object = NULL;
+
     Py_CLEAR(self->text);
     Py_CLEAR(self->iterator);
     Py_CLEAR(self->pattern);
     Py_CLEAR(self->collator);
 
-    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+    self->ob_type->tp_free((PyObject *) self);
 }
 
 DECLARE_TYPE(StringSearch, t_stringsearch, SearchIterator, StringSearch,
@@ -320,7 +328,7 @@ static PyObject *t_searchiterator_last(t_searchiterator *self)
     return PyInt_FromLong(last);
 }
 
-static PyObject *t_searchiterator_next(t_searchiterator *self)
+static PyObject *t_searchiterator_nextMatch(t_searchiterator *self)
 {
     int32_t next;
     STATUS_CALL(next = self->object->next(status));
@@ -407,7 +415,7 @@ static int t_stringsearch_init(t_stringsearch *self,
         }
         if (!parseArgs(args, "WWp",
                        TYPE_CLASSID(RuleBasedCollator),
-                       &u0, &self->pattern, &self->text,
+                       &u0, &self->pattern, &u1, &self->text,
                        &collator, &self->collator))
         {
             INT_STATUS_CALL(self->object = new StringSearch(*u0, *u1, collator,
@@ -602,4 +610,7 @@ void _init_search(PyObject *m)
     INSTALL_ENUM(USearchAttributeValue, USEARCH_PATTERN_BASE_WEIGHT_IS_WILDCARD);
     INSTALL_ENUM(USearchAttributeValue, USEARCH_ANY_BASE_WEIGHT_IS_WILDCARD);
 #endif
+
+    PyDict_SetItemString(SearchIteratorType.tp_dict, "USEARCH_DONE",
+                         make_descriptor(PyInt_FromLong(USEARCH_DONE)));
 }

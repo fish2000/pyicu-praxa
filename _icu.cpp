@@ -185,7 +185,6 @@ static PyObject *t_descriptor___get__(t_descriptor *self,
 
 
 static PyTypeObject *_method_type;
-
 static PyObject *_install__doc__(PyObject *self, PyObject *args)
 {
     PyObject *object;
@@ -194,24 +193,28 @@ static PyObject *_install__doc__(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "Os", &object, &doc))
         return NULL;
 
+    /* constructors */
     if (PyObject_TypeCheck(object, &PyWrapperDescr_Type))
     {
         ((PyWrapperDescrObject *) object)->d_base->doc = strdup(doc);
         Py_RETURN_NONE;
     }
 
+    /* methods */
     if (PyObject_TypeCheck(object, _method_type))
     {
         ((PyMethodDescrObject *) object)->d_method->ml_doc = strdup(doc);
         Py_RETURN_NONE;
     }
 
+    /* class methods */
     if (PyObject_TypeCheck(object, &PyCFunction_Type))
     {
         ((PyCFunctionObject *) object)->m_ml->ml_doc = strdup(doc);
         Py_RETURN_NONE;
     }
 
+    /* classes */
     if (PyType_Check(object))
     {
         object->ob_type->tp_doc = strdup(doc);
@@ -234,7 +237,7 @@ extern "C" {
     void init_icu(void)
     {
         PyObject *m = Py_InitModule3("_icu", _icu_funcs, "_icu");
-        PyObject *ver, *method;
+        PyObject *ver;
 
         PyType_Ready(&ConstVariableDescriptorType);
         Py_INCREF(&ConstVariableDescriptorType);
@@ -284,8 +287,8 @@ extern "C" {
         _init_normalizer(m);
         _init_search(m);
 
-        method = PyObject_GetAttrString((PyObject *) &UObjectType,
-                                        "getDynamicClassID");
+        PyObject *method = PyObject_GetAttrString((PyObject *) &UObjectType,
+                                                  "getDynamicClassID");
         _method_type = method->ob_type;
         Py_DECREF(method);
     }

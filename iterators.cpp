@@ -135,8 +135,12 @@ static PyMethodDef t_ucharcharacteriterator_methods[] = {
 
 static void t_ucharcharacteriterator_dealloc(t_ucharcharacteriterator *self)
 {
+    if (self->flags & T_OWNED)
+        delete self->object;
+    self->object = NULL;
+
     Py_CLEAR(self->text);
-    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+    self->ob_type->tp_free((PyObject *) self);
 }
 
 DECLARE_TYPE(UCharCharacterIterator, t_ucharcharacteriterator,
@@ -229,8 +233,12 @@ static PyMethodDef t_breakiterator_methods[] = {
 
 static void t_breakiterator_dealloc(t_breakiterator *self)
 {
+    if (self->flags & T_OWNED)
+        delete self->object;
+    self->object = NULL;
+
     Py_CLEAR(self->text);
-    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+    self->ob_type->tp_free((PyObject *) self);
 }
 
 DECLARE_TYPE(BreakIterator, t_breakiterator, UObject, BreakIterator,
@@ -343,8 +351,12 @@ static PyMethodDef t_collationelementiterator_methods[] = {
 
 static void t_collationelementiterator_dealloc(t_collationelementiterator *self)
 {
+    if (self->flags & T_OWNED)
+        delete self->object;
+    self->object = NULL;
+
     Py_CLEAR(self->text);
-    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+    self->ob_type->tp_free((PyObject *) self);
 }
 
 DECLARE_TYPE(CollationElementIterator, t_collationelementiterator, UObject,

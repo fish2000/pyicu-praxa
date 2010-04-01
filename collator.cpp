@@ -530,6 +530,7 @@ static int t_rulebasedcollator_init(t_rulebasedcollator *self,
     UnicodeString _u;
     RuleBasedCollator *collator;
     Collator::ECollationStrength strength;
+    UColAttributeValue decompositionMode;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -542,10 +543,10 @@ static int t_rulebasedcollator_init(t_rulebasedcollator *self,
         }
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
-      case 2:
-        if (!parseArgs(args, "Si", &u, &_u, &strength))
+      case 3:
+        if (!parseArgs(args, "Sii", &u, &_u, &strength, &decompositionMode))
         {
-            INT_STATUS_CALL(collator = new RuleBasedCollator(*u, strength, status));
+            INT_STATUS_CALL(collator = new RuleBasedCollator(*u, strength, decompositionMode, status));
             self->object = collator;
             self->flags = T_OWNED;
             break;

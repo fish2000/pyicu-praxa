@@ -238,8 +238,12 @@ static PyMethodDef t_unicodesetiterator_methods[] = {
 
 static void t_unicodesetiterator_dealloc(t_unicodesetiterator *self)
 {
+    if (self->flags & T_OWNED)
+        delete self->object;
+    self->object = NULL;
+
     Py_CLEAR(self->set);
-    self->ob_type->tp_base->tp_dealloc((PyObject *) self);
+    self->ob_type->tp_free((PyObject *) self);
 }
 
 DECLARE_TYPE(UnicodeSetIterator, t_unicodesetiterator, UObject,
