@@ -34,5 +34,4 @@ class ICUError(Exception):
 class InvalidArgsError(Exception):
     pass
 
-
-from _icu import *
+from docs import *

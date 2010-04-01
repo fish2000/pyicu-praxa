@@ -78,4 +78,4 @@ setup(name="PyICU",
                              libraries=_libraries,
                              define_macros=[('PYICU_VER', '"%s"' %(VERSION))])
                    ],
-      py_modules=['icu', 'PyICU'])
+      py_modules=['icu', 'PyICU', 'docs'])

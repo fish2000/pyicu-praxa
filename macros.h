@@ -158,7 +158,7 @@ PyTypeObject name##Type = {                                                 \
     /* tp_setattro        */   0,                                           \
     /* tp_as_buffer       */   0,                                           \
     /* tp_flags           */   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,    \
-    /* tp_doc             */   #t_name" objects",                           \
+    /* tp_doc             */   #name" objects",                             \
     /* tp_traverse        */   0,                                           \
     /* tp_clear           */   0,                                           \
     /* tp_richcompare     */   0,                                           \
@@ -227,7 +227,7 @@ PyTypeObject name##Type = {                                                 \
     /* tp_setattro        */   0,                                           \
     /* tp_as_buffer       */   0,                                           \
     /* tp_flags           */   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,    \
-    /* tp_doc             */   #t_name" objects",                           \
+    /* tp_doc             */   #name" objects",                             \
     /* tp_traverse        */   0,                                           \
     /* tp_clear           */   0,                                           \
     /* tp_richcompare     */   0,                                           \

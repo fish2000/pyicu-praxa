@@ -14,7 +14,7 @@ below.
   - Jan Gehring for Freebsd 7 build entries
   - Christian Kesselheim for Solaris build entries
   - Jimmy Yuen Ho Wong for TimeZone::getDSTSavings()
-  - Bernd Zeimetz for getting replacing Makefile with setup.py
+  - Bernd Zeimetz for replacing Makefile with setup.py
   - 
 
 Thank you all !
