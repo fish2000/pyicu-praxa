@@ -206,6 +206,12 @@ static PyObject *_install__doc__(PyObject *self, PyObject *args)
         Py_RETURN_NONE;
     }
 
+    if (PyObject_TypeCheck(object, &PyCFunction_Type))
+    {
+        ((PyCFunctionObject *) object)->m_ml->ml_doc = strdup(doc);
+        Py_RETURN_NONE;
+    }
+
     if (PyType_Check(object))
     {
         object->ob_type->tp_doc = strdup(doc);

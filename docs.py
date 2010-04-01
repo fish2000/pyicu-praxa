@@ -67,3 +67,10 @@ createSentenceInstance or createTitleInstance.
 _install__doc__(BreakIterator.getText, '''
 Return the string over the text being analyzed.
 ''')
+
+_install__doc__(BreakIterator.createLineInstance, '''
+Returns an instance of a BreakIterator implementing line breaks. Line breaks
+are logically possible line breaks, actual line breaks are usually
+determined based on display width. LineBreak is useful for word wrapping
+text.
+''')
