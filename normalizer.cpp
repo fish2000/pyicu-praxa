@@ -48,7 +48,7 @@ static int t_normalizer_init(t_normalizer *self,
 static PyObject *t_normalizer_current(t_normalizer *self);
 static PyObject *t_normalizer_first(t_normalizer *self);
 static PyObject *t_normalizer_last(t_normalizer *self);
-static PyObject *t_normalizer_next(t_normalizer *self);
+static PyObject *t_normalizer_nextCharacter(t_normalizer *self);
 static PyObject *t_normalizer_previous(t_normalizer *self);
 static PyObject *t_normalizer_reset(t_normalizer *self);
 static PyObject *t_normalizer_setIndexOnly(t_normalizer *self, PyObject *arg);
@@ -71,7 +71,7 @@ static PyMethodDef t_normalizer_methods[] = {
     DECLARE_METHOD(t_normalizer, current, METH_NOARGS),
     DECLARE_METHOD(t_normalizer, first, METH_NOARGS),
     DECLARE_METHOD(t_normalizer, last, METH_NOARGS),
-    DECLARE_METHOD(t_normalizer, next, METH_NOARGS),
+    DECLARE_METHOD(t_normalizer, nextCharacter, METH_NOARGS),
     DECLARE_METHOD(t_normalizer, previous, METH_NOARGS),
     DECLARE_METHOD(t_normalizer, reset, METH_NOARGS),
     DECLARE_METHOD(t_normalizer, setIndexOnly, METH_O),
@@ -147,12 +147,12 @@ public:
     PyObject *filter;
 };
 
+static int t_filterednormalizer2_init(t_filterednormalizer2 *self,
+                                      PyObject *args, PyObject *kwds);
+
 static PyMethodDef t_filterednormalizer2_methods[] = {
     { NULL, NULL, 0, NULL }
 };
-
-static int t_filterednormalizer2_init(t_filterednormalizer2 *self,
-                                      PyObject *args, PyObject *kwds);
 
 static void t_filterednormalizer2_dealloc(t_filterednormalizer2 *self)
 {
@@ -177,21 +177,11 @@ DECLARE_TYPE(FilteredNormalizer2, t_filterednormalizer2, Normalizer2,
 static int t_normalizer_init(t_normalizer *self,
                              PyObject *args, PyObject *kwds)
 {
-    Normalizer *normalizer;
     UnicodeString *u, _u;
     UNormalizationMode mode;
     CharacterIterator *iterator;
 
     switch (PyTuple_Size(args)) {
-      case 1:
-        if (!parseArgs(args, "P", TYPE_CLASSID(Normalizer), &normalizer))
-        {
-            self->object = new Normalizer(*normalizer);
-            self->flags = T_OWNED;
-            break;
-        }
-        PyErr_SetArgsError((PyObject *) self, "__init__", args);
-        return -1;
       case 2:
         if (!parseArgs(args, "Si", &u, &_u, &mode))
         {
@@ -237,7 +227,7 @@ static PyObject * t_normalizer_last(t_normalizer *self)
     return PyInt_FromLong(c);
 }
 
-static PyObject * t_normalizer_next(t_normalizer *self)
+static PyObject * t_normalizer_nextCharacter(t_normalizer *self)
 {
     UChar32 c = self->object->next();
     return PyInt_FromLong(c);
@@ -503,6 +493,23 @@ static int t_normalizer_hash(t_normalizer *self)
     return self->object->hashCode();
 }
 
+static PyObject *t_normalizer_iter(t_normalizer *self)
+{
+    Py_RETURN_SELF();
+}
+
+static PyObject * t_normalizer_iter_next(t_normalizer *self)
+{
+    if (self->object->getIndex() < self->object->endIndex())
+    {
+        UChar32 c = self->object->next();
+        return PyInt_FromLong(c);
+    }
+
+    PyErr_SetNone(PyExc_StopIteration);
+    return NULL;
+}
+
 
 #if U_ICU_VERSION_HEX >= 0x04040000
 
@@ -720,6 +727,8 @@ void _init_normalizer(PyObject *m)
 {
     NormalizerType.tp_richcompare = (richcmpfunc) t_normalizer_richcmp;
     NormalizerType.tp_hash = (hashfunc) t_normalizer_hash;
+    NormalizerType.tp_iter = (getiterfunc) t_normalizer_iter;
+    NormalizerType.tp_iternext = (iternextfunc) t_normalizer_iter_next;
 
     REGISTER_TYPE(Normalizer, m);
 #if U_ICU_VERSION_HEX >= 0x04040000

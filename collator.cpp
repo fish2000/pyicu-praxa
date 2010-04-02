@@ -543,6 +543,10 @@ static int t_rulebasedcollator_init(t_rulebasedcollator *self,
         }
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
+      case 2:
+        /* two-parameter case is ambiguous from python with ints */
+        PyErr_SetArgsError((PyObject *) self, "__init__", args);
+        return -1;
       case 3:
         if (!parseArgs(args, "Sii", &u, &_u, &strength, &decompositionMode))
         {
