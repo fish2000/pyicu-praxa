@@ -209,31 +209,31 @@ static int t_normalizer_init(t_normalizer *self,
     return -1;
 }
 
-static PyObject * t_normalizer_current(t_normalizer *self)
+static PyObject *t_normalizer_current(t_normalizer *self)
 {
     UChar32 c = self->object->current();
     return PyInt_FromLong(c);
 }
 
-static PyObject * t_normalizer_first(t_normalizer *self)
+static PyObject *t_normalizer_first(t_normalizer *self)
 {
     UChar32 c = self->object->first();
     return PyInt_FromLong(c);
 }
 
-static PyObject * t_normalizer_last(t_normalizer *self)
+static PyObject *t_normalizer_last(t_normalizer *self)
 {
     UChar32 c = self->object->last();
     return PyInt_FromLong(c);
 }
 
-static PyObject * t_normalizer_nextCharacter(t_normalizer *self)
+static PyObject *t_normalizer_nextCharacter(t_normalizer *self)
 {
     UChar32 c = self->object->next();
     return PyInt_FromLong(c);
 }
 
-static PyObject * t_normalizer_previous(t_normalizer *self)
+static PyObject *t_normalizer_previous(t_normalizer *self)
 {
     UChar32 c = self->object->previous();
     return PyInt_FromLong(c);
@@ -498,7 +498,7 @@ static PyObject *t_normalizer_iter(t_normalizer *self)
     Py_RETURN_SELF();
 }
 
-static PyObject * t_normalizer_iter_next(t_normalizer *self)
+static PyObject *t_normalizer_iter_next(t_normalizer *self)
 {
     if (self->object->getIndex() < self->object->endIndex())
     {

@@ -333,9 +333,11 @@ PyTypeObject name##Type = {                                             \
         return arg;                                     \
     }
 
-#define Py_RETURN_SELF()                                \
-    Py_INCREF(self);                                    \
-    return (PyObject *) self;
+#define Py_RETURN_SELF()                                    \
+    {                                                       \
+        Py_INCREF(self);                                    \
+        return (PyObject *) self;                           \
+    }
 
 
 #define DECLARE_RICHCMP(name, t_name) \

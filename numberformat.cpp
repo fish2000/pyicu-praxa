@@ -142,6 +142,7 @@ DECLARE_TYPE(NumberFormat, t_numberformat, Format, NumberFormat,
 class t_currencypluralinfo : public _wrapper {
 public:
     CurrencyPluralInfo *object;
+    PyObject *locale;
 };
 
 static int t_currencypluralinfo_init(t_currencypluralinfo *self,
@@ -165,8 +166,20 @@ static PyMethodDef t_currencypluralinfo_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
+static void t_currencypluralinfo_dealloc(t_currencypluralinfo *self)
+{
+    if (self->flags & T_OWNED)
+        delete self->object;
+    self->object = NULL;
+
+    Py_CLEAR(self->locale);
+
+    self->ob_type->tp_free((PyObject *) self);
+}
+
 DECLARE_TYPE(CurrencyPluralInfo, t_currencypluralinfo, UObject,
-             CurrencyPluralInfo, t_currencypluralinfo_init, NULL);
+             CurrencyPluralInfo, t_currencypluralinfo_init,
+             t_currencypluralinfo_dealloc);
 
 #endif
 
@@ -982,7 +995,7 @@ static int t_currencypluralinfo_init(t_currencypluralinfo *self,
         self->flags = T_OWNED;
         break;
       case 1:
-        if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
+        if (!parseArgs(args, "p", TYPE_CLASSID(Locale), &locale, &self->locale))
         {
             INT_STATUS_CALL(self->object = new CurrencyPluralInfo(*locale,
                                                                   status));
@@ -1071,7 +1084,7 @@ static PyObject *t_currencypluralinfo_setLocale(t_currencypluralinfo *self,
 {
     Locale *locale;
 
-    if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
+    if (!parseArg(arg, "p", TYPE_CLASSID(Locale), &locale, &self->locale))
     {
         STATUS_CALL(self->object->setLocale(*locale, status));
         Py_RETURN_NONE;
