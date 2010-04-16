@@ -311,13 +311,13 @@ static PyObject *t_normalizer_setText(t_normalizer *self, PyObject *arg)
 
     if (!parseArg(arg, "S", &u, &_u))
     {
-        STATUS_CALL(self->object->setText(*u, status));
+        STATUS_CALL(self->object->setText(*u, status)); /* copied */
         Py_RETURN_NONE;
     }
     
     if (!parseArg(arg, "P", TYPE_ID(CharacterIterator), &iterator))
     {
-        STATUS_CALL(self->object->setText(*iterator, status));
+        STATUS_CALL(self->object->setText(*iterator, status)); /* copied */
         Py_RETURN_NONE;
     }
      

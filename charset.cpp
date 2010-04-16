@@ -171,6 +171,7 @@ static PyObject *t_charsetdetector_setText(t_charsetdetector *self,
 
     if (!parseArg(arg, "k", &text, &size))
     {
+        /* ref'd */
         STATUS_CALL(ucsdet_setText(self->object, text, size, &status));
 
         Py_INCREF(arg);
@@ -191,6 +192,7 @@ static PyObject *t_charsetdetector_setDeclaredEncoding(t_charsetdetector *self,
 
     if (!parseArg(arg, "k", &encoding, &size))
     {
+        /* copied */
         STATUS_CALL(ucsdet_setDeclaredEncoding(self->object, encoding, size,
                                                &status));
         Py_RETURN_NONE;

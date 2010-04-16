@@ -318,12 +318,11 @@ static PyObject *t_timezone_getID(t_timezone *self, PyObject *args)
 
 static PyObject *t_timezone_setID(t_timezone *self, PyObject *arg)
 {
-    UnicodeString *u;
-    UnicodeString _u;
+    UnicodeString *u, _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
-        self->object->setID(*u);
+        self->object->setID(*u); /* copied */
         Py_RETURN_NONE;
     }
 
@@ -332,8 +331,7 @@ static PyObject *t_timezone_setID(t_timezone *self, PyObject *arg)
 
 static PyObject *t_timezone_getDisplayName(t_timezone *self, PyObject *args)
 {
-    UnicodeString *u;
-    UnicodeString _u;
+    UnicodeString *u, _u;
     int daylight;
     Locale *locale;
     TimeZone::EDisplayType type;
@@ -540,7 +538,7 @@ static PyObject *t_timezone_setDefault(PyTypeObject *type, PyObject *arg)
 
     if (!parseArg(arg, "P", TYPE_CLASSID(TimeZone), &tz))
     {
-        TimeZone::setDefault(*tz);
+        TimeZone::setDefault(*tz); /* copied */
 
         PyObject *m = PyImport_ImportModule("icu");
         PyObject *cls = PyObject_GetAttrString(m, "ICUtzinfo");
@@ -971,7 +969,7 @@ static PyObject *t_calendar_setTimeZone(t_calendar *self, PyObject *arg)
 
     if (!parseArg(arg, "P", TYPE_CLASSID(TimeZone), &tz))
     {
-        self->object->setTimeZone(*tz);
+        self->object->setTimeZone(*tz); /* copied */
         Py_RETURN_NONE;
     }
 

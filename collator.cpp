@@ -507,7 +507,7 @@ static PyObject *t_collator_setVariableTop(t_collator *self, PyObject *arg)
     }
     else if (!parseArg(arg, "S", &u, &_u))
     {
-        STATUS_CALL(self->object->setVariableTop(*u, status));
+        STATUS_CALL(self->object->setVariableTop(*u, status)); /* transient */
         Py_RETURN_NONE;
     }
 

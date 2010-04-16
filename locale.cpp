@@ -599,7 +599,7 @@ static PyObject *t_locale_setDefault(PyTypeObject *type, PyObject *args)
       case 1:
         if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
-            STATUS_CALL(Locale::setDefault(*locale, status));
+            STATUS_CALL(Locale::setDefault(*locale, status)); /* transient */
             Py_RETURN_NONE;
         }
         break;
@@ -770,8 +770,7 @@ static PyObject *t_resourcebundle_getSize(t_resourcebundle *self)
 static PyObject *t_resourcebundle_getString(t_resourcebundle *self,
                                             PyObject *args)
 {
-    UnicodeString *u;
-    UnicodeString _u;
+    UnicodeString *u, _u;
 
     switch (PyTuple_Size(args)) {
       case 0:

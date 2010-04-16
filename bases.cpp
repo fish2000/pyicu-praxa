@@ -2075,12 +2075,11 @@ static PyObject *t_formattable_setDate(t_formattable *self, PyObject *arg)
 
 static PyObject *t_formattable_setString(t_formattable *self, PyObject *arg)
 {
-    UnicodeString *u;
-    UnicodeString _u;
+    UnicodeString *u, _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
-        self->object->setString(*u);
+        self->object->setString(*u); /* copied */
         Py_RETURN_NONE;
     }
 

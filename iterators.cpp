@@ -152,7 +152,6 @@ DECLARE_TYPE(UCharCharacterIterator, t_ucharcharacteriterator,
 class t_stringcharacteriterator : public _wrapper {
 public:
     StringCharacterIterator *object;
-    PyObject *text;
 };
 
 static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
@@ -173,7 +172,6 @@ DECLARE_TYPE(StringCharacterIterator, t_stringcharacteriterator,
 class t_breakiterator : public _wrapper {
 public:
     BreakIterator *object;
-    PyObject *text;
 };
 
 static PyObject *t_breakiterator_getText(t_breakiterator *self);
@@ -231,25 +229,14 @@ static PyMethodDef t_breakiterator_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-static void t_breakiterator_dealloc(t_breakiterator *self)
-{
-    if (self->flags & T_OWNED)
-        delete self->object;
-    self->object = NULL;
-
-    Py_CLEAR(self->text);
-    self->ob_type->tp_free((PyObject *) self);
-}
-
 DECLARE_TYPE(BreakIterator, t_breakiterator, UObject, BreakIterator,
-             abstract_init, t_breakiterator_dealloc);
+             abstract_init, NULL);
 
 /* RuleBasedBreakIterator */
 
 class t_rulebasedbreakiterator : public _wrapper {
 public:
     RuleBasedBreakIterator *object;
-    PyObject *text;
 };
 
 static int t_rulebasedbreakiterator_init(t_rulebasedbreakiterator *self,
@@ -317,7 +304,6 @@ DECLARE_TYPE(CanonicalIterator, t_canonicaliterator, UObject,
 class t_collationelementiterator : public _wrapper {
 public:
     CollationElementIterator *object;
-    PyObject *text;
 };
 
 static PyObject *t_collationelementiterator_reset(t_collationelementiterator *self);
@@ -349,19 +335,8 @@ static PyMethodDef t_collationelementiterator_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-static void t_collationelementiterator_dealloc(t_collationelementiterator *self)
-{
-    if (self->flags & T_OWNED)
-        delete self->object;
-    self->object = NULL;
-
-    Py_CLEAR(self->text);
-    self->ob_type->tp_free((PyObject *) self);
-}
-
 DECLARE_TYPE(CollationElementIterator, t_collationelementiterator, UObject,
-             CollationElementIterator, abstract_init,
-             t_collationelementiterator_dealloc);
+             CollationElementIterator, abstract_init, NULL);
 
 
 /* ForwardCharacterIterator */
@@ -639,7 +614,7 @@ static PyObject *t_ucharcharacteriterator_setText(t_ucharcharacteriterator *self
 
     if (!parseArgs(args, "Wi", &u, &self->text, &length))
     {
-        self->object->setText(u->getTerminatedBuffer(), length);
+        self->object->setText(u->getTerminatedBuffer(), length);  /* ref'd */
         Py_RETURN_NONE;
     }
 
@@ -652,12 +627,12 @@ static PyObject *t_ucharcharacteriterator_setText(t_ucharcharacteriterator *self
 static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
                                           PyObject *args, PyObject *kwds)
 {
-    UnicodeString *u;
+    UnicodeString *u, _u;
     int start, end, pos;
 
     switch (PyTuple_Size(args)) {
       case 1:
-        if (!parseArgs(args, "W", &u, &self->text))
+        if (!parseArgs(args, "S", &u, &_u))
         {
             self->object = new StringCharacterIterator(*u);
             self->flags = T_OWNED;
@@ -666,7 +641,7 @@ static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 2:
-        if (!parseArgs(args, "Wi", &u, &self->text, &pos))
+        if (!parseArgs(args, "Si", &u, &_u, &pos))
         {
             self->object = new StringCharacterIterator(*u, pos);
             self->flags = T_OWNED;
@@ -675,7 +650,7 @@ static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 4:
-        if (!parseArgs(args, "Wiii", &u, &self->text, &start, &end, &pos))
+        if (!parseArgs(args, "Siii", &u, &_u, &start, &end, &pos))
         {
             self->object = new StringCharacterIterator(*u, start, end, pos);
             self->flags = T_OWNED;
@@ -696,11 +671,11 @@ static int t_stringcharacteriterator_init(t_stringcharacteriterator *self,
 
 static PyObject *t_stringcharacteriterator_setText(t_stringcharacteriterator *self, PyObject *args)
 {
-    UnicodeString *u;
+    UnicodeString *u, _u;
 
-    if (!parseArgs(args, "W", &u, &self->text))
+    if (!parseArgs(args, "S", &u, &_u))
     {
-        self->object->setText(*u);
+        self->object->setText(*u); /* copied */
         Py_RETURN_NONE;
     }
 
@@ -718,11 +693,11 @@ static PyObject *t_breakiterator_getText(t_breakiterator *self)
 
 static PyObject *t_breakiterator_setText(t_breakiterator *self, PyObject *arg)
 {
-    UnicodeString *u;
+    UnicodeString *u, _u;
 
-    if (!parseArg(arg, "W", &u, &self->text))
+    if (!parseArg(arg, "S", &u, &_u))
     {
-        self->object->setText(*u);
+        self->object->setText(*u); /* copied */
         Py_RETURN_NONE;
     }
 
@@ -1040,7 +1015,7 @@ static PyObject *t_breakiterator_richcmp(t_breakiterator *self,
 static int t_rulebasedbreakiterator_init(t_rulebasedbreakiterator *self,
                                          PyObject *args, PyObject *kwds)
 {
-    UnicodeString *u;
+    UnicodeString *u, _u;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1048,7 +1023,7 @@ static int t_rulebasedbreakiterator_init(t_rulebasedbreakiterator *self,
         self->flags = T_OWNED;
         break;
       case 1:
-        if (!parseArgs(args, "W", &u, &self->text))
+        if (!parseArgs(args, "S", &u, &_u))
         {
             RuleBasedBreakIterator *iterator;
 
@@ -1168,12 +1143,11 @@ static PyObject *t_canonicaliterator_getSource(t_canonicaliterator *self,
 static PyObject *t_canonicaliterator_setSource(t_canonicaliterator *self,
                                                PyObject *arg)
 {
-    UnicodeString *u;
-    UnicodeString _u;
+    UnicodeString *u, _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
-        STATUS_CALL(self->object->setSource(*u, status));
+        STATUS_CALL(self->object->setSource(*u, status)); /* transient */
         Py_RETURN_NONE;
     }
 
@@ -1254,11 +1228,11 @@ static PyObject *t_collationelementiterator_previous(t_collationelementiterator 
 
 static PyObject *t_collationelementiterator_setText(t_collationelementiterator *self, PyObject *arg)
 {
-    UnicodeString *u;
+    UnicodeString *u, _u;
 
-    if (!parseArg(arg, "W", &u, &self->text))
+    if (!parseArg(arg, "S", &u, &_u))
     {
-        STATUS_CALL(self->object->setText(*u, status));
+        STATUS_CALL(self->object->setText(*u, status)); /* copied */
         Py_RETURN_NONE;
     }
 

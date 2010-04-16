@@ -355,7 +355,7 @@ static PyObject *t_dateformatsymbols_setEras(t_dateformatsymbols *self,
 
     if (!parseArg(arg, "T", &eras, &len))
     {
-        self->object->setEras(eras, len);
+        self->object->setEras(eras, len); /* copied */
         delete[] eras; /* dtfmtsym.cpp code duplicates it */
         Py_RETURN_NONE;
     }
@@ -395,7 +395,7 @@ static PyObject *t_dateformatsymbols_setMonths(t_dateformatsymbols *self,
 
     if (!parseArg(arg, "T", &months, &len))
     {
-        self->object->setMonths(months, len);
+        self->object->setMonths(months, len); /* copied */
         delete[] months; /* dtfmtsym.cpp code duplicates it */
         Py_RETURN_NONE;
     }
@@ -419,7 +419,7 @@ static PyObject *t_dateformatsymbols_setShortMonths(t_dateformatsymbols *self,
 
     if (!parseArg(arg, "T", &months, &len))
     {
-        self->object->setShortMonths(months, len);
+        self->object->setShortMonths(months, len); /* copied */
         delete[] months; /* dtfmtsym.cpp code duplicates it */
         Py_RETURN_NONE;
     }
@@ -459,7 +459,7 @@ static PyObject *t_dateformatsymbols_setWeekdays(t_dateformatsymbols *self,
 
     if (!parseArg(arg, "T", &weekdays, &len))
     {
-        self->object->setWeekdays(weekdays, len);
+        self->object->setWeekdays(weekdays, len); /* copied */
         delete[] weekdays; /* dtfmtsym.cpp code duplicates it */
         Py_RETURN_NONE;
     }
@@ -483,7 +483,7 @@ static PyObject *t_dateformatsymbols_setShortWeekdays(t_dateformatsymbols *self,
 
     if (!parseArg(arg, "T", &weekdays, &len))
     {
-        self->object->setShortWeekdays(weekdays, len);
+        self->object->setShortWeekdays(weekdays, len); /* copied */
         delete[] weekdays; /* dtfmtsym.cpp code duplicates it */
         Py_RETURN_NONE;
     }
@@ -507,7 +507,7 @@ static PyObject *t_dateformatsymbols_setAmPmStrings(t_dateformatsymbols *self,
 
     if (!parseArg(arg, "T", &strings, &len))
     {
-        self->object->setAmPmStrings(strings, len);
+        self->object->setAmPmStrings(strings, len); /* copied */
         delete[] strings; /* dtfmtsym.cpp code duplicates it */
         Py_RETURN_NONE;
     }
@@ -540,12 +540,11 @@ static PyObject *t_dateformatsymbols_getLocalPatternChars(t_dateformatsymbols *s
 
 static PyObject *t_dateformatsymbols_setLocalPatternChars(t_dateformatsymbols *self, PyObject *arg)
 {
-    UnicodeString *u;
-    UnicodeString _u;
+    UnicodeString *u, _u;
 
     if (!parseArg(arg, "S", &u, &_u))
     {
-        self->object->setLocalPatternChars(*u);
+        self->object->setLocalPatternChars(*u); /* copied */
         Py_RETURN_NONE;
     }
 
@@ -706,7 +705,7 @@ static PyObject *t_dateformat_setCalendar(t_dateformat *self, PyObject *arg)
 
     if (!parseArg(arg, "P", TYPE_ID(Calendar), &calendar))
     {
-        self->object->setCalendar(*calendar);
+        self->object->setCalendar(*calendar); /* copied */
         Py_RETURN_NONE;
     }
 
@@ -724,7 +723,7 @@ static PyObject *t_dateformat_setNumberFormat(t_dateformat *self, PyObject *arg)
 
     if (!parseArg(arg, "P", TYPE_CLASSID(NumberFormat), &format))
     {
-        self->object->setNumberFormat(*format);
+        self->object->setNumberFormat(*format); /* copied */
         Py_RETURN_NONE;
     }
 
@@ -742,7 +741,7 @@ static PyObject *t_dateformat_setTimeZone(t_dateformat *self, PyObject *arg)
 
     if (!parseArg(arg, "P", TYPE_CLASSID(TimeZone), &tz))
     {
-        self->object->setTimeZone(*tz);
+        self->object->setTimeZone(*tz); /* copied */
         Py_RETURN_NONE;
     }
 
@@ -1001,7 +1000,7 @@ static PyObject *t_simpledateformat_setDateFormatSymbols(t_simpledateformat *sel
 
     if (!parseArg(arg, "P", TYPE_CLASSID(DateFormatSymbols), &dfs))
     {
-        self->object->setDateFormatSymbols(*dfs);
+        self->object->setDateFormatSymbols(*dfs); /* copied */
         Py_RETURN_NONE;
     }
 
@@ -1116,6 +1115,7 @@ static PyObject *t_dateintervalinfo_setIntervalPattern(t_dateintervalinfo *self,
 
     if (!parseArgs(args, "SiS", &u0, &_u0, &ucdf, &u1, &_u1))
     {
+        /* u0 transient, u1 copied */
         STATUS_CALL(self->object->setIntervalPattern(*u0, ucdf, *u1, status));
         Py_RETURN_NONE;
     }
@@ -1158,6 +1158,7 @@ static PyObject *t_dateintervalinfo_setFallbackIntervalPattern(t_dateintervalinf
 
     if (!parseArg(arg, "S", &u, &_u))
     {
+        /* copied */
         STATUS_CALL(self->object->setFallbackIntervalPattern(*u, status));
         Py_RETURN_NONE;
     }
@@ -1245,6 +1246,7 @@ static PyObject *t_dateintervalformat_setDateIntervalInfo(t_dateintervalformat *
 
     if (!parseArg(arg, "P", TYPE_CLASSID(DateIntervalInfo), &dii))
     {
+        /* copied */
         STATUS_CALL(self->object->setDateIntervalInfo(*dii, status));
         Py_RETURN_NONE;
     }

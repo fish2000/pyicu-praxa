@@ -142,8 +142,6 @@ DECLARE_TYPE(MeasureFormat, t_measureformat, Format, MeasureFormat,
 class t_timeunitformat : public _wrapper {
 public:
     TimeUnitFormat *object;
-    PyObject *locale;
-    PyObject *numberformat;
 };
 
 static int t_timeunitformat_init(t_timeunitformat *self,
@@ -159,20 +157,8 @@ static PyMethodDef t_timeunitformat_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-static void t_timeunitformat_dealloc(t_timeunitformat *self)
-{
-    if (self->flags & T_OWNED)
-        delete self->object;
-    self->object = NULL;
-
-    Py_CLEAR(self->locale);
-    Py_CLEAR(self->numberformat);
-
-    self->ob_type->tp_free((PyObject *) self);
-}
-
 DECLARE_TYPE(TimeUnitFormat, t_timeunitformat, MeasureFormat, TimeUnitFormat,
-             t_timeunitformat_init, t_timeunitformat_dealloc);
+             t_timeunitformat_init, NULL);
 
 #endif
 
@@ -181,7 +167,6 @@ DECLARE_TYPE(TimeUnitFormat, t_timeunitformat, MeasureFormat, TimeUnitFormat,
 class t_messageformat : public _wrapper {
 public:
     MessageFormat *object;
-    PyObject *locale;
 };
 
 static int t_messageformat_init(t_messageformat *self,
@@ -226,19 +211,8 @@ static PyMethodDef t_messageformat_methods[] = {
     { NULL, NULL, 0, NULL }
 };
 
-static void t_messageformat_dealloc(t_messageformat *self)
-{
-    if (self->flags & T_OWNED)
-        delete self->object;
-    self->object = NULL;
-
-    Py_CLEAR(self->locale);
-
-    self->ob_type->tp_free((PyObject *) self);
-}
-
 DECLARE_TYPE(MessageFormat, t_messageformat, Format, MessageFormat,
-             t_messageformat_init, t_messageformat_dealloc);
+             t_messageformat_init, NULL);
 
 #if U_ICU_VERSION_HEX >= 0x04000000
 
@@ -278,7 +252,6 @@ DECLARE_TYPE(PluralRules, t_pluralrules, UObject, PluralRules,
 class t_pluralformat : public _wrapper {
 public:
     PluralFormat *object;
-    PyObject *locale;
     PyObject *numberformat;
 };
 
@@ -308,7 +281,6 @@ static void t_pluralformat_dealloc(t_pluralformat *self)
         delete self->object;
     self->object = NULL;
 
-    Py_CLEAR(self->locale);
     Py_CLEAR(self->numberformat);
     self->ob_type->tp_free((PyObject *) self);
 }
@@ -765,7 +737,7 @@ static int t_timeunitformat_init(t_timeunitformat *self,
         self->flags = T_OWNED;
         break;
       case 1:
-        if (!parseArgs(args, "p", TYPE_CLASSID(Locale), &locale, &self->locale))
+        if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
             INT_STATUS_CALL(self->object = new TimeUnitFormat(*locale, status));
             self->flags = T_OWNED;
@@ -774,8 +746,7 @@ static int t_timeunitformat_init(t_timeunitformat *self,
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 2:
-        if (!parseArgs(args, "pi", TYPE_CLASSID(Locale), &locale, &self->locale,
-                       &style))
+        if (!parseArgs(args, "Pi", TYPE_CLASSID(Locale), &locale, &style))
         {
             INT_STATUS_CALL(self->object = new TimeUnitFormat(*locale, style, status));
             self->flags = T_OWNED;
@@ -799,9 +770,9 @@ static PyObject *t_timeunitformat_setLocale(t_timeunitformat *self,
 {
     Locale *locale;
 
-    if (!parseArg(arg, "p", TYPE_CLASSID(Locale), &locale, &self->locale))
+    if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
     {
-        STATUS_CALL(self->object->setLocale(*locale, status));
+        STATUS_CALL(self->object->setLocale(*locale, status)); /* copied */
         Py_RETURN_NONE;
     }
 
@@ -813,8 +784,7 @@ static PyObject *t_timeunitformat_setNumberFormat(t_timeunitformat *self,
 {
     NumberFormat *format;
 
-    if (!parseArg(arg, "p", TYPE_CLASSID(NumberFormat), &format,
-                  &self->numberformat))
+    if (!parseArg(arg, "P", TYPE_CLASSID(NumberFormat), &format)) /* copied */
     {
         STATUS_CALL(self->object->setNumberFormat(*format, status));
         Py_RETURN_NONE;
@@ -831,8 +801,7 @@ static PyObject *t_timeunitformat_setNumberFormat(t_timeunitformat *self,
 static int t_messageformat_init(t_messageformat *self,
                                 PyObject *args, PyObject *kwds)
 {
-    UnicodeString *u;
-    UnicodeString _u;
+    UnicodeString *u, _u;
     Locale *locale;
 
     switch (PyTuple_Size(args)) {
@@ -849,8 +818,7 @@ static int t_messageformat_init(t_messageformat *self,
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 2:
-        if (!parseArgs(args, "Sp", TYPE_CLASSID(Locale),
-                       &u, &_u, &locale, &self->locale))
+        if (!parseArgs(args, "SP", TYPE_CLASSID(Locale), &u, &_u, &locale))
         {
             MessageFormat *format;
 
@@ -882,9 +850,9 @@ static PyObject *t_messageformat_setLocale(t_messageformat *self,
 {
     Locale *locale;
 
-    if (!parseArg(arg, "p", TYPE_CLASSID(Locale), &locale, &self->locale))
+    if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
     {
-        self->object->setLocale(*locale);
+        self->object->setLocale(*locale); /* copied */
         Py_RETURN_NONE;
     }
 
@@ -985,7 +953,7 @@ static PyObject *t_messageformat_setFormats(t_messageformat *self,
 
     if (!parseArg(arg, "Q", TYPE_ID(Format), &formats, &len, TYPE_ID(Format)))
     {
-        self->object->setFormats(formats, len);
+        self->object->setFormats(formats, len); /* copied */
         free(formats);
         Py_RETURN_NONE;
     }
@@ -1001,7 +969,7 @@ static PyObject *t_messageformat_setFormat(t_messageformat *self,
 
     if (!parseArgs(args, "iP", TYPE_ID(Format), &i, &format))
     {
-        self->object->setFormat(i, *format);
+        self->object->setFormat(i, *format); /* copied */
         Py_RETURN_NONE;
     }
 
@@ -1341,7 +1309,7 @@ static int t_pluralformat_init(t_pluralformat *self,
         self->flags = T_OWNED;
         break;
       case 1:
-        if (!parseArgs(args, "p", TYPE_CLASSID(Locale), &locale, &self->locale))
+        if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
             INT_STATUS_CALL(self->object = new PluralFormat(*locale, status));
             self->flags = T_OWNED;
@@ -1362,17 +1330,16 @@ static int t_pluralformat_init(t_pluralformat *self,
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 2:
-        if (!parseArgs(args, "pP",
+        if (!parseArgs(args, "PP",
                        TYPE_CLASSID(Locale), TYPE_CLASSID(PluralRules),
-                       &locale, &self->locale, &rules))
+                       &locale, &rules))
         {
             INT_STATUS_CALL(self->object = new PluralFormat(*locale, *rules,
                                                             status));
             self->flags = T_OWNED;
             break;
         }
-        if (!parseArgs(args, "pS", TYPE_CLASSID(Locale), &locale, &self->locale,
-                       &u, &_u))
+        if (!parseArgs(args, "PS", TYPE_CLASSID(Locale), &locale, &u, &_u))
         {
             INT_STATUS_CALL(self->object = new PluralFormat(*locale, *u,
                                                             status));
@@ -1389,9 +1356,9 @@ static int t_pluralformat_init(t_pluralformat *self,
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 3:
-        if (!parseArgs(args, "pPS",
+        if (!parseArgs(args, "PPS",
                        TYPE_CLASSID(Locale), TYPE_CLASSID(PluralRules),
-                       &locale, &self->locale, &rules, &u, &_u))
+                       &locale, &rules, &u, &_u))
         {
             INT_STATUS_CALL(self->object = new PluralFormat(*locale, *rules, *u,
                                                             status));
@@ -1415,9 +1382,9 @@ static PyObject *t_pluralformat_setLocale(t_pluralformat *self, PyObject *arg)
 {
     Locale *locale;
 
-    if (!parseArg(arg, "p", TYPE_CLASSID(Locale), &locale, &self->locale))
+    if (!parseArg(arg, "P", TYPE_CLASSID(Locale), &locale))
     {
-        STATUS_CALL(self->object->setLocale(*locale, status));
+        STATUS_CALL(self->object->setLocale(*locale, status)); /* copied */
         Py_RETURN_NONE;
     }
 
@@ -1430,7 +1397,7 @@ static PyObject *t_pluralformat_setNumberFormat(t_pluralformat *self,
     NumberFormat *format;
 
     if (!parseArg(arg, "p", TYPE_CLASSID(NumberFormat), &format,
-                  &self->numberformat))
+                  &self->numberformat)) /* ref'd */
     {
         STATUS_CALL(self->object->setNumberFormat(format, status));
         Py_RETURN_NONE;

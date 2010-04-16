@@ -27,6 +27,8 @@ Version 0.9 ->
   - added missing conditionals for features in ICU versions >= 4.0
   - README now marked-up with reStructuredText (Christoph Burgmer)
   - PyICU main module renamed to 'icu' (with deprecation warning for old name)
+  - UnicodeString objects are now hashable
+  - reviewed all wrapped ICU setters for parameter ownership
   - 
 
 Version 0.8 -> 0.9
