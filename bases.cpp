@@ -1358,6 +1358,11 @@ static PyObject *t_unicodestring_repr(t_unicodestring *self)
     return repr;
 }
 
+static int t_unicodestring_hash(t_unicodestring *self)
+{
+    return self->object->hashCode();
+}
+
 
 static PyObject *t_unicodestring_encode(t_unicodestring *self, PyObject *arg)
 {
@@ -2460,6 +2465,7 @@ void _init_bases(PyObject *m)
     UnicodeStringType.tp_str = (reprfunc) t_unicodestring_str;
     UnicodeStringType.tp_repr = (reprfunc) t_unicodestring_repr;
     UnicodeStringType.tp_richcompare = (richcmpfunc) t_unicodestring_richcmp;
+    UnicodeStringType.tp_hash = (hashfunc) t_unicodestring_hash;
     UnicodeStringType.tp_as_sequence = &t_unicodestring_as_sequence;
     FormattableType.tp_richcompare = (richcmpfunc) t_formattable_richcmp;
     FormattableType.tp_str = (reprfunc) t_formattable_str;

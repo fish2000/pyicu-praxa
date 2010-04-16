@@ -143,6 +143,7 @@ class t_currencypluralinfo : public _wrapper {
 public:
     CurrencyPluralInfo *object;
     PyObject *locale;
+    PyObject *patterns;
 };
 
 static int t_currencypluralinfo_init(t_currencypluralinfo *self,
@@ -173,6 +174,7 @@ static void t_currencypluralinfo_dealloc(t_currencypluralinfo *self)
     self->object = NULL;
 
     Py_CLEAR(self->locale);
+    Py_CLEAR(self->patterns);
 
     self->ob_type->tp_free((PyObject *) self);
 }
@@ -1011,7 +1013,10 @@ static int t_currencypluralinfo_init(t_currencypluralinfo *self,
     }
 
     if (self->object)
+    {
+        self->patterns = PyDict_New();
         return 0;
+    }
 
     return -1;
 }
@@ -1062,12 +1067,25 @@ static PyObject *t_currencypluralinfo_getCurrencyPluralPattern(t_currencyplurali
 
 static PyObject *t_currencypluralinfo_setCurrencyPluralPattern(t_currencypluralinfo *self, PyObject *args)
 {
-    UnicodeString *u0, _u0;
-    UnicodeString *u1, _u1;
+    UnicodeString *u0, *u1;
+    PyObject *pluralCount = NULL, *pattern = NULL;
 
-    if (!parseArgs(args, "SS", &u0, &_u0, &u1, &_u1))
+    if (!parseArgs(args, "WW", &u0, &pluralCount, &u1, &pattern))
     {
-        STATUS_CALL(self->object->setCurrencyPluralPattern(*u0, *u1, status));
+        UErrorCode status = U_ZERO_ERROR;
+        
+        self->object->setCurrencyPluralPattern(*u0, *u1, status);
+        if (U_FAILURE(status))
+        {
+            Py_XDECREF(pluralCount);
+            Py_XDECREF(pattern);
+            return ICUException(status).reportError();
+        }
+
+        PyDict_SetItem(self->patterns, pluralCount, pattern);
+        Py_DECREF(pluralCount);
+        Py_DECREF(pattern);
+
         Py_RETURN_NONE;
     }
 
