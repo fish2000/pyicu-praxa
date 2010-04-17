@@ -573,7 +573,7 @@ static PyObject *t_normalizer2_isNormalized(t_normalizer2 *self, PyObject *arg)
 {
     UnicodeString *u, _u;
 
-    if (!parseArg(arg, "U", &u, &_u))
+    if (!parseArg(arg, "S", &u, &_u))
     {
         UBool b;
 
@@ -588,7 +588,7 @@ static PyObject *t_normalizer2_quickCheck(t_normalizer2 *self, PyObject *arg)
 {
     UnicodeString *u, _u;
 
-    if (!parseArg(arg, "U", &u, &_u))
+    if (!parseArg(arg, "S", &u, &_u))
     {
         UNormalizationCheckResult uncr;
 
@@ -604,7 +604,7 @@ static PyObject *t_normalizer2_spanQuickCheckYes(t_normalizer2 *self,
 {
     UnicodeString *u, _u;
 
-    if (!parseArg(arg, "U", &u, &_u))
+    if (!parseArg(arg, "S", &u, &_u))
     {
         int32_t end;
 
@@ -620,7 +620,7 @@ static PyObject *t_normalizer2_hasBoundaryBefore(t_normalizer2 *self,
 {
     UnicodeString *u, _u;
 
-    if (!parseArg(arg, "U", &u, &_u))
+    if (!parseArg(arg, "S", &u, &_u))
     {
         UChar32 c;
         int32_t len;
@@ -642,7 +642,7 @@ static PyObject *t_normalizer2_hasBoundaryAfter(t_normalizer2 *self,
 {
     UnicodeString *u, _u;
 
-    if (!parseArg(arg, "U", &u, &_u))
+    if (!parseArg(arg, "S", &u, &_u))
     {
         UChar32 c;
         int32_t len;
@@ -663,7 +663,7 @@ static PyObject *t_normalizer2_isInert(t_normalizer2 *self, PyObject *arg)
 {
     UnicodeString *u, _u;
 
-    if (!parseArg(arg, "U", &u, &_u))
+    if (!parseArg(arg, "S", &u, &_u))
     {
         UChar32 c;
         int32_t len;
