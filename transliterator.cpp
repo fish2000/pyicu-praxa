@@ -625,6 +625,6 @@ void _init_transliterator(PyObject *m)
     INSTALL_STRUCT(UTransPosition, m);
     REGISTER_TYPE(Transliterator, m);
 
-    INSTALL_ENUM(UTransDirection, UTRANS_FORWARD);
-    INSTALL_ENUM(UTransDirection, UTRANS_REVERSE);
+    INSTALL_ENUM(UTransDirection, "FORWARD", UTRANS_FORWARD);
+    INSTALL_ENUM(UTransDirection, "REVERSE", UTRANS_REVERSE);
 }

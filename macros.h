@@ -314,9 +314,9 @@ PyTypeObject name##Type = {                                             \
     PyDict_SetItemString(type##Type.tp_dict, #name,                         \
                          make_descriptor(PyInt_FromLong(type::name)))
 
-#define INSTALL_ENUM(type, name)                                        \
-    PyDict_SetItemString(type##Type.tp_dict, #name,                     \
-                         make_descriptor(PyInt_FromLong(name)))
+#define INSTALL_ENUM(type, name, value)                                 \
+    PyDict_SetItemString(type##Type.tp_dict, name,                      \
+                         make_descriptor(PyInt_FromLong(value)))
 
 #define Py_RETURN_BOOL(b)                       \
     {                                           \

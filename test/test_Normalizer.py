@@ -38,7 +38,7 @@ class TestNormalizer2(TestCase):
             return
 
         normalizer = Normalizer2.getInstance(None, "nfkc_cf",
-                                             UNormalizationMode2.UNORM2_COMPOSE)
+                                             UNormalizationMode2.COMPOSE)
 
         self.assert_(normalizer.normalize("Hi There") == u'hi there')
 

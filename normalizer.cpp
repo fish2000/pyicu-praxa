@@ -742,22 +742,22 @@ void _init_normalizer(PyObject *m)
     INSTALL_CONSTANTS_TYPE(UNormalizationMode2, m);
 #endif
 
-    INSTALL_ENUM(UNormalizationMode, UNORM_NONE);
-    INSTALL_ENUM(UNormalizationMode, UNORM_NFD);
-    INSTALL_ENUM(UNormalizationMode, UNORM_NFKD);
-    INSTALL_ENUM(UNormalizationMode, UNORM_NFC);
-    INSTALL_ENUM(UNormalizationMode, UNORM_DEFAULT);
-    INSTALL_ENUM(UNormalizationMode, UNORM_NFKC);
-    INSTALL_ENUM(UNormalizationMode, UNORM_FCD);
+    INSTALL_ENUM(UNormalizationMode, "NONE", UNORM_NONE);
+    INSTALL_ENUM(UNormalizationMode, "NFD", UNORM_NFD);
+    INSTALL_ENUM(UNormalizationMode, "NFKD", UNORM_NFKD);
+    INSTALL_ENUM(UNormalizationMode, "NFC", UNORM_NFC);
+    INSTALL_ENUM(UNormalizationMode, "DEFAULT", UNORM_DEFAULT);
+    INSTALL_ENUM(UNormalizationMode, "NFKC", UNORM_NFKC);
+    INSTALL_ENUM(UNormalizationMode, "FCD", UNORM_FCD);
 
-    INSTALL_ENUM(UNormalizationCheckResult, UNORM_NO);
-    INSTALL_ENUM(UNormalizationCheckResult, UNORM_YES);
-    INSTALL_ENUM(UNormalizationCheckResult, UNORM_MAYBE);
+    INSTALL_ENUM(UNormalizationCheckResult, "NO", UNORM_NO);
+    INSTALL_ENUM(UNormalizationCheckResult, "YES", UNORM_YES);
+    INSTALL_ENUM(UNormalizationCheckResult, "MAYBE", UNORM_MAYBE);
 
 #if U_ICU_VERSION_HEX >= 0x04040000
-    INSTALL_ENUM(UNormalizationMode2, UNORM2_COMPOSE);
-    INSTALL_ENUM(UNormalizationMode2, UNORM2_DECOMPOSE);
-    INSTALL_ENUM(UNormalizationMode2, UNORM2_FCD);
-    INSTALL_ENUM(UNormalizationMode2, UNORM2_COMPOSE_CONTIGUOUS);
+    INSTALL_ENUM(UNormalizationMode2, "COMPOSE", UNORM2_COMPOSE);
+    INSTALL_ENUM(UNormalizationMode2, "DECOMPOSE", UNORM2_DECOMPOSE);
+    INSTALL_ENUM(UNormalizationMode2, "FCD", UNORM2_FCD);
+    INSTALL_ENUM(UNormalizationMode2, "COMPOSE_CONTIGUOUS", UNORM2_COMPOSE_CONTIGUOUS);
 #endif
 }

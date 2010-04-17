@@ -33,7 +33,7 @@ class TestTransliterator(TestCase):
     def testTransliterate(self):
 
         trans = Transliterator.createInstance('Accents-Any',
-                                              UTransDirection.UTRANS_FORWARD)
+                                              UTransDirection.FORWARD)
         inverse = trans.createInverse()
 
         string = u'\xe9v\xe9nement'
@@ -48,7 +48,7 @@ class TestTransliterator(TestCase):
     def testUnicodeString(self):
 
         trans = Transliterator.createInstance('NumericPinyin-Latin',
-                                              UTransDirection.UTRANS_FORWARD)
+                                              UTransDirection.FORWARD)
         string = UnicodeString("Shang4hai3 zi4lai2shui3 lai2 zi4 hai3 shang4")
         result = u'Sh\xe0ngh\u01cei z\xecl\xe1ishu\u01d0 l\xe1i z\xec h\u01cei sh\xe0ng'
 
@@ -79,7 +79,7 @@ class TestTransliterator(TestCase):
         Transliterator.registerInstance(trans)
 
         regTrans = Transliterator.createInstance("vowel",
-                                                 UTransDirection.UTRANS_FORWARD)
+                                                 UTransDirection.FORWARD)
 
         self.assert_(regTrans.transliterate(string) == result)
 

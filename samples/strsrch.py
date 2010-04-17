@@ -29,43 +29,43 @@ def processCollator(options):
     if options.rules is not None:
         rules = unicode(options.rules, 'unicode-escape')
         collator = RuleBasedCollator(rules, Collator.TERTIARY,
-                                     UCollAttributeValue.UCOL_OFF)
+                                     UCollAttributeValue.OFF)
     else:
         collator = Collator.createInstance(Locale(options.locale))
 
     if options.norm:
-        collator.setAttribute(UCollAttribute.UCOL_NORMALIZATION_MODE,
-                              UCollAttributeValue.UCOL_ON)
+        collator.setAttribute(UCollAttribute.NORMALIZATION_MODE,
+                              UCollAttributeValue.ON)
     if options.french:
-        collator.setAttribute(UCollAttribute.UCOL_FRENCH_COLLATION,
-                              UCollAttributeValue.UCOL_ON)
+        collator.setAttribute(UCollAttribute.FRENCH_COLLATION,
+                              UCollAttributeValue.ON)
     if options.lower:
-        collator.setAttribute(UCollAttribute.UCOL_CASE_FIRST,
-                              UCollAttributeValue.UCOL_LOWER_FIRST)
+        collator.setAttribute(UCollAttribute.CASE_FIRST,
+                              UCollAttributeValue.LOWER_FIRST)
     if options.upper:
-        collator.setAttribute(UCollAttribute.UCOL_CASE_FIRST,
-                              UCollAttributeValue.UCOL_UPPER_FIRST)
+        collator.setAttribute(UCollAttribute.CASE_FIRST,
+                              UCollAttributeValue.UPPER_FIRST)
     if options.case:
-        collator.setAttribute(UCollAttribute.UCOL_CASE_LEVEL,
-                              UCollAttributeValue.UCOL_ON)
+        collator.setAttribute(UCollAttribute.CASE_LEVEL,
+                              UCollAttributeValue.ON)
     if options.shifted:
-        collator.setAttribute(UCollAttribute.UCOL_ALTERNATE_HANDLING,
-                              UCollAttributeValue.UCOL_SHIFTED)
+        collator.setAttribute(UCollAttribute.ALTERNATE_HANDLING,
+                              UCollAttributeValue.SHIFTED)
     if options.level == 1:
-        collator.setAttribute(UCollAttribute.UCOL_STRENGTH,
-                              UCollAttributeValue.UCOL_PRIMARY)
+        collator.setAttribute(UCollAttribute.STRENGTH,
+                              UCollAttributeValue.PRIMARY)
     elif options.level == 2:
-        collator.setAttribute(UCollAttribute.UCOL_STRENGTH,
-                              UCollAttributeValue.UCOL_SECONDARY)
+        collator.setAttribute(UCollAttribute.STRENGTH,
+                              UCollAttributeValue.SECONDARY)
     elif options.level == 3:
-        collator.setAttribute(UCollAttribute.UCOL_STRENGTH,
-                              UCollAttributeValue.UCOL_TERTIARY)
+        collator.setAttribute(UCollAttribute.STRENGTH,
+                              UCollAttributeValue.TERTIARY)
     elif options.level == 4:
-        collator.setAttribute(UCollAttribute.UCOL_STRENGTH,
-                              UCollAttributeValue.UCOL_QUATERNARY)
+        collator.setAttribute(UCollAttribute.STRENGTH,
+                              UCollAttributeValue.QUATERNARY)
     elif options.level == 5:
-        collator.setAttribute(UCollAttribute.UCOL_STRENGTH,
-                              UCollAttributeValue.UCOL_IDENTICAL)
+        collator.setAttribute(UCollAttribute.STRENGTH,
+                              UCollAttributeValue.IDENTICAL)
     else:
         raise ValueError, "--level must be between 1 and 5"
 
@@ -79,11 +79,11 @@ def processStringSearch(options, collator):
 
     search = StringSearch(pattern, source, collator)
     if options.overlap:
-        search.setAttribute(USearchAttribute.USEARCH_OVERLAP,
-                            USearchAttributeValue.USEARCH_ON)
+        search.setAttribute(USearchAttribute.OVERLAP,
+                            USearchAttributeValue.ON)
     if options.canonical:
-        search.setAttribute(USearchAttribute.USEARCH_CANONICAL_MATCH,
-                            USearchAttributeValue.USEARCH_ON)
+        search.setAttribute(USearchAttribute.CANONICAL_MATCH,
+                            USearchAttributeValue.ON)
     return search
 
 
