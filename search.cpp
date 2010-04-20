@@ -610,6 +610,5 @@ void _init_search(PyObject *m)
     INSTALL_ENUM(USearchAttributeValue, "ANY_BASE_WEIGHT_IS_WILDCARD", USEARCH_ANY_BASE_WEIGHT_IS_WILDCARD);
 #endif
 
-    PyDict_SetItemString(SearchIteratorType.tp_dict, "DONE",
-                         make_descriptor(PyInt_FromLong(USEARCH_DONE)));
+    INSTALL_ENUM(SearchIterator, "DONE", USEARCH_DONE);
 }

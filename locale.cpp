@@ -21,6 +21,14 @@
  * ====================================================================
  */
 
+#if defined(_MSC_VER) && defined(__WIN32)
+#include <windows.h>
+#else
+#include <sys/fcntl.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#endif
+
 #include "common.h"
 #include "structmember.h"
 
@@ -172,6 +180,9 @@ static PyObject *t_resourcebundle_getIntVector(t_resourcebundle *self);
 static PyObject *t_resourcebundle_getLocale(t_resourcebundle *self,
                                             PyObject *args);
 
+static PyObject *t_resourcebundle_setAppData(PyTypeObject *type,
+                                             PyObject *args);
+
 static PyMethodDef t_resourcebundle_methods[] = {
     DECLARE_METHOD(t_resourcebundle, getSize, METH_NOARGS),
     DECLARE_METHOD(t_resourcebundle, getString, METH_VARARGS),
@@ -191,6 +202,7 @@ static PyMethodDef t_resourcebundle_methods[] = {
     DECLARE_METHOD(t_resourcebundle, getBinary, METH_NOARGS),
     DECLARE_METHOD(t_resourcebundle, getIntVector, METH_NOARGS),
     DECLARE_METHOD(t_resourcebundle, getLocale, METH_VARARGS),
+    DECLARE_METHOD(t_resourcebundle, setAppData, METH_CLASS | METH_VARARGS),
     { NULL, NULL, 0, NULL }
 };
 
@@ -724,8 +736,7 @@ static PyObject *t_locale_str(t_locale *self)
 static int t_resourcebundle_init(t_resourcebundle *self,
                                  PyObject *args, PyObject *kwds)
 {
-    UnicodeString *u;
-    UnicodeString _u;
+    UnicodeString *u, _u;
     Locale *locale;
     ResourceBundle *bundle;
 
@@ -999,7 +1010,109 @@ static PyObject *t_resourcebundle_getLocale(t_resourcebundle *self,
     }
 
     return PyErr_SetArgsError((PyObject *) self, "getLocale", args);
-} 
+}
+
+#if defined(_MSC_VER) || defined(__WIN32)
+
+static PyObject *t_resourcebundle_setAppData(PyTypeObject *type,
+                                             PyObject *args)
+{
+    char *packageName, *path;
+
+    if (!parseArgs(args, "cc", &packageName, &path))
+    {
+        HANDLE fd = CreateFile(path, GENERIC_READ, FILE_SHARE_READ,
+                               NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        UErrorCode status = U_ZERO_ERROR;
+        DWORD dwSize;
+        HANDLE hMap;
+        LPVOID data;
+
+        if (fd == INVALID_HANDLE_VALUE)
+            return PyErr_SetFromWindowsErrWithFileName(0, path);
+
+        dwSize = GetFileSize(fd, NULL);
+        hMap = CreateFileMapping(fd, NULL, PAGE_READONLY, 0, dwSize, NULL);
+        if (!hMap)
+        {
+            PyErr_SetFromWindowsErrWithFileName(0, path);
+            CloseHandle(fd);
+
+            return NULL;
+        }
+        CloseHandle(fd);
+
+        data = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
+        if (!data)
+        {
+            PyErr_SetFromWindowsErrWithFileName(0, path);
+            CloseHandle(hMap);
+
+            return NULL;
+        }
+        CloseHandle(hMap);
+
+        udata_setAppData(packageName, data, &status);
+        if (U_FAILURE(status))
+        {
+            UnmapViewOfFile(data);
+            return ICUException(status).reportError();
+        }
+
+        Py_RETURN_NONE;
+    }
+
+    return PyErr_SetArgsError(type, "setAppData", args);
+}
+
+#else
+
+static PyObject *t_resourcebundle_setAppData(PyTypeObject *type,
+                                             PyObject *args)
+{
+    char *packageName, *path;
+
+    if (!parseArgs(args, "cc", &packageName, &path))
+    {
+        int fd = open(path, O_RDONLY);
+        UErrorCode status = U_ZERO_ERROR;
+        struct stat buf;
+        void *data;
+
+        if (fd < 0)
+            return PyErr_SetFromErrnoWithFilename(PyExc_ValueError, path);
+
+        if (fstat(fd, &buf) < 0)
+        {
+            PyErr_SetFromErrnoWithFilename(PyExc_ValueError, path);
+            close(fd);
+
+            return NULL;
+        }
+
+        data = mmap(NULL, buf.st_size, PROT_READ, MAP_SHARED, fd, 0);
+        if (data == MAP_FAILED)
+        {
+            PyErr_SetFromErrnoWithFilename(PyExc_ValueError, path);
+            close(fd);
+
+            return NULL;
+        }
+        close(fd);
+
+        udata_setAppData(packageName, data, &status);
+        if (U_FAILURE(status))
+        {
+            munmap(data, buf.st_size);
+            return ICUException(status).reportError();
+        }
+
+        Py_RETURN_NONE;
+    }
+
+    return PyErr_SetArgsError(type, "setAppData", args);
+}
+#endif
 
 static PyObject *t_resourcebundle_iter(t_resourcebundle *self)
 {

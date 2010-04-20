@@ -30,6 +30,7 @@ Version 0.9 ->
   - UnicodeString objects are now hashable
   - reviewed all wrapped ICU setters for parameter ownership
   - removed symbol prefixes from wrapped typed enums symbols
+  - added ResourceBundle.setAppData() implementation that memory maps file
   - 
 
 Version 0.8 -> 0.9
