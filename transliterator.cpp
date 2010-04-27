@@ -368,14 +368,12 @@ static PyObject *t_transliterator_transliterate(t_transliterator *self,
         }
         break;
       case 2:
-        if (!parseArgs(args, "UO", &u0,
-                       &UTransPositionType, &utransposition))
+        if (!parseArgs(args, "UO", &UTransPositionType, &u0, &utransposition))
         {
             STATUS_PYTHON_CALL(self->object->transliterate(*u0, *utransposition->object, status));
             Py_RETURN_ARG(args, 0);
         }
-        if (!parseArgs(args, "sO", &_u0,
-                       &UTransPositionType, &utransposition))
+        if (!parseArgs(args, "sO", &UTransPositionType, &_u0, &utransposition))
         {
             STATUS_PYTHON_CALL(self->object->transliterate(_u0, *utransposition->object, status));
             return PyUnicode_FromUnicodeString(&_u0);
@@ -392,8 +390,8 @@ static PyObject *t_transliterator_transliterate(t_transliterator *self,
             PYTHON_CALL(self->object->transliterate(_u0, start, limit));
             return PyUnicode_FromUnicodeString(&_u0);
         }
-        if (!parseArgs(args, "UOS", &u0,
-                       &UTransPositionType, &utransposition, &u1, &_u1))
+        if (!parseArgs(args, "UOS", &UTransPositionType,
+                       &u0, &utransposition, &u1, &_u1))
         {
             STATUS_CALL(len = toUChar32(*u1, &c, status));
             if (len == 1)
@@ -406,8 +404,8 @@ static PyObject *t_transliterator_transliterate(t_transliterator *self,
             }
             Py_RETURN_ARG(args, 0);
         }
-        if (!parseArgs(args, "sOS", &_u0,
-                       &UTransPositionType, &utransposition, &u1, &_u1))
+        if (!parseArgs(args, "sOS", &UTransPositionType, 
+                       &_u0, &utransposition, &u1, &_u1))
         {
             STATUS_CALL(len = toUChar32(*u1, &c, status));
             if (len == 1)
@@ -432,12 +430,12 @@ static PyObject *t_transliterator_finishTransliteration(t_transliterator *self,
     UnicodeString *u, _u;
     t_utransposition *utransposition;
 
-    if (!parseArgs(args, "UO", &u, &UTransPositionType, &utransposition))
+    if (!parseArgs(args, "UO", &UTransPositionType, &u, &utransposition))
     {
         self->object->finishTransliteration(*u, *utransposition->object);
         Py_RETURN_ARG(args, 0);
     }
-    if (!parseArgs(args, "sO", &_u, &UTransPositionType, &utransposition))
+    if (!parseArgs(args, "sO", &UTransPositionType, &_u, &utransposition))
     {
         self->object->finishTransliteration(_u, *utransposition->object);
         return PyUnicode_FromUnicodeString(&_u);
@@ -453,14 +451,14 @@ static PyObject *t_transliterator_filteredTransliterate(t_transliterator *self,
     t_utransposition *utransposition;
     UBool incremental;
 
-    if (!parseArgs(args, "UOB", &u, &UTransPositionType, &utransposition,
+    if (!parseArgs(args, "UOB", &UTransPositionType, &u, &utransposition,
                    &incremental))
     {
         self->object->filteredTransliterate(*u, *utransposition->object,
                                             incremental);
         Py_RETURN_ARG(args, 0);
     }
-    if (!parseArgs(args, "sOB", &_u, &UTransPositionType, &utransposition,
+    if (!parseArgs(args, "sOB", &UTransPositionType, &_u, &utransposition,
                    &incremental))
     {
         self->object->filteredTransliterate(_u, *utransposition->object,
@@ -586,7 +584,7 @@ static PyObject *t_transliterator_createFromRules(PyTypeObject *type,
     UnicodeString *u1, _u1;
     UTransDirection direction;
 
-    if (!parseArgs(args, "Si", &u0, &_u0, &u1, &_u1, &direction))
+    if (!parseArgs(args, "SSi", &u0, &_u0, &u1, &_u1, &direction))
     {
         STATUS_PARSER_CALL(transliterator = Transliterator::createFromRules(*u0, *u1, direction, parseError, status));
         return wrap_Transliterator(transliterator);

@@ -1032,6 +1032,14 @@ static PyObject *t_resourcebundle_setAppData(PyTypeObject *type,
             return PyErr_SetFromWindowsErrWithFileName(0, path);
 
         dwSize = GetFileSize(fd, NULL);
+        if (dwSize == INVALID_FILE_SIZE)
+        {
+            PyErr_SetFromWindowsErrWithFileName(0, path);
+            CloseHandle(fd);
+
+            return NULL;
+        }
+
         hMap = CreateFileMapping(fd, NULL, PAGE_READONLY, 0, dwSize, NULL);
         if (!hMap)
         {
