@@ -1,7 +1,7 @@
 
 For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 
-Version 0.9 ->
+Version 0.9 -> 1.0
 ------------------
   - added support for UnicodeSet, UnicodeFunctor, UnicodeFilter, UnicodeMatcher
   - added support for RegexPattern and RegexMatcher
@@ -31,7 +31,6 @@ Version 0.9 ->
   - reviewed all wrapped ICU setters for parameter ownership
   - removed symbol prefixes from wrapped typed enums symbols
   - added ResourceBundle.setAppData() implementation that memory maps file
-  - 
 
 Version 0.8 -> 0.9
 ------------------
