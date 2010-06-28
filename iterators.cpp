@@ -1016,6 +1016,7 @@ static int t_rulebasedbreakiterator_init(t_rulebasedbreakiterator *self,
                                          PyObject *args, PyObject *kwds)
 {
     UnicodeString *u, _u;
+    char *path, *name;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -1028,6 +1029,36 @@ static int t_rulebasedbreakiterator_init(t_rulebasedbreakiterator *self,
             RuleBasedBreakIterator *iterator;
 
             INT_STATUS_PARSER_CALL(iterator = new RuleBasedBreakIterator(*u, parseError, status));
+            self->object = iterator;
+            self->flags = T_OWNED;
+            break;
+        }
+        PyErr_SetArgsError((PyObject *) self, "__init__", args);
+        return -1;
+      case 2:
+        if (!parseArg(args, "cc", &path, &name))
+        {
+            RuleBasedBreakIterator *iterator;
+            UDataMemory *data;
+            UErrorCode status;
+
+            status = U_ZERO_ERROR;
+            data = udata_open(path, NULL, name, &status);
+            if (U_FAILURE(status))
+            {
+                ICUException(status).reportError();
+                return -1;
+            }
+
+            status = U_ZERO_ERROR;
+            iterator = new RuleBasedBreakIterator(data, status);
+            if (U_FAILURE(status))
+            {
+                udata_close(data);
+                ICUException(status).reportError();
+                return -1;
+            }
+
             self->object = iterator;
             self->flags = T_OWNED;
             break;
@@ -1072,6 +1103,7 @@ static PyObject *t_rulebasedbreakiterator_getRuleStatus(t_rulebasedbreakiterator
 {
     return PyInt_FromLong(self->object->getRuleStatus());
 }
+
 
 
 /* DictionaryBasedBreakIterator */
