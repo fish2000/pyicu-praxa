@@ -4,6 +4,7 @@ For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 Version 1.0 ->
 ------------------
   - removed variable length array uses in regex.cpp (Chandler Carruth)
+  - fixed bug 12983
   - 
 
 Version 0.9 -> 1.0
