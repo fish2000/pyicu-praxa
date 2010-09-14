@@ -249,6 +249,7 @@ DECLARE_TYPE(BreakIterator, t_breakiterator, UObject, BreakIterator,
 class t_rulebasedbreakiterator : public _wrapper {
 public:
     RuleBasedBreakIterator *object;
+    PyObject *text;  /* used by inherited BreakIterator.setText() */
 };
 
 static int t_rulebasedbreakiterator_init(t_rulebasedbreakiterator *self,
