@@ -21,7 +21,7 @@
  * ====================================================================
  */
 
-#if defined(_MSC_VER) && defined(__WIN32)
+#if defined(_MSC_VER) || defined(__WIN32)
 #include <windows.h>
 #else
 #include <sys/fcntl.h>
