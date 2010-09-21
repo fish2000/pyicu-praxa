@@ -1029,12 +1029,12 @@ static PyObject *t_resourcebundle_setAppData(PyTypeObject *type,
         LPVOID data;
 
         if (fd == INVALID_HANDLE_VALUE)
-            return PyErr_SetFromWindowsErrWithFileName(0, path);
+            return PyErr_SetFromWindowsErrWithFilename(0, path);
 
         dwSize = GetFileSize(fd, NULL);
         if (dwSize == INVALID_FILE_SIZE)
         {
-            PyErr_SetFromWindowsErrWithFileName(0, path);
+            PyErr_SetFromWindowsErrWithFilename(0, path);
             CloseHandle(fd);
 
             return NULL;
@@ -1053,7 +1053,7 @@ static PyObject *t_resourcebundle_setAppData(PyTypeObject *type,
         data = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
         if (!data)
         {
-            PyErr_SetFromWindowsErrWithFileName(0, path);
+            PyErr_SetFromWindowsErrWithFilename(0, path);
             CloseHandle(hMap);
 
             return NULL;
