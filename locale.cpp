@@ -1043,7 +1043,7 @@ static PyObject *t_resourcebundle_setAppData(PyTypeObject *type,
         hMap = CreateFileMapping(fd, NULL, PAGE_READONLY, 0, dwSize, NULL);
         if (!hMap)
         {
-            PyErr_SetFromWindowsErrWithFileName(0, path);
+            PyErr_SetFromWindowsErrWithFilename(0, path);
             CloseHandle(fd);
 
             return NULL;
