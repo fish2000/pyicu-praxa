@@ -1259,12 +1259,10 @@ static PyObject *t_dateintervalformat_getDateFormat(t_dateintervalformat *self)
     DateFormat *format = (DateFormat *) self->object->getDateFormat()->clone();
 
 #if U_ICU_VERSION_HEX < 0x04060000
-    UClassID id = format->getDynamicClassID();
-
-    if (id == SimpleDateFormat::getStaticClassID())
+    if (format->getDynamicClassID() == SimpleDateFormat::getStaticClassID())
         return wrap_SimpleDateFormat((SimpleDateFormat *) format, T_OWNED);
 #else
-    if (typeid(format) == typeid(SimpleDateFormat *))
+    if (dynamic_cast<SimpleDateFormat *>(format) != NULL)
         return wrap_SimpleDateFormat((SimpleDateFormat *) format, T_OWNED);
 #endif
 
