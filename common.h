@@ -121,6 +121,7 @@ typedef intintobjargproc ssizessizeobjargproc;
 #include <typeinfo>
 #endif
 
+
 #if U_ICU_VERSION_HEX < 0x04060000
 
 typedef UClassID classid;
@@ -148,6 +149,7 @@ enum {
 typedef const char *classid;
 
 #endif
+
 
 U_NAMESPACE_USE
 
