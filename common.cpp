@@ -178,7 +178,8 @@ EXPORT PyObject *PyUnicode_FromUnicodeString(const UChar *chars, int size)
 }
 
 EXPORT UnicodeString &PyString_AsUnicodeString(PyObject *object,
-                                               char *encoding, char *mode,
+                                               const char *encoding,
+                                               const char *mode,
                                                UnicodeString &string)
 {
     UErrorCode status = U_ZERO_ERROR;
@@ -206,7 +207,7 @@ EXPORT UnicodeString &PyString_AsUnicodeString(PyObject *object,
 
     if (U_FAILURE(status))
     {
-        char *reasonName;
+        const char *reasonName;
 
         switch (stop.reason) {
           case UCNV_UNASSIGNED:
@@ -241,7 +242,8 @@ EXPORT UnicodeString &PyString_AsUnicodeString(PyObject *object,
 }
 
 EXPORT UnicodeString &PyObject_AsUnicodeString(PyObject *object,
-                                               char *encoding, char *mode,
+                                               const char *encoding,
+                                               const char *mode,
                                                UnicodeString &string)
 {
     if (PyUnicode_Check(object))
@@ -672,7 +674,7 @@ static UBool *toUBoolArray(PyObject *arg, int *len)
 
 #ifdef _MSC_VER
 
-int __parseArgs(PyObject *args, char *types, ...)
+int __parseArgs(PyObject *args, const char *types, ...)
 {
     int count = ((PyTupleObject *)(args))->ob_size;
     va_list list;
@@ -682,7 +684,7 @@ int __parseArgs(PyObject *args, char *types, ...)
     return _parseArgs(((PyTupleObject *)(args))->ob_item, count, types, list);
 }
 
-int __parseArg(PyObject *arg, char *types, ...)
+int __parseArg(PyObject *arg, const char *types, ...)
 {
     va_list list;
 
@@ -692,14 +694,14 @@ int __parseArg(PyObject *arg, char *types, ...)
 }
 
 
-int _parseArgs(PyObject **args, int count, char *types, va_list list)
+int _parseArgs(PyObject **args, int count, const char *types, va_list list)
 {
     if (count != strlen(types))
         return -1;
 
 #else
 
-int _parseArgs(PyObject **args, int count, char *types, ...)
+int _parseArgs(PyObject **args, int count, const char *types, ...)
 {
     va_list list;
 
@@ -1121,7 +1123,7 @@ int _parseArgs(PyObject **args, int count, char *types, ...)
     return 0;
 }
 
-PyObject *PyErr_SetArgsError(PyObject *self, char *name, PyObject *args)
+PyObject *PyErr_SetArgsError(PyObject *self, const char *name, PyObject *args)
 {
     if (!PyErr_Occurred())
     {
@@ -1135,7 +1137,7 @@ PyObject *PyErr_SetArgsError(PyObject *self, char *name, PyObject *args)
     return NULL;
 }
 
-PyObject *PyErr_SetArgsError(PyTypeObject *type, char *name, PyObject *args)
+PyObject *PyErr_SetArgsError(PyTypeObject *type, const char *name, PyObject *args)
 {
     if (!PyErr_Occurred())
     {

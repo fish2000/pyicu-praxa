@@ -532,7 +532,7 @@ static int t_unicodestring_init(t_unicodestring *self,
 {
     UnicodeString *u, _u;
     PyObject *obj;
-    char *encoding, *mode;
+    const char *encoding, *mode;
     int32_t start, length;
     int i;
 

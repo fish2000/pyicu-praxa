@@ -1,6 +1,11 @@
 
 For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 
+Version 1.1 ->
+------------------
+  - fixed bug 13009 (Martin von Gagern)
+  - 
+
 Version 1.0 -> 1.1
 ------------------
   - added support for ICU 4.6
