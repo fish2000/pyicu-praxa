@@ -27,31 +27,23 @@ from unittest import TestCase, main
 from icu import *
 
 
-class TestCollator(TestCase):
+class TestBreakIterator(TestCase):
 
     def assertIsInstance(self, obj, cls):
         self.assert_(isinstance(obj, cls))
 
-    def testSort(self):
-
-        collator = Collator.createInstance(Locale.getFrance())
-        module = sys.modules[TestCollator.__module__].__file__
-        input = file(os.path.join(os.path.dirname(module), 'noms.txt'))
-        names = [unicode(n.strip(), 'utf-8') for n in input.readlines()]
-        input.close()
-        ecole = names[0]
-
-        names.sort()
-        self.assert_(names[-1] is ecole)
-
-        names.sort(collator.compare)
-        self.assert_(names[2] is ecole)
-
     def testCreateInstancePolymorph(self):
 
-        collator = Collator.createInstance(Locale("epo")) # Esperanto
-        self.assertIsInstance(collator, RuleBasedCollator)
-        rules = collator.getRules()
+        bi = BreakIterator.createWordInstance(Locale.getEnglish())
+        self.assertIsInstance(bi, RuleBasedBreakIterator)
+        bi = BreakIterator.createLineInstance(Locale.getEnglish())
+        self.assertIsInstance(bi, RuleBasedBreakIterator)
+        bi = BreakIterator.createCharacterInstance(Locale.getEnglish())
+        self.assertIsInstance(bi, RuleBasedBreakIterator)
+        bi = BreakIterator.createSentenceInstance(Locale.getEnglish())
+        self.assertIsInstance(bi, RuleBasedBreakIterator)
+        bi = BreakIterator.createTitleInstance(Locale.getEnglish())
+        self.assertIsInstance(bi, RuleBasedBreakIterator)
 
 
 if __name__ == "__main__":

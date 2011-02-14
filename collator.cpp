@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2010 Open Source Applications Foundation.
+ * Copyright (c) 2004-2011 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -371,6 +371,20 @@ static PyObject *t_collator_getLocale(t_collator *self, PyObject *args)
     return PyErr_SetArgsError((PyObject *) self, "getLocale", args);
 }
 
+static inline PyObject *wrap_Collator(Collator *collator)
+{
+#if U_ICU_VERSION_HEX < 0x04060000
+    if (collator->getDynamicClassID() ==
+        RuleBasedCollator::getStaticClassID())
+        return wrap_RuleBasedCollator((RuleBasedCollator *) collator, T_OWNED);
+#else
+    if (dynamic_cast<RuleBasedCollator *>(collator) != NULL)
+        return wrap_RuleBasedCollator((RuleBasedCollator *) collator, T_OWNED);
+#endif
+
+    return wrap_Collator(collator, T_OWNED);
+}
+
 static PyObject *t_collator_createInstance(PyTypeObject *type, PyObject *args)
 {
     Locale *locale;
@@ -379,12 +393,12 @@ static PyObject *t_collator_createInstance(PyTypeObject *type, PyObject *args)
     switch (PyTuple_Size(args)) {
       case 0:
         STATUS_CALL(collator = Collator::createInstance(status));
-        return wrap_Collator(collator, T_OWNED);
+        return wrap_Collator(collator);
       case 1:
         if (!parseArgs(args, "P", TYPE_CLASSID(Locale), &locale))
         {
             STATUS_CALL(collator = Collator::createInstance(*locale, status));
-            return wrap_Collator(collator, T_OWNED);
+            return wrap_Collator(collator);
         }
         break;
     }
