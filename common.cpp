@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2005-2010 Open Source Applications Foundation.
+ * Copyright (c) 2005-2011 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -29,6 +29,7 @@
 #include <unicode/ustring.h>
 
 #include "bases.h"
+#include "macros.h"
 
 static PyObject *utcoffset_NAME;
 static PyObject *toordinal_NAME;
@@ -1152,14 +1153,8 @@ PyObject *PyErr_SetArgsError(PyTypeObject *type, const char *name, PyObject *arg
 
 int isUnicodeString(PyObject *arg)
 {
-#if U_ICU_VERSION_HEX < 0x04060000
     return (PyObject_TypeCheck(arg, &UObjectType) &&
-            (((t_uobject *) arg)->object->getDynamicClassID() ==
-             UnicodeString::getStaticClassID()));
-#else
-    return (PyObject_TypeCheck(arg, &UObjectType) &&
-            dynamic_cast<UnicodeString *>(((t_uobject *) arg)->object) != NULL);
-#endif
+            ISINSTANCE(((t_uobject *) arg)->object, UnicodeString));
 }
 
 int32_t toUChar32(UnicodeString& u, UChar32 *c, UErrorCode& status)

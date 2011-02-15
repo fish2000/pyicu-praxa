@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2010 Open Source Applications Foundation.
+ * Copyright (c) 2004-2011 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -352,16 +352,8 @@ DECLARE_TYPE(RuleBasedNumberFormat, t_rulebasednumberformat, NumberFormat,
 
 PyObject *wrap_NumberFormat(NumberFormat *format)
 {
-    if (format->getDynamicClassID() ==
-        DecimalFormat::getStaticClassID())
-        return wrap_DecimalFormat((DecimalFormat *) format,
-                                  T_OWNED);
-
-    if (format->getDynamicClassID() ==
-        RuleBasedNumberFormat::getStaticClassID())
-        return wrap_RuleBasedNumberFormat((RuleBasedNumberFormat *) format,
-                                          T_OWNED);
-
+    RETURN_WRAPPED_IF_ISINSTANCE(format, DecimalFormat);
+    RETURN_WRAPPED_IF_ISINSTANCE(format, RuleBasedNumberFormat);
     return wrap_NumberFormat(format, T_OWNED);
 }
 

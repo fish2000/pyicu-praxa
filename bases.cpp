@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2010 Open Source Applications Foundation.
+ * Copyright (c) 2004-2011 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -102,8 +102,7 @@ PyObject *wrap_UObject(UObject *object, int flags)
 {
     if (object)
     {
-        if (UnicodeString::getStaticClassID() ==
-            object->getDynamicClassID())
+        if (ISINSTANCE(object, UnicodeString))
             return PyUnicode_FromUnicodeString((UnicodeString *) object);
 
         t_uobject *self = (t_uobject *) UObjectType.tp_alloc(&UObjectType, 0);

@@ -373,15 +373,7 @@ static PyObject *t_collator_getLocale(t_collator *self, PyObject *args)
 
 static inline PyObject *wrap_Collator(Collator *collator)
 {
-#if U_ICU_VERSION_HEX < 0x04060000
-    if (collator->getDynamicClassID() ==
-        RuleBasedCollator::getStaticClassID())
-        return wrap_RuleBasedCollator((RuleBasedCollator *) collator, T_OWNED);
-#else
-    if (dynamic_cast<RuleBasedCollator *>(collator) != NULL)
-        return wrap_RuleBasedCollator((RuleBasedCollator *) collator, T_OWNED);
-#endif
-
+    RETURN_WRAPPED_IF_ISINSTANCE(collator, RuleBasedCollator);
     return wrap_Collator(collator, T_OWNED);
 }
 
