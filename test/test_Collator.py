@@ -30,7 +30,11 @@ from icu import *
 class TestCollator(TestCase):
 
     def assertIsInstance(self, obj, cls):
-        self.assert_(isinstance(obj, cls))
+        if hasattr(TestCase, 'assertIsInstance'):
+            TestCase.assertIsInstance(self, obj, cls)
+        else:
+            self.assertTrue(isinstance(obj, cls),
+                            u'%s is not an instance of %s' % (obj, cls))
 
     def testSort(self):
 
@@ -42,10 +46,10 @@ class TestCollator(TestCase):
         ecole = names[0]
 
         names.sort()
-        self.assert_(names[-1] is ecole)
+        self.assertTrue(names[-1] is ecole)
 
         names.sort(collator.compare)
-        self.assert_(names[2] is ecole)
+        self.assertTrue(names[2] is ecole)
 
     def testCreateInstancePolymorph(self):
 

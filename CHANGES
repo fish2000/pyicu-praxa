@@ -5,6 +5,7 @@ Version 1.1 ->
 ------------------
   - fixed bug 13009 (Martin von Gagern)
   - fixed bug 13011 (Martin von Gagern)
+  - some unit test beautification (Martin von Gagern)
   - 
 
 Version 1.0 -> 1.1

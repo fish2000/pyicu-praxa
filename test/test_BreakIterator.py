@@ -30,7 +30,11 @@ from icu import *
 class TestBreakIterator(TestCase):
 
     def assertIsInstance(self, obj, cls):
-        self.assert_(isinstance(obj, cls))
+        if hasattr(TestCase, 'assertIsInstance'):
+            TestCase.assertIsInstance(self, obj, cls)
+        else:
+            self.assertTrue(isinstance(obj, cls),
+                            u'%s is not an instance of %s' % (obj, cls))
 
     def testCreateInstancePolymorph(self):
 

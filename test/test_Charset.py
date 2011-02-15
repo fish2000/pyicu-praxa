@@ -35,28 +35,28 @@ class TestCharset(TestCase):
         detector.setText('foo')
 
         match = detector.detect()
-        self.assert_(match.getName() == 'UTF-8')
+        self.assertTrue(match.getName() == 'UTF-8')
 
     def testDetectAll(self):
 
         detector = CharsetDetector('foo')
 
         matches = detector.detectAll()
-        self.assert_(matches[0].getName() == 'UTF-8')
+        self.assertTrue(matches[0].getName() == 'UTF-8')
 
     def testDeclared(self):
 
         detector = CharsetDetector('beaut\xe9 probable', 'iso-8859-1')
 
-        self.assert_("ISO-8859-1" in (m.getName()
-                                      for m in detector.detectAll()))
+        self.assertTrue("ISO-8859-1" in (m.getName()
+                                         for m in detector.detectAll()))
 
     def testUnicode(self):
 
         string = 'beaut\xe9 probable'
         ustring = unicode(CharsetDetector(string).detect())
 
-        self.assert_(ustring.encode('iso-8859-1') == string)
+        self.assertTrue(ustring.encode('iso-8859-1') == string)
         
         
 
