@@ -57,6 +57,23 @@ class TestCollator(TestCase):
         self.assertIsInstance(collator, RuleBasedCollator)
         rules = collator.getRules()
 
+    def testGetSortKey(self):
+
+        rules = UnicodeString("");
+        collator = RuleBasedCollator(rules)
+        collator.setAttribute(UCollAttribute.NORMALIZATION_MODE,
+                              UCollAttributeValue.ON)
+        collator.setAttribute(UCollAttribute.ALTERNATE_HANDLING,
+                              UCollAttributeValue.SHIFTED)
+        collator.setAttribute(UCollAttribute.STRENGTH,
+                              UCollAttributeValue.QUATERNARY)
+        collator.setAttribute(UCollAttribute.HIRAGANA_QUATERNARY_MODE,
+                              UCollAttributeValue.ON)
+        s = u'\u3052'
+        k = collator.getSortKey(s)
+        self.assertTrue("791C0186DCFD019B05010D0D00" ==
+                        ''.join(['%02X' %(ord(c)) for c in k]))
+
 
 if __name__ == "__main__":
     main()

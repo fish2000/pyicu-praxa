@@ -292,7 +292,7 @@ static PyObject *t_collator_getSortKey(t_collator *self, PyObject *args)
 {
     UnicodeString *u;
     UnicodeString _u;
-    uint32_t len;
+    uint32_t len, size;
     uint8_t *buf;
     PyObject *key;
 
@@ -300,14 +300,24 @@ static PyObject *t_collator_getSortKey(t_collator *self, PyObject *args)
       case 1:
         if (!parseArgs(args, "S", &u, &_u))
         {
-            len = u->length() * 4;
-            buf = (uint8_t *) calloc(len, 1);
+            len = u->length() * 4 + 8;
+            buf = (uint8_t *) malloc(len);
+          retry:
             if (buf == NULL)
                 return PyErr_NoMemory();
 
-            len = self->object->getSortKey(*u, buf, len);
-            key = PyString_FromStringAndSize((char *) buf, len);
-            free(buf);
+            size = self->object->getSortKey(*u, buf, len);
+            if (size <= len)
+            {
+                key = PyString_FromStringAndSize((char *) buf, size);
+                free(buf);
+            }
+            else
+            {
+                len = size;
+                buf = (uint8_t *) realloc(buf, len);
+                goto retry;
+            }
 
             return key;
         }
