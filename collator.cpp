@@ -580,7 +580,7 @@ static int t_rulebasedcollator_init(t_rulebasedcollator *self,
       case 2:
         if (!parseArgs(args, "CO", &RuleBasedCollatorType, &buf, &base))
         {
-            INT_STATUS_CALL(collator = new RuleBasedCollator((uint8_t *) PyString_AS_STRING(buf), PyString_GET_SIZE(buf), ((t_rulebasedcollator *) base)->object, status));            
+            INT_STATUS_CALL(collator = new RuleBasedCollator((uint8_t *) PyString_AS_STRING(buf), PyString_GET_SIZE(buf), ((t_rulebasedcollator *) base)->object, status));
             self->object = collator;
             self->flags = T_OWNED;
             self->buf = buf; Py_INCREF(buf);

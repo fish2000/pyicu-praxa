@@ -99,11 +99,7 @@ class TestCollator(TestCase):
 
         return collator
 
-    def LoadCollatorFromBinaryBuffer(self):
-
-        f = open(self.filePath("collation-rules.bin"), 'rb')
-        bin = f.read()
-        f.close()
+    def LoadCollatorFromBinaryBuffer(self, bin):
 
         collator = RuleBasedCollator(bin, RuleBasedCollator(""))
 
@@ -126,11 +122,7 @@ class TestCollator(TestCase):
         key0 = collator.getSortKey(u'\u3069\u3052\u3056')
         bin = collator.cloneBinary()
 
-        f = open(self.filePath("collation-rules.bin"), 'wb')
-        f.write(bin)
-        f.close()
-
-        collator = self.LoadCollatorFromBinaryBuffer()
+        collator = self.LoadCollatorFromBinaryBuffer(bin)
         key1 = collator.getSortKey(u'\u3069\u3052\u3056')
 
         self.assertTrue(key0 == key1)
