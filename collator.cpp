@@ -116,6 +116,8 @@ DECLARE_TYPE(Collator, t_collator, UObject, Collator, abstract_init, NULL);
 class t_rulebasedcollator : public _wrapper {
 public:
     RuleBasedCollator *object;
+    PyObject *buf;
+    PyObject *base;
 };
 
 static int t_rulebasedcollator_init(t_rulebasedcollator *self,
@@ -123,15 +125,30 @@ static int t_rulebasedcollator_init(t_rulebasedcollator *self,
 static PyObject *t_rulebasedcollator_getRules(t_rulebasedcollator *self,
                                               PyObject *args);
 static PyObject *t_rulebasedcollator_createCollationElementIterator(t_rulebasedcollator *self, PyObject *arg);
+static PyObject *t_rulebasedcollator_cloneBinary(t_rulebasedcollator *self);
 
 static PyMethodDef t_rulebasedcollator_methods[] = {
     DECLARE_METHOD(t_rulebasedcollator, getRules, METH_VARARGS),
     DECLARE_METHOD(t_rulebasedcollator, createCollationElementIterator, METH_O),
+    DECLARE_METHOD(t_rulebasedcollator, cloneBinary, METH_NOARGS),
     { NULL, NULL, 0, NULL }
 };
 
+static void t_rulebasedcollator_dealloc(t_rulebasedcollator *self)
+{
+    if (self->flags & T_OWNED)
+        delete self->object;
+    self->object = NULL;
+
+    Py_CLEAR(self->buf);
+    Py_CLEAR(self->base);
+
+    self->ob_type->tp_free((PyObject *) self);
+}
+
 DECLARE_TYPE(RuleBasedCollator, t_rulebasedcollator, Collator,
-             RuleBasedCollator, t_rulebasedcollator_init, NULL);
+             RuleBasedCollator, t_rulebasedcollator_init,
+             t_rulebasedcollator_dealloc);
 
 
 /* CollationKey */
@@ -547,6 +564,7 @@ static int t_rulebasedcollator_init(t_rulebasedcollator *self,
     RuleBasedCollator *collator;
     Collator::ECollationStrength strength;
     UColAttributeValue decompositionMode;
+    PyObject *buf, *base;
 
     switch (PyTuple_Size(args)) {
       case 1:
@@ -560,7 +578,15 @@ static int t_rulebasedcollator_init(t_rulebasedcollator *self,
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 2:
-        /* two-parameter case is ambiguous from python with ints */
+        if (!parseArgs(args, "CO", &RuleBasedCollatorType, &buf, &base))
+        {
+            INT_STATUS_CALL(collator = new RuleBasedCollator((uint8_t *) PyString_AS_STRING(buf), PyString_GET_SIZE(buf), ((t_rulebasedcollator *) base)->object, status));            
+            self->object = collator;
+            self->flags = T_OWNED;
+            self->buf = buf; Py_INCREF(buf);
+            self->base = base; Py_INCREF(base);
+            break;
+        }
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 3:
@@ -609,6 +635,22 @@ static PyObject *t_rulebasedcollator_createCollationElementIterator(t_rulebasedc
     }
 
     return PyErr_SetArgsError((PyObject *) self, "createCollationElementIterator", arg);
+}
+
+static PyObject *t_rulebasedcollator_cloneBinary(t_rulebasedcollator *self)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    PyObject *result;
+    int32_t len;
+
+    len = self->object->cloneBinary(NULL, 0, status);
+    result = PyString_FromStringAndSize(NULL, len);
+    if (!result)
+        return NULL;
+
+    STATUS_CALL(len = self->object->cloneBinary((uint8_t *) PyString_AS_STRING(result), len, status));
+
+    return result;
 }
 
 static PyObject *t_rulebasedcollator_str(t_rulebasedcollator *self)

@@ -8,6 +8,7 @@ Version 1.1 ->
   - some unit test beautification (Martin von Gagern)
   - added macros for RTTI checks (Martin von Gagern)
   - fixed bug 13012
+  - fixed bug 13013 (Yuriy Pilgun)
   - 
 
 Version 1.0 -> 1.1

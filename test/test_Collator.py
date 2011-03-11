@@ -21,13 +21,18 @@
 # ====================================================================
 #
 
-import sys, os
+import sys, os, codecs
 
 from unittest import TestCase, main
 from icu import *
 
 
 class TestCollator(TestCase):
+
+    def filePath(self, name):
+
+        module = sys.modules[TestCollator.__module__].__file__
+        return os.path.join(os.path.dirname(module), name)
 
     def assertIsInstance(self, obj, cls):
         if hasattr(TestCase, 'assertIsInstance'):
@@ -39,8 +44,7 @@ class TestCollator(TestCase):
     def testSort(self):
 
         collator = Collator.createInstance(Locale.getFrance())
-        module = sys.modules[TestCollator.__module__].__file__
-        input = file(os.path.join(os.path.dirname(module), 'noms.txt'))
+        input = file(self.filePath('noms.txt'))
         names = [unicode(n.strip(), 'utf-8') for n in input.readlines()]
         input.close()
         ecole = names[0]
@@ -73,6 +77,63 @@ class TestCollator(TestCase):
         k = collator.getSortKey(s)
         self.assertTrue("791C0186DCFD019B05010D0D00" ==
                         ''.join(['%02X' %(ord(c)) for c in k]))
+
+    def LoadCollatorFromRules(self):
+
+        f = codecs.open(self.filePath("collation-rules.txt"), 'r', 'utf-8')
+        rulelines = f.readlines()
+        f.close()
+
+        rules = UnicodeString("".join(rulelines));
+        collator = RuleBasedCollator(rules)
+        collator.setAttribute(UCollAttribute.NORMALIZATION_MODE,
+                              UCollAttributeValue.ON)
+        collator.setAttribute(UCollAttribute.CASE_FIRST,
+                              UCollAttributeValue.UPPER_FIRST)
+        collator.setAttribute(UCollAttribute.ALTERNATE_HANDLING,
+                              UCollAttributeValue.SHIFTED)
+        collator.setAttribute(UCollAttribute.STRENGTH,
+                              UCollAttributeValue.QUATERNARY)
+        collator.setAttribute(UCollAttribute.HIRAGANA_QUATERNARY_MODE,
+                              UCollAttributeValue.ON)
+
+        return collator
+
+    def LoadCollatorFromBinaryBuffer(self):
+
+        f = open(self.filePath("collation-rules.bin"), 'rb')
+        bin = f.read()
+        f.close()
+
+        collator = RuleBasedCollator(bin, RuleBasedCollator(""))
+
+        collator.setAttribute(UCollAttribute.NORMALIZATION_MODE,
+                              UCollAttributeValue.ON)
+        collator.setAttribute(UCollAttribute.CASE_FIRST,
+                              UCollAttributeValue.UPPER_FIRST)
+        collator.setAttribute(UCollAttribute.ALTERNATE_HANDLING,
+                              UCollAttributeValue.SHIFTED)
+        collator.setAttribute(UCollAttribute.STRENGTH,
+                              UCollAttributeValue.QUATERNARY)
+        collator.setAttribute(UCollAttribute.HIRAGANA_QUATERNARY_MODE,
+                              UCollAttributeValue.ON)
+
+        return collator
+
+    def testCollatorLoading(self):
+
+        collator = self.LoadCollatorFromRules()
+        key0 = collator.getSortKey(u'\u3069\u3052\u3056')
+        bin = collator.cloneBinary()
+
+        f = open(self.filePath("collation-rules.bin"), 'wb')
+        f.write(bin)
+        f.close()
+
+        collator = self.LoadCollatorFromBinaryBuffer()
+        key1 = collator.getSortKey(u'\u3069\u3052\u3056')
+
+        self.assertTrue(key0 == key1)
 
 
 if __name__ == "__main__":
