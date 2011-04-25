@@ -78,6 +78,19 @@ class TestCollator(TestCase):
         self.assertTrue("791C0186DCFD019B05010D0D00" ==
                         ''.join(['%02X' %(ord(c)) for c in k]))
 
+    def setupCollator(self, collator):
+
+        collator.setAttribute(UCollAttribute.NORMALIZATION_MODE,
+                              UCollAttributeValue.ON)
+        collator.setAttribute(UCollAttribute.CASE_FIRST,
+                              UCollAttributeValue.UPPER_FIRST)
+        collator.setAttribute(UCollAttribute.ALTERNATE_HANDLING,
+                              UCollAttributeValue.SHIFTED)
+        collator.setAttribute(UCollAttribute.STRENGTH,
+                              UCollAttributeValue.QUATERNARY)
+        collator.setAttribute(UCollAttribute.HIRAGANA_QUATERNARY_MODE,
+                              UCollAttributeValue.ON)
+
     def LoadCollatorFromRules(self):
 
         f = codecs.open(self.filePath("collation-rules.txt"), 'r', 'utf-8')
@@ -86,33 +99,14 @@ class TestCollator(TestCase):
 
         rules = UnicodeString("".join(rulelines));
         collator = RuleBasedCollator(rules)
-        collator.setAttribute(UCollAttribute.NORMALIZATION_MODE,
-                              UCollAttributeValue.ON)
-        collator.setAttribute(UCollAttribute.CASE_FIRST,
-                              UCollAttributeValue.UPPER_FIRST)
-        collator.setAttribute(UCollAttribute.ALTERNATE_HANDLING,
-                              UCollAttributeValue.SHIFTED)
-        collator.setAttribute(UCollAttribute.STRENGTH,
-                              UCollAttributeValue.QUATERNARY)
-        collator.setAttribute(UCollAttribute.HIRAGANA_QUATERNARY_MODE,
-                              UCollAttributeValue.ON)
+        self.setupCollator(collator)
 
         return collator
 
     def LoadCollatorFromBinaryBuffer(self, bin):
 
         collator = RuleBasedCollator(bin, RuleBasedCollator(""))
-
-        collator.setAttribute(UCollAttribute.NORMALIZATION_MODE,
-                              UCollAttributeValue.ON)
-        collator.setAttribute(UCollAttribute.CASE_FIRST,
-                              UCollAttributeValue.UPPER_FIRST)
-        collator.setAttribute(UCollAttribute.ALTERNATE_HANDLING,
-                              UCollAttributeValue.SHIFTED)
-        collator.setAttribute(UCollAttribute.STRENGTH,
-                              UCollAttributeValue.QUATERNARY)
-        collator.setAttribute(UCollAttribute.HIRAGANA_QUATERNARY_MODE,
-                              UCollAttributeValue.ON)
+        self.setupCollator(collator)
 
         return collator
 
