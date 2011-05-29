@@ -10,6 +10,7 @@ Version 1.1 ->
   - fixed bug 13012
   - fixed bug 13013 (Yuriy Pilgun)
   - added wrappers for Locale::isBogus()/setToBogus() (Jimmy Yuen Ho Wong)
+  - fixed bug 13022 (Martin von Gagern)
   - 
 
 Version 1.0 -> 1.1
