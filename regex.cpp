@@ -167,7 +167,7 @@ static void t_regexmatcher_dealloc(t_regexmatcher *self)
     Py_CLEAR(self->callable);
 #endif
 
-    self->ob_type->tp_free((PyObject *) self);
+    Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
 DECLARE_TYPE(RegexMatcher, t_regexmatcher, UObject, RegexMatcher,

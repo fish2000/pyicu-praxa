@@ -274,7 +274,7 @@ static int t_dateformatsymbols_init(t_dateformatsymbols *self,
     UnicodeString _u;
     Locale *locale;
     DateFormatSymbols *dfs;
-    char *type;
+    charsArg type;
 
     switch (PyTuple_Size(args)) {
       case 0:
@@ -290,7 +290,7 @@ static int t_dateformatsymbols_init(t_dateformatsymbols *self,
             self->flags = T_OWNED;
             break;
         }
-        if (!parseArgs(args, "c", &type))
+        if (!parseArgs(args, "n", &type))
         {
             INT_STATUS_CALL(dfs = new DateFormatSymbols(type, status));
             self->object = dfs;
@@ -300,7 +300,7 @@ static int t_dateformatsymbols_init(t_dateformatsymbols *self,
         PyErr_SetArgsError((PyObject *) self, "__init__", args);
         return -1;
       case 2:
-        if (!parseArgs(args, "Pc", TYPE_CLASSID(Locale),
+        if (!parseArgs(args, "Pn", TYPE_CLASSID(Locale),
                        &locale, &type))
         {
             INT_STATUS_CALL(dfs = new DateFormatSymbols(*locale, type, status));

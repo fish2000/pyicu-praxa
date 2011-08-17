@@ -137,8 +137,7 @@ PyObject *make_descriptor(PyObject *(*get)(PyObject *));
 
 #define DECLARE_TYPE(name, t_name, base, icuClass, init, dealloc)           \
 PyTypeObject name##Type = {                                                 \
-    PyObject_HEAD_INIT(NULL)                                                \
-    /* ob_size            */   0,                                           \
+    PyVarObject_HEAD_INIT(NULL, 0)                                          \
     /* tp_name            */   "icu."#name,                                 \
     /* tp_basicsize       */   sizeof(t_name),                              \
     /* tp_itemsize        */   0,                                           \
@@ -206,8 +205,7 @@ static PyObject *t_name##_new(PyTypeObject *type,                       \
     return (PyObject *) self;                                           \
 }                                                                       \
 PyTypeObject name##Type = {                                                 \
-    PyObject_HEAD_INIT(NULL)                                                \
-    /* ob_size            */   0,                                           \
+    PyVarObject_HEAD_INIT(NULL, 0)                                          \
     /* tp_name            */   "icu."#name,                                 \
     /* tp_basicsize       */   sizeof(t_name),                              \
     /* tp_itemsize        */   0,                                           \
@@ -264,8 +262,7 @@ PyObject *wrap_##name(icuStruct *object, int flags)                     \
 
 #define DECLARE_CONSTANTS_TYPE(name)                                    \
 PyTypeObject name##Type = {                                             \
-    PyObject_HEAD_INIT(NULL)                                            \
-    /* ob_size            */   0,                                       \
+    PyVarObject_HEAD_INIT(NULL, 0)                                      \
     /* tp_name            */   "icu."#name,                             \
     /* tp_basicsize       */   0,                                       \
     /* tp_itemsize        */   0,                                       \

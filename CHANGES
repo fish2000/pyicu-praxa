@@ -1,6 +1,12 @@
 
 For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 
+Version 1.2 ->
+------------------
+  - fixed bug 13031
+  - PyICU ready for Python 3.2 (tests pass 2to3'd) (Martin von Gagern)
+  - 
+
 Version 1.1 -> 1.2
 ------------------
   - fixed bug 13009 (Martin von Gagern)

@@ -56,7 +56,7 @@ static void t_utransposition_dealloc(t_utransposition *self)
         self->object = NULL;
     }
 
-    self->ob_type->tp_free((PyObject *) self);
+    Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
 DECLARE_STRUCT(UTransPosition, t_utransposition, UTransPosition,

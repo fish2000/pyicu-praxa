@@ -71,8 +71,7 @@ static PyMethodDef t_descriptor_methods[] = {
 
 
 PyTypeObject ConstVariableDescriptorType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                                   /* ob_size */
+    PyVarObject_HEAD_INIT(NULL, 0)
     "icu.ConstVariableDescriptor",       /* tp_name */
     sizeof(t_descriptor),                /* tp_basicsize */
     0,                                   /* tp_itemsize */
@@ -118,7 +117,7 @@ static void t_descriptor_dealloc(t_descriptor *self)
     {
         Py_DECREF(self->access.value);
     }
-    self->ob_type->tp_free((PyObject *) self);
+    Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
 PyObject *make_descriptor(PyObject *value)
@@ -231,12 +230,8 @@ static PyMethodDef _icu_funcs[] = {
     { NULL, NULL, 0, NULL }
 };
 
-
-extern "C" {
-
-    void init_icu(void)
-    {
-        PyObject *m = Py_InitModule3("_icu", _icu_funcs, "_icu");
+static PyObject *PyInit_icu(PyObject *m)
+{
         PyObject *ver;
 
         PyType_Ready(&ConstVariableDescriptorType);
@@ -257,7 +252,7 @@ extern "C" {
         {
             if (!PyErr_Occurred())
                 PyErr_SetString(PyExc_ImportError, "icu");
-            return;
+            return NULL;
         }
 
         PyExc_ICUError = PyObject_GetAttrString(module, "ICUError");
@@ -286,5 +281,36 @@ extern "C" {
                                                   "getDynamicClassID");
         _method_type = method->ob_type;
         Py_DECREF(method);
+        if (PyErr_Occurred()) return NULL;
+        return m;
+}
+
+
+#if PY_MAJOR_VERSION >= 3
+/* TODO: Properly implement http://www.python.org/dev/peps/pep-3121/ */
+static struct PyModuleDef moduledef = {
+    PyModuleDef_HEAD_INIT,
+    /* m_name    */ "_icu",
+    /* m_doc     */ "PyICU extension module",
+    /* m_size    */ -1,
+    /* m_methods */ _icu_funcs,
+    /* m_reload  */ NULL,
+    /* m_clear   */ NULL,
+    /* m_free    */ NULL,
+};
+extern "C" {
+    PyMODINIT_FUNC PyInit__icu(void)
+    {
+        PyObject *m = PyModule_Create(&moduledef);
+        return PyInit_icu(m);
+    }
+}        
+#else
+extern "C" {
+    void init_icu(void)
+    {
+        PyObject *m = Py_InitModule3("_icu", _icu_funcs, "_icu");
+        PyInit_icu(m);
     }
 }
+#endif
