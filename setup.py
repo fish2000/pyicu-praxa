@@ -80,5 +80,14 @@ setup(name="PyICU",
                              extra_compile_args=_cflags,
                              extra_link_args=_lflags,
                              libraries=_libraries)],
-      py_modules=['icu', 'PyICU', 'docs'],
-)
+      py_modules=['icu', 'PyICU', 'docs'])
+
+
+if sys.version_info >= (3,):
+    path = os.path.join('test', '2to3.note')
+    if not os.path.exists(path):
+        from lib2to3.main import main
+        main("lib2to3.fixes", ['-w', '-n', '--no-diffs', 'test'])
+        output = open(path, 'w')
+        output.write('tests auto-converted by 2to3 during setup\n')
+        output.close()
