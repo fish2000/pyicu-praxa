@@ -390,8 +390,7 @@ static PyObject *t_layoutengine_layoutEngineFactory(PyTypeObject *type,
                     fe, script, language, (LEErrorCode &) status));
             break;
         }
-        PyErr_SetArgsError((PyObject *) type, "__init__", args);
-        return NULL;
+        return PyErr_SetArgsError((PyObject *) type, "__init__", args);
 
       case 4:
         if (!parseArgs(args, "Piii", TYPE_CLASSID(LEFontInstance), &fe,
@@ -402,12 +401,10 @@ static PyObject *t_layoutengine_layoutEngineFactory(PyTypeObject *type,
                     fe, script, language, typo_flag, (LEErrorCode &) status));
             break;
         }
-        PyErr_SetArgsError((PyObject *) type, "__init__", args);
-        return NULL;
+        return PyErr_SetArgsError((PyObject *) type, "__init__", args);
 
       default:
-        PyErr_SetArgsError((PyObject *) type, "__init__", args);
-        return NULL;
+        return PyErr_SetArgsError((PyObject *) type, "__init__", args);
     }
                 
     return wrap_LayoutEngine(le, T_OWNED);

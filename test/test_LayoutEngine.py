@@ -55,7 +55,7 @@ class TTXLEFont(LEFontInstance):
     def getLeading(self):
         self.ttx['hhea'].lineGap * self.size * 1. / self.upem
 
-    def getUnitsPerEM(self):
+    def getUnitsPerEm(self):
         return self.upem
 
     def mapCharToGlyph(self, code):
