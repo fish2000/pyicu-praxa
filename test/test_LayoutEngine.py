@@ -42,7 +42,6 @@ class TTXLEFont(LEFontInstance):
         self.size = size
         self.upem = self.ttx['head'].unitsPerEm
         self.cmap = self.ttx['cmap'].getcmap(3, 1).cmap
-        self.tables = {}
 
     def getFontTable(self, table):
         return self.ttx.getTableData(table)

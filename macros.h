@@ -405,11 +405,11 @@ PyTypeObject name##Type = {                                             \
 
 
 #define DEFINE_ABSTRACT(t_name, name, method)                           \
-  static PyObject *t_name##_##method(t_name *self, PyObject *arg)       \
-  {                                                                     \
-      return PyErr_Format(PyExc_NotImplementedError,                    \
-                          "%s.%s() is abstract", #name, #method);       \
-  }
+    static PyObject *t_name##_##method(t_name *self, PyObject *arg)     \
+    {									\
+        return PyErr_Format(PyExc_NotImplementedError,                  \
+			    "%s.%s() is abstract", #name, #method);	\
+    }
 
 
 #if U_ICU_VERSION_HEX < 0x04060000

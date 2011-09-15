@@ -521,10 +521,13 @@ static PyObject *t_layoutengine_getGlyphPosition(t_layoutengine *self,
     float x, y;
 
     if (!parseArg(arg, "i", &n))
+    {
         STATUS_CALL(self->object->getGlyphPosition(n, x, y,
                                                    (LEErrorCode &) status));
+        return Py_BuildValue("(ff)", x, y);
+    }
 
-    return Py_BuildValue("(ff)", x, y);
+    return PyErr_SetArgsError((PyObject *) self, "getGlyphPosition", arg);
 }
 
 

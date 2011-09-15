@@ -6,7 +6,7 @@ Version 1.2 ->
   - fixed bug 13031
   - PyICU ready for Python 3.2 (tests pass 2to3'd) (Martin von Gagern)
   - added auto-conversion of test sources for Python 3 during setup
-  - added support for LEFontInstance and LayoutEngine (Martin Hosken)
+  - added support for LEFontInstance and LayoutEngine (Martin Hosken, bug 13035)
   - 
 
 Version 1.1 -> 1.2
