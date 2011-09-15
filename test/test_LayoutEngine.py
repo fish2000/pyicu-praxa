@@ -68,12 +68,11 @@ class TTXLEFont(LEFontInstance):
 
         name = self.ttx.getGlyphName(glyph)
         x = self.ttx['hmtx'][name][0] * self.size * 1. / self.upem
-        y = 0.
 
-        try:
+        if 'vmtx' in self.ttx:
             y = self.ttx['vmtx'][name][0] * self.size * 1. / self.upem
-        except:
-            pass
+        else:
+            y = 0.
 
         return (x, y)
 
