@@ -119,9 +119,13 @@ class U_EXPORT PythonLEFontInstance : public LEFontInstance {
 
     virtual const void *getFontTable(LETag tag) const
     {
+#if PY_MAJOR_VERSION >= 3
+        PyObject *key = PyUnicode_FromStringAndSize(NULL, 4);
+        Py_UNICODE *s = PyUnicode_AS_UNICODE(key);
+#else
         PyObject *key = PyString_FromStringAndSize(NULL, 4);
         char *s = PyString_AS_STRING(key);
-
+#endif
         for (int i = 0; i < 4; ++i) {
             s[3 - i] = tag & 0xff;
             tag >>= 8;
@@ -143,7 +147,11 @@ class U_EXPORT PythonLEFontInstance : public LEFontInstance {
                 return NULL;
             }
 
+#if PY_MAJOR_VERSION >= 3
+            if (!PyBytes_CheckExact(result))
+#else
             if (!PyString_CheckExact(result))
+#endif
             {
                 PyErr_SetObject(PyExc_TypeError, result);
                 Py_DECREF(result);
@@ -160,7 +168,11 @@ class U_EXPORT PythonLEFontInstance : public LEFontInstance {
         else
             Py_DECREF(key);
 
+#if PY_MAJOR_VERSION >= 3
+        return PyBytes_AS_STRING(result);
+#else
         return PyString_AS_STRING(result);
+#endif
     }
 
     virtual le_int32 getAscent() const
