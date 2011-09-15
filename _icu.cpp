@@ -41,6 +41,7 @@
 #include "regex.h"
 #include "normalizer.h"
 #include "search.h"
+#include "layoutengine.h"
 
 
 /* const variable descriptor */
@@ -232,57 +233,61 @@ static PyMethodDef _icu_funcs[] = {
 
 static PyObject *PyInit_icu(PyObject *m)
 {
-        PyObject *ver;
+    PyObject *ver;
 
-        PyType_Ready(&ConstVariableDescriptorType);
-        Py_INCREF(&ConstVariableDescriptorType);
+    PyType_Ready(&ConstVariableDescriptorType);
+    Py_INCREF(&ConstVariableDescriptorType);
 
-        ver = PyString_FromString(PYICU_VER);
-        PyObject_SetAttrString(m, "VERSION", ver); Py_DECREF(ver);
+    ver = PyString_FromString(PYICU_VER);
+    PyObject_SetAttrString(m, "VERSION", ver); Py_DECREF(ver);
 
-        ver = PyString_FromString(U_ICU_VERSION);
-        PyObject_SetAttrString(m, "ICU_VERSION", ver); Py_DECREF(ver);
+    ver = PyString_FromString(U_ICU_VERSION);
+    PyObject_SetAttrString(m, "ICU_VERSION", ver); Py_DECREF(ver);
 
-        ver = PyString_FromString(U_UNICODE_VERSION);
-        PyObject_SetAttrString(m, "UNICODE_VERSION", ver); Py_DECREF(ver);
+    ver = PyString_FromString(U_UNICODE_VERSION);
+    PyObject_SetAttrString(m, "UNICODE_VERSION", ver); Py_DECREF(ver);
 
-        PyObject *module = PyImport_ImportModule("icu");
+    PyObject *module = PyImport_ImportModule("icu");
 
-        if (!module)
-        {
-            if (!PyErr_Occurred())
-                PyErr_SetString(PyExc_ImportError, "icu");
-            return NULL;
-        }
+    if (!module)
+    {
+        if (!PyErr_Occurred())
+            PyErr_SetString(PyExc_ImportError, "icu");
+        return NULL;
+    }
 
-        PyExc_ICUError = PyObject_GetAttrString(module, "ICUError");
-        PyExc_InvalidArgsError = PyObject_GetAttrString(module, "InvalidArgsError");
-        Py_DECREF(module);
+    PyExc_ICUError = PyObject_GetAttrString(module, "ICUError");
+    PyExc_InvalidArgsError = PyObject_GetAttrString(module, "InvalidArgsError");
+    Py_DECREF(module);
 
-        _init_common(m);
-        _init_errors(m);
-        _init_bases(m);
-        _init_locale(m);
-        _init_transliterator(m);
-        _init_iterators(m);
-        _init_format(m);
-        _init_dateformat(m);
-        _init_numberformat(m);
-        _init_calendar(m);
-        _init_collator(m);
-        _init_charset(m);
-        _init_tzinfo(m);
-        _init_unicodeset(m);
-        _init_regex(m);
-        _init_normalizer(m);
-        _init_search(m);
+    _init_common(m);
+    _init_errors(m);
+    _init_bases(m);
+    _init_locale(m);
+    _init_transliterator(m);
+    _init_iterators(m);
+    _init_format(m);
+    _init_dateformat(m);
+    _init_numberformat(m);
+    _init_calendar(m);
+    _init_collator(m);
+    _init_charset(m);
+    _init_tzinfo(m);
+    _init_unicodeset(m);
+    _init_regex(m);
+    _init_normalizer(m);
+    _init_search(m);
+    _init_layoutengine(m);
 
-        PyObject *method = PyObject_GetAttrString((PyObject *) &UObjectType,
-                                                  "getDynamicClassID");
-        _method_type = method->ob_type;
-        Py_DECREF(method);
-        if (PyErr_Occurred()) return NULL;
-        return m;
+    PyObject *method = PyObject_GetAttrString((PyObject *) &UObjectType,
+                                              "getDynamicClassID");
+
+    _method_type = method->ob_type;
+    Py_DECREF(method);
+    if (PyErr_Occurred())
+        return NULL;
+
+    return m;
 }
 
 

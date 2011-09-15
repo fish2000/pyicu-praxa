@@ -244,45 +244,57 @@ int abstract_init(PyObject *self, PyObject *args, PyObject *kwds);
 // helper class, to allow argument parsing with proper cleanup
 class charsArg {
 private:
-
     const char *str;
     PyObject *obj;
 
-    void clear() {
+    void clear()
+    {
         Py_XDECREF(obj);
     }
 
 public:
+    charsArg() : str(NULL), obj(NULL) {}
 
-    charsArg() : str(NULL), obj(NULL) { }
+    ~charsArg()
+    {
+        clear();
+    }
 
-    ~charsArg() { clear();  }
-
-    const char *c_str() const {
+    const char *c_str() const
+    {
         return str;
     }
 
+    size_t size() const
+    {
+        return strlen(str);
+    }
+
 #if PY_VERSION_HEX >= 0x02070000
-    // Allow using this class wherever a const char* is statically expected
-    operator const char*() const {
+    // Allow using this class wherever a const char * is statically expected
+    operator const char *() const
+    {
         return str;
     }
 #else
     // Old python APIs were extremely unclean about constness of char strings
-    operator char*() const {
-      return const_cast<char*>(str);
+    operator char *() const
+    {
+        return const_cast<char *>(str);
     }
 #endif
 
     // Point to an existing bytes object. We don't own the buffer.
-    void borrow(PyObject *bytes) {
+    void borrow(PyObject *bytes)
+    {
         clear();
         obj = NULL;
         str = PyBytes_AS_STRING(bytes);
     }
 
     // Point to a newly created bytes object, which we own and will clean.
-    void own(PyObject *bytes) {
+    void own(PyObject *bytes)
+    {
         clear();
         obj = bytes;
         str = PyBytes_AS_STRING(bytes);

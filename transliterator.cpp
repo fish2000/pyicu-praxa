@@ -110,10 +110,10 @@ DECLARE_TYPE(Transliterator, t_transliterator, UObject,
 
 /* PythonTransliterator */
 
-UOBJECT_DEFINE_RTTI_IMPLEMENTATION(PythonTransliterator)
+UOBJECT_DEFINE_RTTI_IMPLEMENTATION(PythonTransliterator);
 
 PythonTransliterator::PythonTransliterator(t_transliterator *self,
-                                           UnicodeString& id) :
+                                           UnicodeString &id) :
     Transliterator(id, NULL)
 {
     this->self = self;
@@ -121,7 +121,7 @@ PythonTransliterator::PythonTransliterator(t_transliterator *self,
 }
 
 PythonTransliterator::PythonTransliterator(t_transliterator *self,
-                                           UnicodeString& id,
+                                           UnicodeString &id,
                                            UnicodeFilter *adoptedFilter) :
     Transliterator(id, adoptedFilter)
 {

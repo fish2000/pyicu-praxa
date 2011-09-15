@@ -200,7 +200,7 @@ static PyObject *t_collationkey_getByteArray(t_collationkey *self)
     return PyBytes_FromStringAndSize((char *) array, count);
 }
 
-DECLARE_RICHCMP(CollationKey, t_collationkey);
+DEFINE_RICHCMP(CollationKey, t_collationkey);
 
 
 /* Collator */
@@ -659,7 +659,7 @@ static PyObject *t_rulebasedcollator_str(t_rulebasedcollator *self)
     return PyUnicode_FromUnicodeString(&u);
 }
 
-DECLARE_RICHCMP(RuleBasedCollator, t_rulebasedcollator);
+DEFINE_RICHCMP(RuleBasedCollator, t_rulebasedcollator);
 
 
 void _init_collator(PyObject *m)

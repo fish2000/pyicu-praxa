@@ -513,7 +513,7 @@ static PyObject *t_dateformatsymbols_setAmPmStrings(t_dateformatsymbols *self,
     return PyErr_SetArgsError((PyObject *) self, "setAmPmStrings", arg);
 }
 
-DECLARE_RICHCMP(DateFormatSymbols, t_dateformatsymbols);
+DEFINE_RICHCMP(DateFormatSymbols, t_dateformatsymbols);
         
 static PyObject *t_dateformatsymbols_getLocalPatternChars(t_dateformatsymbols *self, PyObject *args)
 {
@@ -1060,7 +1060,7 @@ static PyObject *t_dateinterval_str(t_dateinterval *self)
     return PyUnicode_FromUnicodeString(&u);
 }
 
-DECLARE_RICHCMP(DateInterval, t_dateinterval);
+DEFINE_RICHCMP(DateInterval, t_dateinterval);
 
 
 /* DateIntervalInfo */
@@ -1184,7 +1184,7 @@ static PyObject *t_dateintervalinfo_getFallbackIntervalPattern(t_dateintervalinf
     return PyErr_SetArgsError((PyObject *) self, "getFallbackIntervalPattern", args);
 }
 
-DECLARE_RICHCMP(DateIntervalInfo, t_dateintervalinfo);
+DEFINE_RICHCMP(DateIntervalInfo, t_dateintervalinfo);
 
 
 /* DateIntervalFormat */
@@ -1313,7 +1313,7 @@ static PyObject *t_dateintervalformat_createInstance(PyTypeObject *type,
     return PyErr_SetArgsError(type, "createInstance", args);
 }
 
-DECLARE_RICHCMP(DateIntervalFormat, t_dateintervalformat);
+DEFINE_RICHCMP(DateIntervalFormat, t_dateintervalformat);
 
 #endif
 

@@ -1402,7 +1402,7 @@ static PyObject *t_collationelementiterator_iter_next(t_collationelementiterator
     return PyInt_FromLong(n);
 }
 
-DECLARE_RICHCMP(CollationElementIterator, t_collationelementiterator);
+DEFINE_RICHCMP(CollationElementIterator, t_collationelementiterator);
 
 
 void _init_iterators(PyObject *m)

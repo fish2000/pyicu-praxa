@@ -316,7 +316,7 @@ PyTypeObject name##Type = {                                             \
         Py_INCREF(&className##Type);                                    \
         PyModule_AddObject(module, #className,                          \
                            (PyObject *) &className##Type);              \
-        registerType(&className##Type, typeid(className).name());	\
+        registerType(&className##Type, typeid(className).name());       \
     }
 
 #define REGISTER_TYPE(className, module)                                \
@@ -377,7 +377,7 @@ PyTypeObject name##Type = {                                             \
     }
 
 
-#define DECLARE_RICHCMP(name, t_name) \
+#define DEFINE_RICHCMP(name, t_name) \
     static PyObject *t_name ## _richcmp(t_name *self,                   \
                                         PyObject *arg, int op)          \
     {                                                                   \
@@ -402,6 +402,14 @@ PyTypeObject name##Type = {                                             \
         }                                                               \
         return PyErr_SetArgsError((PyObject *) self, "__richcmp__", arg); \
     }
+
+
+#define DEFINE_ABSTRACT(t_name, name, method)                           \
+  static PyObject *t_name##_##method(t_name *self, PyObject *arg)       \
+  {                                                                     \
+      return PyErr_Format(PyExc_NotImplementedError,                    \
+                          "%s.%s() is abstract", #name, #method);       \
+  }
 
 
 #if U_ICU_VERSION_HEX < 0x04060000

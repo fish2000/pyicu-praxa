@@ -579,7 +579,7 @@ static PyObject *t_stringsearch_str(t_stringsearch *self)
     return PyUnicode_FromUnicodeString(&u);
 }
 
-DECLARE_RICHCMP(StringSearch, t_stringsearch);
+DEFINE_RICHCMP(StringSearch, t_stringsearch);
 
 
 void _init_search(PyObject *m)
