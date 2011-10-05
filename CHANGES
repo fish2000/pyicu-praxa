@@ -7,6 +7,7 @@ Version 1.2 ->
   - PyICU ready for Python 3.2 (tests pass 2to3'd) (Martin von Gagern)
   - added auto-conversion of test sources for Python 3 during setup
   - added support for LEFontInstance and LayoutEngine (Martin Hosken, bug 13035)
+  - fixed bugs in RegexMatcher and RegexPattern not keeping their inputs
   - 
 
 Version 1.1 -> 1.2

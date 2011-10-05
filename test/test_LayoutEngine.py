@@ -111,7 +111,7 @@ else:
                                                            ScriptCode.deva,
                                                            LanguageCode.nul)
 
-        def testHello(self) :
+        def testHello(self):
 
             self.layout.layoutChars(u"नमस्ते दुनिया")
             self.assertEqual(self.layout.getGlyphCount(), 13)
