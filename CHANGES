@@ -4,6 +4,7 @@ For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 Version 1.3 ->
 ------------------
   - fixed bug with default tzinfo set on ICUtzinfo type (bug 13038)
+  - fixed bug 13040 (Martin Hosken)
   - 
 
 Version 1.2 -> 1.3
