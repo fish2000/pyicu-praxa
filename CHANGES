@@ -5,6 +5,8 @@ Version 1.3 ->
 ------------------
   - fixed bug with default tzinfo set on ICUtzinfo type (bug 13038)
   - fixed bug 13040 (Martin Hosken)
+  - added wrapper for Transliterator::toRules()
+  - added missing wrapper for RuleBasedNumberFormat(URBNFRuleSetTag, Locale)
   - 
 
 Version 1.2 -> 1.3
