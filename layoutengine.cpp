@@ -705,6 +705,20 @@ void _init_layoutengine(PyObject *m)
     INSTALL_ENUM(ScriptCode, "palm", palmScriptCode);
     INSTALL_ENUM(ScriptCode, "sind", sindScriptCode);
     INSTALL_ENUM(ScriptCode, "wara", waraScriptCode);
+
+#if U_ICU_VERSION_HEX >= 0x31000000
+    INSTALL_ENUM(ScriptCode, "afak", afakScriptCode);
+    INSTALL_ENUM(ScriptCode, "jurc", jurcScriptCode);
+    INSTALL_ENUM(ScriptCode, "khoj", khojScriptCode);
+    INSTALL_ENUM(ScriptCode, "mroo", mrooScriptCode);
+    INSTALL_ENUM(ScriptCode, "nshu", nshuScriptCode);
+    INSTALL_ENUM(ScriptCode, "shrd", shrdScriptCode);
+    INSTALL_ENUM(ScriptCode, "sora", soraScriptCode);
+    INSTALL_ENUM(ScriptCode, "takr", takrScriptCode);
+    INSTALL_ENUM(ScriptCode, "tang", tangScriptCode);
+    INSTALL_ENUM(ScriptCode, "tirh", tirhScriptCode);
+    INSTALL_ENUM(ScriptCode, "wole", woleScriptCode);
+#endif  /* 49.0 */
 #endif  /* 4.6 */
 #endif  /* 4.4 */
 #endif  /* 4.0 */

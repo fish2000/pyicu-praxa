@@ -670,6 +670,7 @@ static PyObject *t_numberformat_parse(t_numberformat *self, PyObject *args)
     return PyErr_SetArgsError((PyObject *) self, "parse", args);
 }
 
+#if U_ICU_VERSION_HEX < 0x31000000  /* < 49.0 */
 static PyObject *t_numberformat_parseCurrency(t_numberformat *self,
                                               PyObject *args)
 {
@@ -729,6 +730,31 @@ static PyObject *t_numberformat_parseCurrency(t_numberformat *self,
         
     return PyErr_SetArgsError((PyObject *) self, "parseCurrency", args);
 }
+#else
+static PyObject *t_numberformat_parseCurrency(t_numberformat *self,
+                                              PyObject *args)
+{
+    UnicodeString _u, *u;
+
+    switch (PyTuple_Size(args)) {
+      case 1:
+        if (!parseArgs(args, "S", &u, &_u))
+        {
+            CurrencyAmount *a;
+            ParsePosition _pp;
+
+            _pp.setErrorIndex(-1);
+            a = self->object->parseCurrency(*u, _pp);
+            if (_pp.getErrorIndex() != -1)
+                Py_RETURN_NONE;
+            return wrap_CurrencyAmount(a, T_OWNED);
+        }
+        break;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "parseCurrency", args);
+}
+#endif
 
 static PyObject *t_numberformat_isParseIntegerOnly(t_numberformat *self)
 {
