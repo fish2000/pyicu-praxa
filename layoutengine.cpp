@@ -218,6 +218,16 @@ class U_EXPORT PythonLEFontInstance : public LEFontInstance {
         return 0;
     }
 
+    virtual LEGlyphID mapCharToGlyph(LEUnicode32 u,
+                                     const LECharMapper *mapper) const {
+      return LEFontInstance::mapCharToGlyph(u, mapper);
+    }
+
+    virtual LEGlyphID mapCharToGlyph(LEUnicode32 u, const LECharMapper *mapper,
+                                     le_bool filterZeroWidth) const {
+      return LEFontInstance::mapCharToGlyph(u, mapper, filterZeroWidth);
+    }
+
     virtual void getGlyphAdvance(LEGlyphID glyph, LEPoint &advance) const
     {
         PyObject *name = PyString_FromString("getGlyphAdvance");
