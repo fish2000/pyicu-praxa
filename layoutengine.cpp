@@ -716,7 +716,7 @@ void _init_layoutengine(PyObject *m)
     INSTALL_ENUM(ScriptCode, "sind", sindScriptCode);
     INSTALL_ENUM(ScriptCode, "wara", waraScriptCode);
 
-#if U_ICU_VERSION_HEX >= 0x31000000
+#if U_ICU_VERSION_HEX >= VERSION_HEX(49, 0, 0)
     INSTALL_ENUM(ScriptCode, "afak", afakScriptCode);
     INSTALL_ENUM(ScriptCode, "jurc", jurcScriptCode);
     INSTALL_ENUM(ScriptCode, "khoj", khojScriptCode);
