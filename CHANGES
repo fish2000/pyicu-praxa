@@ -1,6 +1,11 @@
 
 For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 
+Version 1.4 ->
+------------------
+  - added wrapper for MessageFormat::format(argumentNames, arguments, ...)
+  - 
+
 Version 1.3 -> 1.4
 ------------------
   - fixed bug with default tzinfo set on ICUtzinfo type (bug 13038)
