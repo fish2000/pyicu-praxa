@@ -86,8 +86,10 @@ class TestCollator(TestCase):
             key = "AC300186DC9D019B0501282800"
         elif ICU_VERSION < '49.0':
             key = "791C0186DCFD019B05010D0D00"
-        else:
+        elif ICU_VERSION < '50.1':
             key = "791C0186DA95019B05010D0D00"
+        else:
+            key = "791C0186DA95019B05010E00"
 
         self.assertTrue(key == ''.join(['%02X' %(byte2int(c)) for c in k]))
 
