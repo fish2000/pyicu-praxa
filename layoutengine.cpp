@@ -558,9 +558,6 @@ void _init_layoutengine(PyObject *m)
     REGISTER_TYPE(LEFontInstance, m);
     REGISTER_TYPE(LayoutEngine, m);
 
-    INSTALL_STATIC_INT(LayoutEngine, kTypoFlagKern);
-    INSTALL_STATIC_INT(LayoutEngine, kTypoFlagLiga);
-
     INSTALL_ENUM(ScriptCode, "zyyy", zyyyScriptCode);
     INSTALL_ENUM(ScriptCode, "zinh", zinhScriptCode);
     INSTALL_ENUM(ScriptCode, "qaai", qaaiScriptCode);
