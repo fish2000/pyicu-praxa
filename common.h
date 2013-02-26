@@ -121,6 +121,7 @@ typedef intintobjargproc ssizessizeobjargproc;
 #include <unicode/ucsdet.h>
 #include <unicode/uidna.h>
 #include <unicode/translit.h>
+#include <unicode/ulocdata.h>
 #include <unicode/unifunct.h>
 #include <unicode/unimatch.h>
 #include <unicode/unifilt.h>
