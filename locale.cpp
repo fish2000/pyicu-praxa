@@ -268,6 +268,7 @@ static void t_localedata_dealloc(t_localedata *self)
         self->object = NULL;
     }
     free(self->locale_id);
+    self->locale_id = NULL;
 
     Py_TYPE(self)->tp_free((PyObject *) self);
 }
