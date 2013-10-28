@@ -118,6 +118,12 @@ class U_EXPORT PythonLEFontInstance : public LEFontInstance {
      * LEFontInstance API.
      */
 
+    virtual const void *getFontTable(LETag tableTag, size_t &length) const
+    {
+        length = -1;
+        return getFontTable(tableTag);
+    }
+
     virtual const void *getFontTable(LETag tag) const
     {
 #if PY_MAJOR_VERSION >= 3
