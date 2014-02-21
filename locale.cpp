@@ -71,6 +71,7 @@ static PyObject *t_locale_getDisplayName(t_locale *self, PyObject *args);
 static PyObject *t_locale_createKeywords(t_locale *self);
 static PyObject *t_locale_getKeywordValue(t_locale *self, PyObject *arg);
 static PyObject *t_locale_setKeywordValue(t_locale *self, PyObject *args);
+static PyObject *t_locale_removeKeywordValue(t_locale *self, PyObject *arg);
 static PyObject *t_locale_isBogus(t_locale *self);
 static PyObject *t_locale_setToBogus(t_locale *self);
 static PyObject *t_locale_getEnglish(PyTypeObject *type);
@@ -120,6 +121,7 @@ static PyMethodDef t_locale_methods[] = {
     DECLARE_METHOD(t_locale, createKeywords, METH_NOARGS),
     DECLARE_METHOD(t_locale, getKeywordValue, METH_O),
     DECLARE_METHOD(t_locale, setKeywordValue, METH_VARARGS),
+    DECLARE_METHOD(t_locale, removeKeywordValue, METH_O),
     DECLARE_METHOD(t_locale, isBogus, METH_NOARGS),
     DECLARE_METHOD(t_locale, setToBogus, METH_NOARGS),
     DECLARE_METHOD(t_locale, getEnglish, METH_NOARGS | METH_CLASS),
@@ -587,6 +589,19 @@ static PyObject *t_locale_setKeywordValue(t_locale *self, PyObject *args)
     }
 
     return PyErr_SetArgsError((PyObject *) self, "setKeywordValue", args);
+}
+
+static PyObject *t_locale_removeKeywordValue(t_locale *self, PyObject *arg)
+{
+    charsArg name;
+
+    if (!parseArg(arg, "n", &name))
+    {
+        STATUS_CALL(self->object->setKeywordValue(name, "", status));
+        Py_RETURN_NONE;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "removeKeywordValue", arg);
 }
 
 static PyObject *t_locale_isBogus(t_locale *self)
