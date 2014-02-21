@@ -1,5 +1,5 @@
 /* ====================================================================
- * Copyright (c) 2004-2010 Open Source Applications Foundation.
+ * Copyright (c) 2004-2014 Open Source Applications Foundation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -70,8 +70,10 @@ static PyObject *t_locale_getDisplayVariant(t_locale *self, PyObject *args);
 static PyObject *t_locale_getDisplayName(t_locale *self, PyObject *args);
 static PyObject *t_locale_createKeywords(t_locale *self);
 static PyObject *t_locale_getKeywordValue(t_locale *self, PyObject *arg);
+#if U_ICU_VERSION_HEX >= VERSION_HEX(49, 0, 0)
 static PyObject *t_locale_setKeywordValue(t_locale *self, PyObject *args);
 static PyObject *t_locale_removeKeywordValue(t_locale *self, PyObject *arg);
+#endif
 static PyObject *t_locale_isBogus(t_locale *self);
 static PyObject *t_locale_setToBogus(t_locale *self);
 static PyObject *t_locale_getEnglish(PyTypeObject *type);
@@ -120,8 +122,10 @@ static PyMethodDef t_locale_methods[] = {
     DECLARE_METHOD(t_locale, getDisplayName, METH_VARARGS),
     DECLARE_METHOD(t_locale, createKeywords, METH_NOARGS),
     DECLARE_METHOD(t_locale, getKeywordValue, METH_O),
+#if U_ICU_VERSION_HEX >= VERSION_HEX(49, 0, 0)
     DECLARE_METHOD(t_locale, setKeywordValue, METH_VARARGS),
     DECLARE_METHOD(t_locale, removeKeywordValue, METH_O),
+#endif
     DECLARE_METHOD(t_locale, isBogus, METH_NOARGS),
     DECLARE_METHOD(t_locale, setToBogus, METH_NOARGS),
     DECLARE_METHOD(t_locale, getEnglish, METH_NOARGS | METH_CLASS),
@@ -578,6 +582,7 @@ static PyObject *t_locale_getKeywordValue(t_locale *self, PyObject *arg)
     return PyErr_SetArgsError((PyObject *) self, "getKeywordValue", arg);
 }
 
+#if U_ICU_VERSION_HEX >= VERSION_HEX(49, 0, 0)
 static PyObject *t_locale_setKeywordValue(t_locale *self, PyObject *args)
 {
     charsArg name, value;
@@ -603,6 +608,7 @@ static PyObject *t_locale_removeKeywordValue(t_locale *self, PyObject *arg)
 
     return PyErr_SetArgsError((PyObject *) self, "removeKeywordValue", arg);
 }
+#endif
 
 static PyObject *t_locale_isBogus(t_locale *self)
 {
