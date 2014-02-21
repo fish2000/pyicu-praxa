@@ -8,6 +8,7 @@ Version 1.5 -> 1.6
   - added wrappers for uscript functions and UScriptCode enum (bug 13081)
   - generalized freebsd setup.py support (Laurence Parry)
   - added support for ICU 52.1
+  - added wrapper for Locale::setKeywordValue()
   - 
 
 Version 1.4 -> 1.5

@@ -69,6 +69,8 @@ static PyObject *t_locale_getDisplayCountry(t_locale *self, PyObject *args);
 static PyObject *t_locale_getDisplayVariant(t_locale *self, PyObject *args);
 static PyObject *t_locale_getDisplayName(t_locale *self, PyObject *args);
 static PyObject *t_locale_createKeywords(t_locale *self);
+static PyObject *t_locale_getKeywordValue(t_locale *self, PyObject *arg);
+static PyObject *t_locale_setKeywordValue(t_locale *self, PyObject *args);
 static PyObject *t_locale_isBogus(t_locale *self);
 static PyObject *t_locale_setToBogus(t_locale *self);
 static PyObject *t_locale_getEnglish(PyTypeObject *type);
@@ -97,7 +99,6 @@ static PyObject *t_locale_setDefault(PyTypeObject *type, PyObject *args);
 static PyObject *t_locale_createFromName(PyTypeObject *type, PyObject *args);
 static PyObject *t_locale_createCanonical(PyTypeObject *type, PyObject *arg);
 static PyObject *t_locale_getAvailableLocales(PyTypeObject *type);
-static PyObject *t_locale_getKeywordValue(t_locale *self, PyObject *arg);
 static PyObject *t_locale_getISOCountries(PyTypeObject *type);
 static PyObject *t_locale_getISOLanguages(PyTypeObject *type);
 
@@ -117,6 +118,8 @@ static PyMethodDef t_locale_methods[] = {
     DECLARE_METHOD(t_locale, getDisplayVariant, METH_VARARGS),
     DECLARE_METHOD(t_locale, getDisplayName, METH_VARARGS),
     DECLARE_METHOD(t_locale, createKeywords, METH_NOARGS),
+    DECLARE_METHOD(t_locale, getKeywordValue, METH_O),
+    DECLARE_METHOD(t_locale, setKeywordValue, METH_VARARGS),
     DECLARE_METHOD(t_locale, isBogus, METH_NOARGS),
     DECLARE_METHOD(t_locale, setToBogus, METH_NOARGS),
     DECLARE_METHOD(t_locale, getEnglish, METH_NOARGS | METH_CLASS),
@@ -145,7 +148,6 @@ static PyMethodDef t_locale_methods[] = {
     DECLARE_METHOD(t_locale, createFromName, METH_VARARGS | METH_CLASS),
     DECLARE_METHOD(t_locale, createCanonical, METH_O | METH_CLASS),
     DECLARE_METHOD(t_locale, getAvailableLocales, METH_NOARGS | METH_CLASS),
-    DECLARE_METHOD(t_locale, getKeywordValue, METH_O),
     DECLARE_METHOD(t_locale, getISOCountries, METH_NOARGS | METH_CLASS),
     DECLARE_METHOD(t_locale, getISOLanguages, METH_NOARGS | METH_CLASS),
     { NULL, NULL, 0, NULL }
@@ -553,6 +555,40 @@ static PyObject *t_locale_createKeywords(t_locale *self)
     return wrap_StringEnumeration(se, T_OWNED);
 }
 
+static PyObject *t_locale_getKeywordValue(t_locale *self, PyObject *arg)
+{
+    charsArg name;
+
+    if (!parseArg(arg, "n", &name))
+    {
+        char buf[ULOC_FULLNAME_CAPACITY];
+        int32_t len;
+
+        STATUS_CALL(len = self->object->getKeywordValue(
+            name, buf, sizeof(buf) - 1, status));
+
+        if (len == 0)
+            Py_RETURN_NONE;
+
+        return PyString_FromStringAndSize(buf, len);
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "getKeywordValue", arg);
+}
+
+static PyObject *t_locale_setKeywordValue(t_locale *self, PyObject *args)
+{
+    charsArg name, value;
+
+    if (!parseArgs(args, "nn", &name, &value))
+    {
+        STATUS_CALL(self->object->setKeywordValue(name, value, status));
+        Py_RETURN_NONE;
+    }
+
+    return PyErr_SetArgsError((PyObject *) self, "setKeywordValue", args);
+}
+
 static PyObject *t_locale_isBogus(t_locale *self)
 {
     int retval = self->object->isBogus();
@@ -744,26 +780,6 @@ static PyObject *t_locale_getAvailableLocales(PyTypeObject *type)
     }
 
     return dict;
-}
-
-static PyObject *t_locale_getKeywordValue(t_locale *self, PyObject *arg)
-{
-    charsArg name;
-
-    if (!parseArg(arg, "n", &name))
-    {
-        char buf[ULOC_FULLNAME_CAPACITY];
-        UErrorCode status = U_ZERO_ERROR;
-        int32_t len = self->object->getKeywordValue(name, buf, sizeof(buf) - 1,
-                                                    status);
-
-        if (len == 0)
-            Py_RETURN_NONE;
-
-        return PyString_FromStringAndSize(buf, len);
-    }
-
-    return PyErr_SetArgsError((PyObject *) self, "getKeywordValue", arg);
 }
 
 static PyObject *t_locale_getISOCountries(PyTypeObject *type)
