@@ -11,7 +11,7 @@ Version 1.5 -> 1.6
   - added wrapper for Locale::setKeywordValue()
   - added Locale::removeKeywordValue()
   - added support for ListFormatter
-  - 
+  - build tested with Python 2.7 and Python 3.3.0
 
 Version 1.4 -> 1.5
 ------------------
