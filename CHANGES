@@ -1,6 +1,12 @@
 
 For bug <NUM>, see http://bugzilla.osafoundation.org/show_bug.cgi?id=<NUM>
 
+Version 1.6 ->
+------------------
+  - added missing #include for <unicode/uscript.h>
+  - fixed issues building against ICU 4.2
+  - 
+
 Version 1.5 -> 1.6
 ------------------
   - removed wrappers for some layoutengine.cpp internal flags (bug 13074)
