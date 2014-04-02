@@ -5,6 +5,7 @@ Version 1.6 ->
 ------------------
   - added missing #include for <unicode/uscript.h>
   - fixed issues building against ICU 4.2
+  - added wrapper for Script.isRightToLeft() (bug 13081)
   - 
 
 Version 1.5 -> 1.6

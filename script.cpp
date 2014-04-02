@@ -48,6 +48,9 @@ static int t_script_init(t_script *self, PyObject *args, PyObject *kwds);
 static PyObject *t_script_getName(t_script *self);
 static PyObject *t_script_getShortName(t_script *self);
 static PyObject *t_script_getScriptCode(t_script *self);
+#if U_ICU_VERSION_HEX >= VERSION_HEX(51, 0, 0)
+static PyObject *t_script_isRightToLeft(t_script *self);
+#endif
 static PyObject *t_script_getCode(PyTypeObject *type, PyObject *arg);
 static PyObject *t_script_getScript(PyTypeObject *type, PyObject *arg);
 static PyObject *t_script_hasScript(PyTypeObject *type, PyObject *args);
@@ -57,6 +60,9 @@ static PyMethodDef t_script_methods[] = {
     DECLARE_METHOD(t_script, getName, METH_NOARGS),
     DECLARE_METHOD(t_script, getShortName, METH_NOARGS),
     DECLARE_METHOD(t_script, getScriptCode, METH_NOARGS),
+#if U_ICU_VERSION_HEX >= VERSION_HEX(51, 0, 0)
+    DECLARE_METHOD(t_script, isRightToLeft, METH_NOARGS),
+#endif
     DECLARE_METHOD(t_script, getCode, METH_O | METH_CLASS),
     DECLARE_METHOD(t_script, getScript, METH_O | METH_CLASS),
     DECLARE_METHOD(t_script, hasScript, METH_VARARGS | METH_CLASS),
@@ -116,6 +122,16 @@ static PyObject *t_script_getScriptCode(t_script *self)
 {
     return PyInt_FromLong(self->code);
 }
+
+#if U_ICU_VERSION_HEX >= VERSION_HEX(51, 0, 0)
+static PyObject *t_script_isRightToLeft(t_script *self)
+{
+    if (uscript_isRightToLeft(self->code))
+        Py_RETURN_TRUE;
+
+    Py_RETURN_FALSE;
+}
+#endif
 
 static PyObject *t_script_getCode(PyTypeObject *type, PyObject *arg)
 {
