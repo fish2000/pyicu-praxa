@@ -9,8 +9,24 @@ except ImportError:
 
 VERSION = '1.6'
 
+darwin_includes = [
+    '/usr/local/include',
+    '/usr/local/opt/icu4c/include']
+if 'INSTANCE_INCLUDE' in os.environ: # Praxa
+    darwin_includes.append(os.environ['INSTANCE_INCLUDE'])
+if 'LOCAL_INCLUDE' in os.environ: # Praxa (local)
+    darwin_includes.append(os.environ['LOCAL_INCLUDE'])
+
+darwin_libs = [
+    '/usr/local/lib',
+    '/usr/local/opt/icu4c/lib']
+if 'INSTANCE_LIB' in os.environ: # Praxa
+    darwin_libs.append(os.environ['INSTANCE_LIB'])
+if 'LOCAL_LIB' in os.environ: # Praxa (local)
+    darwin_libs.append(os.environ['LOCAL_LIB'])
+
 INCLUDES = {
-    'darwin': ['/usr/local/include'],
+    'darwin': list(reversed(darwin_includes)),
     'linux': [],
     'freebsd': ['/usr/local/include'],
     'win32': ['c:/icu/include'],
@@ -35,7 +51,7 @@ DEBUG_CFLAGS = {
 }
 
 LFLAGS = {
-    'darwin': ['-L/usr/local/lib'],
+    'darwin': list(reversed(map(lambda libpth: "-L%s" % libpth, darwin_libs))),
     'linux': [],
     'freebsd': ['-L/usr/local/lib'],
     'win32': ['/LIBPATH:c:/icu/lib'],
