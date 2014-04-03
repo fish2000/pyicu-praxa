@@ -21,10 +21,10 @@
  * ====================================================================
  */
 
-#include "common.h"
-#include "structmember.h"
+#include "../includes/common.h"
+#include "../includes/structmember.h"
 
-#include "errors.h"
+#include "../includes/errors.h"
 
 static void _setMsg(PyObject *messages, UErrorCode code, const char *msg)
 {

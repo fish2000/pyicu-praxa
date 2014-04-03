@@ -21,15 +21,15 @@
  * ====================================================================
  */
 
-#include "common.h"
-#include "structmember.h"
+#include "../includes/common.h"
+#include "../includes/structmember.h"
 
-#include "bases.h"
-#include "locale.h"
-#include "format.h"
-#include "macros.h"
-#include "dateformat.h"
-#include "numberformat.h"
+#include "../includes/bases.h"
+#include "../includes/locale.h"
+#include "../includes/format.h"
+#include "../includes/macros.h"
+#include "../includes/dateformat.h"
+#include "../includes/numberformat.h"
 
 #if U_ICU_VERSION_HEX >= 0x04080000
     DECLARE_CONSTANTS_TYPE(UTimeUnitFormatStyle);

@@ -21,14 +21,14 @@
  * ====================================================================
  */
 
-#include "common.h"
-#include "structmember.h"
-#include "datetime.h"
+#include "../includes/common.h"
+#include "../includes/structmember.h"
+#include "../includes/datetime.h"
 
-#include "bases.h"
-#include "calendar.h"
-#include "tzinfo.h"
-#include "macros.h"
+#include "../includes/bases.h"
+#include "../includes/calendar.h"
+#include "../includes/tzinfo.h"
+#include "../includes/macros.h"
 
 /* A tzinfo extension that wraps an ICU timezone wrapper.
  * The tz field is supposed to be immutable.

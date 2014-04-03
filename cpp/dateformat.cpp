@@ -21,16 +21,16 @@
  * ====================================================================
  */
 
-#include "common.h"
-#include "structmember.h"
+#include "../includes/common.h"
+#include "../includes/structmember.h"
 
-#include "bases.h"
-#include "locale.h"
-#include "format.h"
-#include "calendar.h"
-#include "numberformat.h"
-#include "dateformat.h"
-#include "macros.h"
+#include "../includes/bases.h"
+#include "../includes/locale.h"
+#include "../includes/format.h"
+#include "../includes/calendar.h"
+#include "../includes/numberformat.h"
+#include "../includes/dateformat.h"
+#include "../includes/macros.h"
 
 
 /* DateFormatSymbols */

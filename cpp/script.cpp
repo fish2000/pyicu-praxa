@@ -24,12 +24,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "common.h"
-#include "structmember.h"
+#include "../includes/common.h"
+#include "../includes/structmember.h"
 
-#include "bases.h"
-#include "script.h"
-#include "macros.h"
+#include "../includes/bases.h"
+#include "../includes/script.h"
+#include "../includes/macros.h"
 
 DECLARE_CONSTANTS_TYPE(UScriptCode);
 

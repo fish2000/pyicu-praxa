@@ -21,15 +21,15 @@
  * ====================================================================
  */
 
-#include "common.h"
+#include "../includes/common.h"
 #include <stdarg.h>
 #include <string.h>
 #include <datetime.h>
 
 #include <unicode/ustring.h>
 
-#include "bases.h"
-#include "macros.h"
+#include "../includes/bases.h"
+#include "../includes/macros.h"
 
 static PyObject *utcoffset_NAME;
 static PyObject *toordinal_NAME;

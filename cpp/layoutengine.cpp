@@ -21,17 +21,17 @@
  * ====================================================================
  */
 
-#include "common.h"
-#include "structmember.h"
+#include "../includes/common.h"
+#include "../includes/structmember.h"
 
 #include <layout/LayoutEngine.h>
 #include <layout/LEFontInstance.h>
 #include <layout/LELanguages.h>
 #include <layout/LEScripts.h>
 
-#include "bases.h"
-#include "layoutengine.h"
-#include "macros.h"
+#include "../includes/bases.h"
+#include "../includes/layoutengine.h"
+#include "../includes/macros.h"
 
 DECLARE_CONSTANTS_TYPE(ScriptCode);
 DECLARE_CONSTANTS_TYPE(LanguageCode);

@@ -21,13 +21,13 @@
  * ====================================================================
  */
 
-#include "common.h"
-#include "structmember.h"
+#include "../includes/common.h"
+#include "../includes/structmember.h"
 
-#include "bases.h"
-#include "locale.h"
-#include "calendar.h"
-#include "macros.h"
+#include "../includes/bases.h"
+#include "../includes/locale.h"
+#include "../includes/calendar.h"
+#include "../includes/macros.h"
 
 DECLARE_CONSTANTS_TYPE(UCalendarDateFields);
 DECLARE_CONSTANTS_TYPE(UCalendarDaysOfWeek);

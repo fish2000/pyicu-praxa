@@ -32,13 +32,13 @@
 #include <sys/mman.h>
 #endif
 
-#include "common.h"
-#include "structmember.h"
+#include "../includes/common.h"
+#include "../includes/structmember.h"
 
-#include "bases.h"
-#include "locale.h"
-#include "macros.h"
-#include "unicodeset.h"
+#include "../includes/bases.h"
+#include "../includes/locale.h"
+#include "../includes/macros.h"
+#include "../includes/unicodeset.h"
 
 DECLARE_CONSTANTS_TYPE(ULocDataLocaleType);
 DECLARE_CONSTANTS_TYPE(UResType);

@@ -21,12 +21,12 @@
  * ====================================================================
  */
 
-#include "common.h"
-#include "structmember.h"
+#include "../includes/common.h"
+#include "../includes/structmember.h"
 
-#include "bases.h"
-#include "regex.h"
-#include "macros.h"
+#include "../includes/bases.h"
+#include "../includes/regex.h"
+#include "../includes/macros.h"
 
 DECLARE_CONSTANTS_TYPE(URegexpFlag);
 

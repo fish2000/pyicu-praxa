@@ -119,7 +119,7 @@ setup(name="PyICU",
                    'Topic :: Software Development :: Localization',
                    'Topic :: Software Development :: Internationalization'],
       ext_modules=[Extension('_icu',
-                             [filename for filename in os.listdir(os.curdir)
+                             [filename for filename in os.listdir(os.path.join(os.curdir, 'cpp'))
                               if filename.endswith('.cpp')],
                              include_dirs=_includes,
                              extra_compile_args=_cflags,
