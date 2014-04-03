@@ -22,3 +22,4 @@ build/
 dist/
 sdist/
 PyICU.egg-info/
+pyicu_praxa.egg-info/
