@@ -24,6 +24,7 @@
 #include <Python.h>
 
 #include "includes/structmember.h"
+
 #include "includes/common.h"
 #include "includes/errors.h"
 #include "includes/bases.h"
