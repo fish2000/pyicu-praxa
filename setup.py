@@ -7,7 +7,18 @@ except ImportError:
     from distutils.core import setup, Extension
 
 
-VERSION = '1.6'
+if 'sdist' in sys.argv and 'upload' in sys.argv:
+    import commands
+    finder = "/usr/bin/find %s \( -name \*.pyc -or -name .DS_Store \) -delete"
+    theplace = os.getcwd()
+    if theplace not in (".", "/"):
+        print("+ Deleting crapola from %s..." % theplace)
+        print("$ %s" % finder % theplace)
+        commands.getstatusoutput(finder % theplace)
+        print("")
+
+
+VERSION = '1.7'
 
 darwin_includes = [
     '/usr/local/include',
@@ -99,14 +110,19 @@ else:
     _libraries = LIBRARIES[platform]
 
 
-setup(name="PyICU",
-      description='Python extension wrapping the ICU C++ API',
-      long_description=open('README').read(),
+cppdir = os.listdir(os.path.join(os.curdir, 'cpp'))
+cppfiles = ["cpp%s%s" % (os.path.sep, filename) for filename in cppdir if filename.endswith('.cpp')]
+#cppfiles.append(os.path.join(os.curdir, '_icu.cpp'))
+cppfiles.append('_icu.cpp')
+
+setup(name="pyicu-praxa",
+      description='Python extension wrapping the ICU C++ API (Praxa fork)',
+      long_description=open('README.rst').read(),
       version=VERSION,
       test_suite="test",
       url='http://pyicu.osafoundation.org/',
-      author='Open Source Applications Foundation',
-      author_email='vajda@osafoundation.org',
+      author='Alexander Bohn',
+      author_email='fish2000@gmail.com',
       classifiers=['Development Status :: 5 - Production/Stable',
                    'Environment :: Console',
                    'Intended Audience :: Developers',
@@ -118,9 +134,7 @@ setup(name="PyICU",
                    'Programming Language :: Python :: 3',
                    'Topic :: Software Development :: Localization',
                    'Topic :: Software Development :: Internationalization'],
-      ext_modules=[Extension('_icu',
-                             [filename for filename in os.listdir(os.path.join(os.curdir, 'cpp'))
-                              if filename.endswith('.cpp')],
+      ext_modules=[Extension('_icu', cppfiles,
                              include_dirs=_includes,
                              extra_compile_args=_cflags,
                              extra_link_args=_lflags,

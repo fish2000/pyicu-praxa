@@ -22,7 +22,7 @@
  */
 
 #include "../includes/common.h"
-#include "../includes/structmember.h"
+#include "structmember.h"
 
 #include <layout/LayoutEngine.h>
 #include <layout/LEFontInstance.h>

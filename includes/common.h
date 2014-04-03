@@ -31,6 +31,7 @@
 #endif
 
 #include <Python.h>
+#include "structmember.h"
 
 #if PY_VERSION_HEX < 0x02040000
 #define Py_RETURN_NONE return Py_INCREF(Py_None), Py_None

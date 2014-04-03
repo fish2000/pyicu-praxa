@@ -22,7 +22,7 @@
  */
 
 #include "../includes/common.h"
-#include "../includes/structmember.h"
+#include "structmember.h"
 
 #include "../includes/bases.h"
 #include "../includes/regex.h"

@@ -22,8 +22,8 @@
  */
 
 #include "../includes/common.h"
-#include "../includes/structmember.h"
-#include "../includes/datetime.h"
+#include "structmember.h"
+#include "datetime.h"
 
 #include "../includes/bases.h"
 #include "../includes/calendar.h"
